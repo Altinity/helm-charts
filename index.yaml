@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  clickhouse-eks:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-04-17T19:44:38.75805235Z"
+    description: A Helm chart for ClickHouse running on AWS EKS
+    digest: 9bb30dcba11305151178bcdab73a8c04a8e6f99a2ebb0f4fa75a996bffe0f838
+    name: clickhouse-eks
+    type: application
+    urls:
+    - https://github.com/Altinity/kubernetes-blueprints-for-clickhouse/releases/download/clickhouse-eks-0.1.0/clickhouse-eks-0.1.0.tgz
+    version: 0.1.0
+generated: "2024-04-17T19:44:38.758060565Z"
