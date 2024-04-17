@@ -1,0 +1,13 @@
+all:
+  metadata:
+    labels:
+      application_group: keeper
+
+keeper:
+  name: keeper
+  replicas: 1
+  listen_host: "0.0.0.0"
+  tcp_port: 2181
+  image: "altinity/clickhouse-keeper:23.8.8.21.altinitystable"
+  storage: 25Gi
+
