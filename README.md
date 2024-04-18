@@ -19,6 +19,8 @@ To get started, you'll need to:
 * Install [helm](https://helm.sh/docs/intro/install/)
 * Use helm to install the [clickhouse-operator](https://github.com/Altinity/clickhouse-operator/tree/master/deploy/helm) using the commands shown below.
 
+
+
 ```sh
 helm repo add clickhouse-operator https://docs.altinity.com/clickhouse-operator/
 helm install clickhouse-operator clickhouse-operator/altinity-clickhouse-operator
@@ -30,6 +32,16 @@ helm install clickhouse-operator clickhouse-operator/altinity-clickhouse-operato
 
 - **[clickhouse-eks](./helm/clickhouse-eks/)**: Deploys ClickHouse optimized for AWS EKS.
 - **[keeper-ss](./helm/keeper-ss/)**: Deploys ClickHouse Keeper using StatefulSets for better data persistence.
+
+### Install
+
+```sh
+# add the kubernetes-blueprints-for-clickhouse chart repository
+helm repo add kubernetes-blueprints-for-clickhouse https://altinity.github.io/kubernetes-blueprints-for-clickhouse
+
+# use this command to install any of the avaiable charts
+helm install ch kubernetes-blueprints-for-clickhouse/[chart-name] --namespace clickhouse --create-namespace
+```
 
 ## Contributing
 We welcome contributions from the community! If you encounter issues or have improvements to suggest, please log an issue or submit a PR.
