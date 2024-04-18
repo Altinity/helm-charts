@@ -33,7 +33,7 @@ helm install clickhouse-operator clickhouse-operator/altinity-clickhouse-operato
 - **[clickhouse-eks](./helm/clickhouse-eks/)**: Deploys ClickHouse optimized for AWS EKS.
 - **[keeper-ss](./helm/keeper-ss/)**: Deploys ClickHouse Keeper using StatefulSets for better data persistence.
 
-### Install
+### Install Charts
 
 ```sh
 # add the kubernetes-blueprints-for-clickhouse chart repository
@@ -41,6 +41,9 @@ helm repo add kubernetes-blueprints-for-clickhouse https://altinity.github.io/ku
 
 # use this command to install any of the avaiable charts
 helm install ch kubernetes-blueprints-for-clickhouse/[chart-name] --namespace clickhouse --create-namespace
+
+# check chart release status
+helm status ch ---namespace clickhouse
 ```
 
 ## Contributing
