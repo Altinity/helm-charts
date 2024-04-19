@@ -4,6 +4,9 @@ VERSION ?= $(shell git describe --tags --always --dirty)
 
 $(shell mkdir -p ${BUILD_DIR})
 
+docs:
+	helm-docs helm
+
 verify:
 	${REPO_ROOT}/scripts/validate.sh
 	${REPO_ROOT}/scripts/lint.sh
@@ -14,4 +17,4 @@ version:
 help:
 	@grep -E '^[a-zA-Z_-]+:.*$$' $(MAKEFILE_LIST) | sort
 
-.PHONY: version version help
+.PHONY: version version help docs
