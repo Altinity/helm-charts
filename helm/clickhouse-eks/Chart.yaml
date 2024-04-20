@@ -5,7 +5,7 @@ type: application
 version: 0.1.1
 appVersion: "1.16.0"
 
-dependencies:
-  - name: keeper-ss
-    version: ">=0.1.0"
-    repository: "https://altinity.github.io/kubernetes-blueprints-for-clickhouse/keeper-ss"
+# dependencies:
+#   - name: keeper-ss
+#     version: ">=0.1.0"
+#     repository: "https://altinity.github.io/kubernetes-blueprints-for-clickhouse/keeper-ss"
