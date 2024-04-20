@@ -4,16 +4,35 @@ all:
       application_group: "eks"
 
 clickhouse:
+
+  # -- Metadata name
   name: eks
+  # -- Cluster name
   cluster: dev
+  # -- AWS availability zones for creating replicas
   zones:
     - us-east-1a
     - us-east-1a
     - us-east-1c
+  # -- AWS instance type
   node_selector: m6i.large
-  image: "altinity/clickhouse-server:23.8.8.21.altinitystable"
-  storage: 50Gi
+
+  # -- Name of the keeper cluster
   keeper_name: keeper-eks
+
+  # Storage class for ClickHouse data
   storage_class_name: gp2
+  # Storage size for ClickHouse data
+  storage: 50Gi
+
+  # ClickHouse server image
+  image: "altinity/clickhouse-server:23.8.8.21.altinitystable"
+
+  # -- Possible service types are `cluster-ip`, `internal-loadbalancer` and `external-loadbalancer`
   service_type: cluster-ip
+
+  # --- ClickHouse user name
   user: default
+
+  # --- ClickHouse user password
+  password:

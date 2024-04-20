@@ -1,0 +1,30 @@
+{{ define "extra.install" -}}
+
+## Install
+
+```sh
+# add the kubernetes-blueprints-for-clickhouse chart repository
+helm repo add kubernetes-blueprints-for-clickhouse https://altinity.github.io/kubernetes-blueprints-for-clickhouse
+
+# use this command to install any of the avaiable charts
+helm install ch kubernetes-blueprints-for-clickhouse/{{ template "chart.name" . }}
+```
+
+> Use `-f` flag to override default values: `helm install -f newvalues.yaml`
+
+## Upgrade
+```
+# upgrade to a newer version using the release name (`ch`)
+helm upgrade ch kubernetes-blueprints-for-clickhouse/{{ template "chart.name" . }}
+```
+
+## Uninstall
+
+```sh
+# uninstall using the release name (`ch`)
+helm uninstall ch
+```
+
+{{- end }}
+
+
