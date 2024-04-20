@@ -30,6 +30,18 @@ helm uninstall ch --namespace clickhouse
 
 > This command removes all the Kubernetes components associated with the chart and deletes the release.
 
+## Connecting to your ClickHouse Cluster
+
+```sh
+# list your pods
+kubectl get pods --namespace clickhouse
+
+# pick any of your available pods and connect through the clickhouse-client
+kubectl exec -it chi-eks-dev-0-0-0 --namespace clickhouse -- clickhouse-client
+```
+
+> Use `kubectl port forward` to access your ClickHouse cluster from outside: `kubectl port-forward service clickhouse-eks 9000:9000 & clickhouse-client`
+
 {{- end }}
 
 

@@ -2,7 +2,7 @@
 
 # keeper-ss
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.16.0](https://img.shields.io/badge/AppVersion-1.16.0-informational?style=flat-square)
+![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.16.0](https://img.shields.io/badge/AppVersion-1.16.0-informational?style=flat-square)
 
 A Helm chart for setting up ClickHouse Keeper using StatefulSet
 
@@ -35,6 +35,18 @@ helm uninstall ch --namespace clickhouse
 ```
 
 > This command removes all the Kubernetes components associated with the chart and deletes the release.
+
+## Connecting to your ClickHouse Cluster
+
+```sh
+# list your pods
+kubectl get pods --namespace clickhouse
+
+# pick any of your available pods and connect through the clickhouse-client
+kubectl exec -it chi-eks-dev-0-0-0 --namespace clickhouse -- clickhouse-client
+```
+
+> Use `kubectl port forward` to access your ClickHouse cluster from outside: `kubectl port-forward service clickhouse-eks 9000:9000 & clickhouse-client`
 
 ## Values
 
