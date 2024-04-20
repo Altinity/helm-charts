@@ -3,6 +3,17 @@ entries:
   clickhouse-eks:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2024-04-20T02:48:36.302309934Z"
+    description: A Helm chart for ClickHouse running on AWS EKS across AZs using a
+      nodeSelector to pin resources to run on specific VMs types
+    digest: d54abdad670e1901c5fede1e093987034124a1567f0dbc1de91ed6f2cbc3e8e4
+    name: clickhouse-eks
+    type: application
+    urls:
+    - https://github.com/Altinity/kubernetes-blueprints-for-clickhouse/releases/download/clickhouse-eks-0.1.1/clickhouse-eks-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2024-04-17T19:44:38.75805235Z"
     description: A Helm chart for ClickHouse running on AWS EKS
     digest: 9bb30dcba11305151178bcdab73a8c04a8e6f99a2ebb0f4fa75a996bffe0f838
@@ -14,6 +25,16 @@ entries:
   keeper-ss:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2024-04-20T02:48:36.415578491Z"
+    description: A Helm chart for setting up ClickHouse Keeper using StatefulSet
+    digest: 73c8c5308e0ffe3fc88a9f1f7420d5eac82e0605b32ed6ffd2a7bf926bd14b8a
+    name: keeper-ss
+    type: application
+    urls:
+    - https://github.com/Altinity/kubernetes-blueprints-for-clickhouse/releases/download/keeper-ss-0.1.1/keeper-ss-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2024-04-17T19:51:55.699577612Z"
     description: A Helm chart for setting up ClickHouse Keeper using StatefulSet
     digest: a3d113dcf8331c0cba67d1732d0ff099a0cd36e872d81a72a441d7389bafd370
@@ -22,4 +43,4 @@ entries:
     urls:
     - https://github.com/Altinity/kubernetes-blueprints-for-clickhouse/releases/download/keeper-ss-0.1.0/keeper-ss-0.1.0.tgz
     version: 0.1.0
-generated: "2024-04-17T19:51:55.69958708Z"
+generated: "2024-04-20T02:48:36.415622854Z"
