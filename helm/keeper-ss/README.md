@@ -40,7 +40,7 @@ helm uninstall ch --namespace clickhouse
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| all.metadata.labels.application_group | string | `"keeper"` |  |
+| all.metadata.labels.application_group | string | `"keeper"` | The name of the application group |
 | keeper.image | string | `"altinity/clickhouse-keeper:23.8.8.21.altinitystable"` | ClickHouse ClickHouse Keeper image |
 | keeper.listen_host | string | `"0.0.0.0"` | ClickHouse Keeper host IP |
 | keeper.name | string | `"keeper"` | Name of the ClickHouse Keeper cluster |

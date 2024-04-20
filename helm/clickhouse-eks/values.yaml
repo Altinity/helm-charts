@@ -1,6 +1,7 @@
 all:
   metadata:
     labels:
+      # -- The name of the application group
       application_group: "eks"
 
 clickhouse:
@@ -20,19 +21,19 @@ clickhouse:
   # -- Name of the keeper cluster
   keeper_name: keeper-eks
 
-  # Storage class for ClickHouse data
+  # -- Storage class for ClickHouse data
   storage_class_name: gp2
-  # Storage size for ClickHouse data
+  # -- Storage size for ClickHouse data
   storage: 50Gi
 
-  # ClickHouse server image
+  # -- ClickHouse server image
   image: "altinity/clickhouse-server:23.8.8.21.altinitystable"
 
   # -- Possible service types are `cluster-ip`, `internal-loadbalancer` and `external-loadbalancer`
   service_type: cluster-ip
 
-  # --- ClickHouse user name
+  # -- ClickHouse user name
   user: default
 
-  # --- ClickHouse user password
+  # -- ClickHouse user password
   password:
