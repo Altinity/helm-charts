@@ -6,6 +6,12 @@
 
 A Helm chart for ClickHouse running on AWS EKS across AZs using a nodeSelector to pin resources to run on specific VMs types
 
+## Requirements
+
+| Repository | Name | Version |
+|------------|------|---------|
+| https://altinity.github.io/kubernetes-blueprints-for-clickhouse/keeper-ss | keeper-ss | >=0.1.0 |
+
 ## Installing the Chart
 
 ```sh
