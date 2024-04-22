@@ -30,7 +30,7 @@ helm install clickhouse-operator clickhouse-operator/altinity-clickhouse-operato
 ## Helm Charts
 
 - **[clickhouse-eks](./helm/clickhouse-eks/)**: Deploys ClickHouse optimized for AWS EKS.
-- **[keeper-ss](./helm/keeper-ss/)**: Deploys ClickHouse Keeper using StatefulSets for better data persistence.
+- **[keeper-sts](./helm/keeper-sts/)**: Deploys ClickHouse Keeper using StatefulSets for better data persistence.
 
 ### How to Install a Chart
 

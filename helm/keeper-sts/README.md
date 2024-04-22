@@ -1,6 +1,6 @@
 
 
-# keeper-ss
+# keeper-sts
 
 ![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.16.0](https://img.shields.io/badge/AppVersion-1.16.0-informational?style=flat-square)
 
@@ -12,8 +12,8 @@ A Helm chart for setting up ClickHouse Keeper using StatefulSet
 # add the kubernetes-blueprints-for-clickhouse chart repository
 helm repo add kubernetes-blueprints-for-clickhouse https://altinity.github.io/kubernetes-blueprints-for-clickhouse
 
-# use this command to install keeper-ss chart (it will also create a `clickhouse` namespace)
-helm install ch kubernetes-blueprints-for-clickhouse/keeper-ss --namespace clickhouse --create-namespace
+# use this command to install keeper-sts chart (it will also create a `clickhouse` namespace)
+helm install ch kubernetes-blueprints-for-clickhouse/keeper-sts --namespace clickhouse --create-namespace
 ```
 
 > Use `-f` flag to override default values: `helm install -f newvalues.yaml`
@@ -24,7 +24,7 @@ helm install ch kubernetes-blueprints-for-clickhouse/keeper-ss --namespace click
 helm repo update
 
 # upgrade to a newer version using the release name (`ch`)
-helm upgrade ch kubernetes-blueprints-for-clickhouse/keeper-ss --namespace clickhouse
+helm upgrade ch kubernetes-blueprints-for-clickhouse/keeper-sts --namespace clickhouse
 ```
 
 ## Uninstalling the Chart
