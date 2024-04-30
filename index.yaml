@@ -33,27 +33,6 @@ entries:
     urls:
     - https://github.com/Altinity/kubernetes-blueprints-for-clickhouse/releases/download/clickhouse-eks-0.1.0/clickhouse-eks-0.1.0.tgz
     version: 0.1.0
-  keeper-ss:
-  - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2024-04-20T02:48:36.415578491Z"
-    description: A Helm chart for setting up ClickHouse Keeper using StatefulSet
-    digest: 73c8c5308e0ffe3fc88a9f1f7420d5eac82e0605b32ed6ffd2a7bf926bd14b8a
-    name: keeper-ss
-    type: application
-    urls:
-    - https://github.com/Altinity/kubernetes-blueprints-for-clickhouse/releases/download/keeper-ss-0.1.1/keeper-ss-0.1.1.tgz
-    version: 0.1.1
-  - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2024-04-17T19:51:55.699577612Z"
-    description: A Helm chart for setting up ClickHouse Keeper using StatefulSet
-    digest: a3d113dcf8331c0cba67d1732d0ff099a0cd36e872d81a72a441d7389bafd370
-    name: keeper-ss
-    type: application
-    urls:
-    - https://github.com/Altinity/kubernetes-blueprints-for-clickhouse/releases/download/keeper-ss-0.1.0/keeper-ss-0.1.0.tgz
-    version: 0.1.0
   keeper-sts:
   - apiVersion: v2
     appVersion: 1.16.0
@@ -65,4 +44,4 @@ entries:
     urls:
     - https://github.com/Altinity/kubernetes-blueprints-for-clickhouse/releases/download/keeper-sts-0.1.1/keeper-sts-0.1.1.tgz
     version: 0.1.1
-generated: "2024-04-22T14:00:28.717606726Z"
+generated: "2024-04-30T00:20:28.717606726Z"
