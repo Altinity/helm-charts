@@ -42,7 +42,7 @@ helm repo add kubernetes-blueprints-for-clickhouse https://altinity.github.io/ku
 helm install ch kubernetes-blueprints-for-clickhouse/[chart-name] --namespace clickhouse --create-namespace
 
 # check chart release status
-helm status ch ---namespace clickhouse
+helm status ch --namespace clickhouse
 ```
 
 > Please refer to any of helm charts `README` file for detailed instructions about each of the them.
