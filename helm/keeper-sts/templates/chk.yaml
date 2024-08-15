@@ -145,7 +145,7 @@ data:
         echo "<server_id>${MY_ID}</server_id>"
         echo "<raft_configuration>"
         if [[ "0" == $(echo "${CURRENT_KEEPER_CONFIG}" | grep -c "${HOST}.${DOMAIN}") ]]; then
-          echo "<server><id>${MY_ID}</id><hostname>${HOST}.${DOMAIN}</hostname><port>${RAFT_PORT}</port><priority>1</priority><start_as_follower>true</start_as_follower></server>"
+          echo "<server><id>${MY_ID}</id><hostname>${HOST}.${DOMAIN}</hostname><port>${RAFT_PORT}</port><priority>1</priority></server>"
         fi
         while IFS= read -r line; do
           id=$(echo "$line" | cut -d '=' -f 1 | cut -d '.' -f 2)
