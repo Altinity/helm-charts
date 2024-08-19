@@ -17,17 +17,16 @@ fullnameOverride: ""
 keeperConfig: |
   <clickhouse>
       <include_from>/tmp/clickhouse-keeper/config.d/generated-keeper-settings.xml</include_from>
+      <path>/var/lib/clickhouse-keeper</path>
       <logger>
           <level>trace</level>
           <console>true</console>
       </logger>
       <listen_host>0.0.0.0</listen_host>
       <keeper_server incl="keeper_server">
-          <path>/var/lib/clickhouse-keeper</path>
           <tcp_port>2181</tcp_port>
           <four_letter_word_white_list>*</four_letter_word_white_list>
           <coordination_settings>
-              <!-- <raft_logs_level>trace</raft_logs_level> -->
               <raft_logs_level>information</raft_logs_level>
           </coordination_settings>
       </keeper_server>
@@ -93,15 +92,13 @@ persistence:
   ## persistence.persistence.storageClass -- Storage class for PV (e.g. gp2, standard, ...)
   ##
   storageClass: ""
-  ## @param persistence.existingClaim The name of an existing PVC to use for persistence
-  ##
-  existingClaim: ""
 
 podAnnotations: {}
 podLabels: {}
 
-podSecurityContext: {}
-  # fsGroup: 2000
+podSecurityContext: 
+  runAsUser: 101
+  runAsGroup: 101
 
 securityContext: {}
   # capabilities:

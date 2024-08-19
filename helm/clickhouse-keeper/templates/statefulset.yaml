@@ -61,8 +61,6 @@ spec:
           volumeMounts:
             - name: clickhouse-keeper-settings
               mountPath: /etc/clickhouse-keeper/
-            - name: clickhouse-keeper-data
-              mountPath: /var/lib/clickhouse-keeper
           {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
@@ -73,13 +71,6 @@ spec:
             items:
               - key: keeper_config.xml
                 path: keeper_config.xml
-        - name: clickhouse-keeper-data
-          {{- if .Values.persistence.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim | default (include "clickhouse-keeper.claimName" .) }}
-          {{- else }}
-          emptyDir: {}
-          {{- end }} 
       {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -95,7 +86,7 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-  {{- if and .Values.persistence.enabled (not .Values.persistence.existingClaim) }}
+  {{- if .Values.persistence.enabled }}
   volumeClaimTemplates:
     - metadata:
         name: {{ printf "%s-data" (include "clickhouse-keeper.fullname" .) }}
