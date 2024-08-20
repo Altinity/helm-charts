@@ -1,53 +1,60 @@
-clickhouse:
-  #must be an odd number
-  replicaCount: 1
+# -- number of replicas. Must be an odd number
+replicaCount: 1
 
-  # -- ClickHouse cluster settings
-  cluster:
-    # -- Default ClickHouse user and pasword
-    defaultUser:
-      user: "default"
-      password: ""
+# -- ClickHouse cluster settings
+cluster:
+  # -- Default ClickHouse user and pasword
+  defaultUser:
+    user: "default"
+    password: ""
+    # If set, hostIP should be empty/unset.
+    allowExternalAccess: false
+    # Should not be set if allowExternalAccess is set
+    hostIP: ""
+    # hostIP: 10.0.0.0/8
 
-  image:
-    repository: altinity/clickhouse-server
-    pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
-    tag: "23.8.8.21.altinitystable"
+image:
+  repository: altinity/clickhouse-server
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "23.8.8.21.altinitystable"
 
-  imagePullSecrets: []
-  nameOverride: ""
-  fullnameOverride: ""
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
 
-  persistence:
-    # -- enable storage
-    enabled: true
-    # -- volume size (per replica)
-    size: 10Gi
-    accessMode: ReadWriteOnce
-    ## -- StorageClass for PV (e.g. gp2, standard, ...)
-    storageClass: ""
+persistence:
+  # -- enable storage
+  enabled: true
+  # -- volume size (per replica)
+  size: 10Gi
+  accessMode: ReadWriteOnce
+  ## -- StorageClass for PV (e.g. gp2, standard, ...)
+  storageClass: ""
 
-  podAnnotations: {}
-  podLabels: {}
+podAnnotations: {}
+podLabels: {}
 
-  podSecurityContext: 
-    runAsUser: 101
-    runAsGroup: 101
+podSecurityContext: 
+  runAsUser: 101
+  runAsGroup: 101
 
-  securityContext: {}
+securityContext: {}
 
-  service:
-    type: ClusterIP
+service:
+  type: ClusterIP
 
-  nodeSelector: {}
+nodeSelector: {}
 
-  tolerations: []
+tolerations: []
 
-  affinity:
+affinity:
 
 clickhouse-keeper:
   enabled: true
   #todo: option for external keeper
   #must be an odd number
   replicaCount: 1
+
+altinity-clickhouse-operator:
+  enabled: true

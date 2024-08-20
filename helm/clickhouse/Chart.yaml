@@ -4,3 +4,13 @@ description: A Helm chart for creating a ClickHouse Cluster with the Altinity Op
 type: application
 version: 0.1.1
 appVersion: "23.8.8.21"
+
+dependencies:
+  - name: clickhouse-keeper
+    repository: "file://../clickhouse-keeper"
+    version: 0.1.3
+    condition: clickhouse-keeper.enabled
+  - name: altinity-clickhouse-operator
+    repository: https://altinity.github.io/clickhouse-operator
+    version: 0.23.6
+    condition: altinity-clickhouse-operator.enabled
