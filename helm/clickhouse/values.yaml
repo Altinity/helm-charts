@@ -52,7 +52,6 @@ affinity:
 
 clickhouse-keeper:
   enabled: true
-  #todo: option for external keeper
   #must be an odd number
   replicaCount: 1
 

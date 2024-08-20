@@ -38,7 +38,7 @@ Pod Template Name
 {{- end }}
 
 {{/*
-Sevice Template Name
+Service Template Name
 */}}
 {{- define "clickhouse.serviceTemplateName" -}}
 {{- printf "%s-service" (include "clickhouse.fullname" .) | replace "+" "_" | trunc 63 | trimSuffix "-" }}
@@ -49,6 +49,20 @@ Volume Claim Template Name
 */}}
 {{- define "clickhouse.volumeClaimTemplateName" -}}
 {{- printf "%s-storage" (include "clickhouse.fullname" .) | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Default User Host IP
+*/}}
+{{- define "clickhouse.defaultUser.ip" -}}
+{{- if .Values.clickhouse.defaultUser.allowExternalAccess }}
+0.0.0.0/0
+{{- else }}
+{{- if .Values.clickhouse.defaultUser.hostIP }}
+{{ .Values.defaultUser.hostIP }}
+{{- else }}
+127.0.0.1/32
+{{- end }}
 {{- end }}
 
 {{/*
