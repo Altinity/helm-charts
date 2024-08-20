@@ -1,8 +1,8 @@
-# -- number of replicas. Must be an odd number
+# -- number of replicas. 
 replicaCount: 1
 
 # -- ClickHouse cluster settings
-cluster:
+clickhouse:
   # -- Default ClickHouse user and pasword
   defaultUser:
     user: "default"

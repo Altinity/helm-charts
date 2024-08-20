@@ -1,5 +1,5 @@
 apiVersion: v2
-name: clickhouse-cluster
+name: clickhouse
 description: A Helm chart for creating a ClickHouse Cluster with the Altinity Operator for ClickHouse
 type: application
 version: 0.1.1
