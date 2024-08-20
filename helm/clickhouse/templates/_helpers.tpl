@@ -52,7 +52,7 @@ Volume Claim Template Name
 {{- end }}
 
 {{/*
-Default User Host IP
+User Host IP
 */}}
 {{- define "clickhouse.defaultUser.ip" -}}
 {{- if .Values.clickhouse.defaultUser.allowExternalAccess }}
@@ -62,6 +62,7 @@ Default User Host IP
 {{ .Values.defaultUser.hostIP }}
 {{- else }}
 127.0.0.1/32
+{{- end }}
 {{- end }}
 {{- end }}
 

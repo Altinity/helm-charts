@@ -14,7 +14,7 @@ spec:
       volumeClaimTemplate: {{ include "clickhouse.volumeClaimTemplateName" . }}
       {{- end }}
     users:
-      {{ .Values.clickhouse.defaultUser.user }}/networks/ip: {{ include "clickhouse.defaultUserHostIP"}}
+      {{ .Values.clickhouse.defaultUser.user }}/networks/ip: {{ include "clickhouse.defaultUser.ip" . | quote }}
       {{ .Values.clickhouse.defaultUser.user }}/access_management: 1
       {{ .Values.clickhouse.defaultUser.user }}/password:
         valueFrom:
