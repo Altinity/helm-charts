@@ -1,36 +1,47 @@
-# -- number of replicas. 
+# -- Number of database replicas.
+# For replication, `clickhouse-keeper.enabled` must be `true`
 replicaCount: 1
 
-# -- ClickHouse cluster settings
-clickhouse:
-  # -- Default ClickHouse user and pasword
-  defaultUser:
-    user: "default"
-    password: ""
-    # If set, hostIP should be empty/unset.
-    allowExternalAccess: false
-    # Should not be set if allowExternalAccess is set
-    hostIP: ""
-    # hostIP: 10.0.0.0/8
-
-image:
-  repository: altinity/clickhouse-server
-  pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: "23.8.8.21.altinitystable"
-
-imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
+defaultUser:
+  user: "default"
+  password: ""
+  # -- Allow the default user to access ClickHouse from any IP.
+  # If set, will override `hostIP` to always be `0.0.0.0/0`.
+  allowExternalAccess: false
+  # defaultUser.hostIP -- (string) Set a mask for IPs allowed for the default user.
+  # Should not be set if allowExternalAccess is set.
+  # @default -- 127.0.0.1/32
+  hostIP: 
 
 persistence:
   # -- enable storage
   enabled: true
   # -- volume size (per replica)
-  size: 10Gi
+  size: 1Gi
   accessMode: ReadWriteOnce
   ## -- StorageClass for PV (e.g. gp2, standard, ...)
   storageClass: ""
+  logs:
+    # -- enable pvc for logs
+    enabled: false
+    # -- size for logs pvc
+    size: 1Gi
+    accessMode: ReadWriteOnce
+
+
+image:
+  repository: altinity/clickhouse-server
+  pullPolicy: IfNotPresent
+  # Overrides the image tag for a specific version
+  tag: "23.8.8.21.altinitystable"
+
+service:
+  # e.g. `LoadBalancer`, `NodePort`
+  type: ClusterIP
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
 
 podAnnotations: {}
 podLabels: {}
@@ -41,19 +52,21 @@ podSecurityContext:
 
 securityContext: {}
 
-service:
-  type: ClusterIP
-
 nodeSelector: {}
 
 tolerations: []
 
-affinity:
+affinity: {}
 
 clickhouse-keeper:
-  enabled: true
-  #must be an odd number
-  replicaCount: 1
+  # -- Whether to enable Keeper.
+  # Required for replicated tables.
+  enabled: false
+  # -- Number of keeper replicas.
+  # Must be an odd number.
+  replicaCount: 3
 
 altinity-clickhouse-operator:
+  # -- Whether to enabled the Altinity Operator for ClickHouse.
+  # Disable if you already have the Operator installed cluster-wide.
   enabled: true

@@ -31,6 +31,13 @@ Create chart name and version as used by the chart label.
 {{- end }}
 
 {{/*
+Cluster Name
+*/}}
+{{- define "clickhouse.clustername" -}}
+{{- printf "%s" .Release.Name | replace "+" "_" | trunc 15 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
 Pod Template Name
 */}}
 {{- define "clickhouse.podTemplateName" -}}
@@ -45,25 +52,54 @@ Service Template Name
 {{- end }}
 
 {{/*
-Volume Claim Template Name
+Data Volume Claim Template Name
 */}}
 {{- define "clickhouse.volumeClaimTemplateName" -}}
-{{- printf "%s-storage" (include "clickhouse.fullname" .) | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- printf "%s-data" (include "clickhouse.fullname" .) | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Logs Volume Claim Template Name
+*/}}
+{{- define "clickhouse.logsVolumeClaimTemplateName" -}}
+{{- printf "%s-logs" (include "clickhouse.fullname" .) | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+User Credentials Name
+*/}}
+{{- define "clickhouse.credentialsName" -}}
+  {{- $fullname := include "clickhouse.fullname" . | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+  {{- printf "%s-credentials" $fullname -}}
 {{- end }}
 
 {{/*
 User Host IP
 */}}
 {{- define "clickhouse.defaultUser.ip" -}}
-{{- if .Values.clickhouse.defaultUser.allowExternalAccess }}
+{{- if .Values.defaultUser.allowExternalAccess -}}
 0.0.0.0/0
 {{- else }}
-{{- if .Values.clickhouse.defaultUser.hostIP }}
+{{- if .Values.defaultUser.hostIP -}}
 {{ .Values.defaultUser.hostIP }}
-{{- else }}
+{{- else -}}
 127.0.0.1/32
 {{- end }}
 {{- end }}
+{{- end }}
+
+
+{{/*
+Keeper Host
+*/}}
+{{- define "clickhouse.keeper.host" -}}
+  {{- $keeper := index .Values "clickhouse-keeper" -}}
+  {{- $keeper_enabled := $keeper.enabled | default false -}}
+  {{- if $keeper_enabled -}}
+    {{- include "clickhouse-keeper.fullname" (dict "Chart" (index .Subcharts "clickhouse-keeper" "Chart") "Release" .Release "Values" (index .Values "clickhouse-keeper")) -}}
+  {{- else -}}
+    ""
+  {{- end -}}
 {{- end }}
 
 {{/*

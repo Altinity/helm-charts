@@ -1,0 +1,6 @@
+dependencies:
+- name: clickhouse
+  repository: file://../../helm/clickhouse
+  version: 0.1.1
+digest: sha256:f4d5832312cb658b1a5b9e932158e93b9917ed1994847876695de264ffd468f0
+generated: "2024-08-20T16:01:02.895736-04:00"

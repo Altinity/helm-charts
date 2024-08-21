@@ -11,24 +11,30 @@ spec:
       serviceTemplate: {{ include "clickhouse.serviceTemplateName" . }}
       podTemplate: {{ include "clickhouse.podTemplateName" . }}
       {{- if .Values.persistence.enabled }}
-      volumeClaimTemplate: {{ include "clickhouse.volumeClaimTemplateName" . }}
+      dataVolumeClaimTemplate: {{ include "clickhouse.volumeClaimTemplateName" . }}
       {{- end }}
+  useTemplates:
+    - name: {{ include "clickhouse.serviceTemplateName" . }}
+    - name: {{ include "clickhouse.podTemplateName" . }}
+    - name: {{ include "clickhouse.volumeClaimTemplateName" . }}
+
+  configuration:
     users:
-      {{ .Values.clickhouse.defaultUser.user }}/networks/ip: {{ include "clickhouse.defaultUser.ip" . | quote }}
-      {{ .Values.clickhouse.defaultUser.user }}/access_management: 1
-      {{ .Values.clickhouse.defaultUser.user }}/password:
+      {{ .Values.defaultUser.user }}/networks/ip: {{ include "clickhouse.defaultUser.ip" . | quote }}
+      {{ .Values.defaultUser.user }}/access_management: 1
+      {{ .Values.defaultUser.user }}/password:
         valueFrom:
           secretKeyRef:
             name: clickhouse-credentials
             key: password
     clusters:
-      - name: {{ include "clickhouse.fullname" . }}
+      - name: {{ include "clickhouse.clustername" . }}
         layout:
-          shards:
-            - replicas: {{ .Values.replicaCount }}
+          shardsCount: 1
+          replicasCount: {{ .Values.replicaCount }}
     {{- if ".Values.clickhouse-keeper.enabled" }}
     zookeeper:
         nodes:
-        - host: "{{ include "clickhouse-keeper.fullname" . }}"
+        - host: {{ include "clickhouse.keeper.host" . }}
           port: 2181
     {{- end }}
