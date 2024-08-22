@@ -1,0 +1,8 @@
+replicaCount: 3
+clickhouse-keeper:
+  enabled: true
+  replicaCount: 3
+# use operator created by simple example
+# must be in same namespace
+altinity-clickhouse-operator:
+  enabled: false

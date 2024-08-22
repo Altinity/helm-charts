@@ -1,5 +1,7 @@
 # -- Number of database replicas.
-# For replication, `clickhouse-keeper.enabled` must be `true`
+# For replication, `clickhouse-keeper.enabled` must be `true` to enable the built-in keeper
+# or a hostname for keeper must be explicitly set under `keeper.host`
+# The built-in keeper will automatically be enabled if replicaCount > 1 and a hostname is not provided
 replicaCount: 1
 
 defaultUser:
@@ -17,7 +19,7 @@ persistence:
   # -- enable storage
   enabled: true
   # -- volume size (per replica)
-  size: 1Gi
+  size: 10Gi
   accessMode: ReadWriteOnce
   ## -- StorageClass for PV (e.g. gp2, standard, ...)
   storageClass: ""
@@ -25,14 +27,22 @@ persistence:
     # -- enable pvc for logs
     enabled: false
     # -- size for logs pvc
-    size: 1Gi
+    size: 10Gi
     accessMode: ReadWriteOnce
 
+# -- Keeper connection settings.
+keeper:
+  # -- Specify a keeper host.
+  # Should be left empty if `clickhouse-keeper.enabled` is `true`.
+  # Will override the defaults set from `clickhouse-keeper.enabled`.
+  host: ""
+  # -- Override the default keeper port
+  port: 2181
 
 image:
   repository: altinity/clickhouse-server
   pullPolicy: IfNotPresent
-  # Overrides the image tag for a specific version
+  # -- Override the image tag for a specific version
   tag: "23.8.8.21.altinitystable"
 
 service:
@@ -46,9 +56,9 @@ fullnameOverride: ""
 podAnnotations: {}
 podLabels: {}
 
-podSecurityContext: 
-  runAsUser: 101
-  runAsGroup: 101
+podSecurityContext: {}
+  # runAsUser: 101
+  # runAsGroup: 101
 
 securityContext: {}
 
@@ -64,6 +74,7 @@ clickhouse-keeper:
   enabled: false
   # -- Number of keeper replicas.
   # Must be an odd number.
+  # !! DO NOT CHANGE AFTER INITIAL DEPLOYMENT
   replicaCount: 3
 
 altinity-clickhouse-operator:

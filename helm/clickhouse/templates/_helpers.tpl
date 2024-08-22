@@ -79,27 +79,31 @@ User Host IP
 {{- define "clickhouse.defaultUser.ip" -}}
 {{- if .Values.defaultUser.allowExternalAccess -}}
 0.0.0.0/0
-{{- else }}
+{{- else -}}
 {{- if .Values.defaultUser.hostIP -}}
 {{ .Values.defaultUser.hostIP }}
 {{- else -}}
 127.0.0.1/32
-{{- end }}
-{{- end }}
-{{- end }}
+{{- end -}}
+{{- end -}}
+{{- end -}}
 
 {{/*
 Keeper Host
 */}}
 {{- define "clickhouse.keeper.host" -}}
-  {{- $keeper := index .Values "clickhouse-keeper" -}}
-  {{- $keeper_enabled := $keeper.enabled | default false -}}
-  {{- if $keeper_enabled -}}
-    {{- include "clickhouse-keeper.fullname" (dict "Chart" (index .Subcharts "clickhouse-keeper" "Chart") "Release" .Release "Values" (index .Values "clickhouse-keeper")) -}}
+  {{- if not (empty .Values.keeper.host) -}}
+    {{ .Values.keeper.host }}
   {{- else -}}
-    ""
+    {{- $keeper := index .Values "clickhouse-keeper" -}}
+    {{- $keeper_enabled := $keeper.enabled | default false -}}
+    {{- if $keeper_enabled -}}
+      {{- include "clickhouse-keeper.fullname" (dict "Chart" (index .Subcharts "clickhouse-keeper" "Chart") "Release" .Release "Values" (index .Values "clickhouse-keeper")) -}}
+    {{- else -}}
+      ""
+    {{- end -}}
   {{- end -}}
-{{- end }}
+{{- end -}}
 
 {{/*
 Common labels
