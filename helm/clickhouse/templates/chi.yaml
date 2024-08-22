@@ -25,7 +25,7 @@ spec:
       {{ .Values.defaultUser.user }}/password:
         valueFrom:
           secretKeyRef:
-            name: clickhouse-credentials
+            name: {{ include "clickhouse.credentialsName" . }}
             key: password
     clusters:
       - name: {{ include "clickhouse.clustername" . }}
