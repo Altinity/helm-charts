@@ -49,23 +49,42 @@ service:
   # e.g. `LoadBalancer`, `NodePort`
   type: ClusterIP
 
+# By default pods will prefer to run on a node with no other CH instances
+podDistribution:
+  - type: ClickHouseAntiAffinity
+    scope: ClickHouseInstallation
+
+# Specify which zones to run in.
+# `replicaCount` will applied within each zone.
+zones: []
+
+# @ignore
 imagePullSecrets: []
+
+# @ignore
 nameOverride: ""
+
+# @ignore
 fullnameOverride: ""
 
 podAnnotations: {}
 podLabels: {}
 
+# @ignore
 podSecurityContext: {}
   # runAsUser: 101
   # runAsGroup: 101
 
+# @ignore
 securityContext: {}
 
+# @ignore
 nodeSelector: {}
 
+# @ignore
 tolerations: []
 
+# @ignore
 affinity: {}
 
 clickhouse-keeper:

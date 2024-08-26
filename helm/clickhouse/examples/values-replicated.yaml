@@ -1,4 +1,8 @@
-replicaCount: 3
+replicaCount: 1
+zones:
+  - us-east-1a
+  - us-east-2a
+
 clickhouse-keeper:
   enabled: true
   replicaCount: 3

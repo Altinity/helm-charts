@@ -17,6 +17,12 @@ spec:
     - name: {{ include "clickhouse.serviceTemplateName" . }}
     - name: {{ include "clickhouse.podTemplateName" . }}
     - name: {{ include "clickhouse.volumeClaimTemplateName" . }}
+    {{- if not (empty .Values.zones) -}}
+    {{- $originalContext := . -}}
+    {{- range .Values.zones }}
+    - name: {{ include "clickhouse.podTemplateName" $originalContext }}-{{ . }}
+    {{- end -}}
+    {{- end }}
 
   configuration:
     users:
@@ -30,11 +36,22 @@ spec:
     clusters:
       - name: {{ include "clickhouse.clustername" . }}
         layout:
+          {{- if (empty .Values.zones) }}
           shardsCount: 1
           replicasCount: {{ .Values.replicaCount }}
-    {{- if ".Values.clickhouse-keeper.enabled" }}
+          {{- else }}
+          shards:
+            - replicas:
+              {{- $originalContext := . -}}
+              {{- range .Values.zones }}
+                - templates: 
+                    podTemplate: {{ include "clickhouse.podTemplateName" $originalContext }}-{{ . }}
+              {{- end -}}
+          {{- end -}}
+    {{- $keeper_host := tpl (include "clickhouse.keeper.host" . ) . -}}
+    {{- if not (empty $keeper_host) }}
     zookeeper:
         nodes:
-        - host: {{ include "clickhouse.keeper.host" . }}
-          port: 2181
+          - host: {{ $keeper_host }}
+            port: {{ .Values.keeper.port }}
     {{- end }}
