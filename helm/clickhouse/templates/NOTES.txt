@@ -4,25 +4,26 @@
                   Thank you for using Altinity Helm Charts!
 ---------------------------------------------------------------------------------
 
-  {{- $operator := index .Values "altinity-clickhouse-operator" }}
-  {{- if $operator.enabled }}
+{{- $operator := index .Values "altinity-clickhouse-operator" }}
+{{- if $operator.enabled }}
 
-  The Altinity Operator for ClickHouse is being installed first.
+The Altinity Operator for ClickHouse is being installed first.
 
-  {{- else }}
-  
-  Your configuration requires the Altinity Operator for ClickHouse in your cluster.
-  Visit the Altinity docs for instructions on how to install the Operator:
+{{- else }}
 
-  https://docs.altinity.com/
+Your configuration requires the Altinity Operator for ClickHouse in your cluster.
+Visit the Altinity docs for instructions on how to install the Operator:
 
-  {{- end }}
+https://docs.altinity.com/
 
-  Your ClickHouseInstallation resource has been created.
+{{- end }}
 
-  Once the cluster is available you can connect with:
+Your ClickHouseInstallation resource has been created.
+
+Once the cluster is available you can connect with:
 
   kubectl exec -it \
     chi-{{ include "clickhouse.clustername" . }}-clickhouse-{{ include "clickhouse.clustername" . }}-0-0-0 \
     clickhouse-client
+
 {{- end }}

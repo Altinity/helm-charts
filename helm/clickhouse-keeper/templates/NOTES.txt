@@ -1,13 +1,15 @@
+{{ if .Release.IsInstall }}
+  
+---------------------------------------------------------------------------------
+                  Thank you for using Altinity Helm Charts!
+---------------------------------------------------------------------------------
 
-ClickHouse Keeper services name:
+ClickHouse Keeper is being installed.
 
-{{- range $i, $e := until (int .Values.replicaCount) }}
-- {{ printf "%s-%d" (include "clickhouse-keeper.fullname" $) $i }}.{{ include "clickhouse-keeper.service-name" $ }}.{{ $.Release.Namespace }}.svc:8123
+Special thanks to @duyet for providing the basis for this chart.
+
+Get list of keeper pods:
+
+  kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "clickhouse-keeper.name" . }},app.kubernetes.io/instance={{ .Release.Name }}"
+
 {{- end }}
-
-Get list of pods:
-
-kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "clickhouse-keeper.name" . }},app.kubernetes.io/instance={{ .Release.Name }}"
-
-
-The documents of how to connect to ClickHouse Keepers: https://clickhouse.com/docs/en/guides/sre/keeper/clickhouse-keeper
