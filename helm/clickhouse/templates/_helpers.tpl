@@ -145,12 +145,10 @@ User Host IP
 Keeper Host
 */}}
 {{- define "clickhouse.keeper.host" -}}
-  {{- if not (empty .Values.keeper.host) -}}
-    {{ .Values.keeper.host }}
+  {{- if not (empty .Values.clickhouse.keeper.host) -}}
+    {{ .Values.clickhouse.keeper.host }}
   {{- else -}}
-    {{- $keeper := index .Values "clickhouse-keeper" -}}
-    {{- $keeper_enabled := $keeper.enabled | default false -}}
-    {{- if $keeper_enabled -}}
+    {{- if .Values.keeper.enabled -}}
       {{- include "clickhouse-keeper.fullname" (dict "Chart" (index .Subcharts "clickhouse-keeper" "Chart") "Release" .Release "Values" (index .Values "clickhouse-keeper")) -}}
     {{- else -}}
       ""

@@ -4,16 +4,28 @@
 # The built-in keeper will automatically be enabled if replicaCount > 1 and a hostname is not provided
 replicaCount: 1
 
-defaultUser:
-  user: "default"
-  password: ""
-  # -- Allow the default user to access ClickHouse from any IP.
-  # If set, will override `hostIP` to always be `0.0.0.0/0`.
-  allowExternalAccess: false
-  # defaultUser.hostIP -- (string) Set a mask for IPs allowed for the default user.
-  # Should not be set if allowExternalAccess is set.
-  # @default -- 127.0.0.1/32
-  hostIP: 
+clickhouse:
+  defaultUser:
+    user: "default"
+    password: ""
+    # -- Allow the default user to access ClickHouse from any IP.
+    # If set, will override `hostIP` to always be `0.0.0.0/0`.
+    allowExternalAccess: false
+    # defaultUser.hostIP -- (string) Set a mask for IPs allowed for the default user.
+    # Should not be set if allowExternalAccess is set.
+    # @default -- 127.0.0.1/32
+    hostIP: 
+
+  # -- Keeper connection settings.
+  keeper:
+    # -- Specify a keeper host.
+    # Should be left empty if `clickhouse-keeper.enabled` is `true`.
+    # Will override the defaults set from `clickhouse-keeper.enabled`.
+    host: ""
+    # -- Override the default keeper port
+    port: 2181
+
+
 
 persistence:
   # -- enable storage
@@ -30,14 +42,10 @@ persistence:
     size: 10Gi
     accessMode: ReadWriteOnce
 
-# -- Keeper connection settings.
-keeper:
-  # -- Specify a keeper host.
-  # Should be left empty if `clickhouse-keeper.enabled` is `true`.
-  # Will override the defaults set from `clickhouse-keeper.enabled`.
-  host: ""
-  # -- Override the default keeper port
-  port: 2181
+
+# Specify which zones to run in.
+# `replicaCount` will applied within each zone.
+zones: []
 
 image:
   repository: altinity/clickhouse-server
@@ -53,10 +61,6 @@ service:
 podDistribution:
   - type: ClickHouseAntiAffinity
     scope: ClickHouseInstallation
-
-# Specify which zones to run in.
-# `replicaCount` will applied within each zone.
-zones: []
 
 # @ignore
 imagePullSecrets: []
@@ -87,7 +91,7 @@ tolerations: []
 # @ignore
 affinity: {}
 
-clickhouse-keeper:
+keeper:
   # -- Whether to enable Keeper.
   # Required for replicated tables.
   enabled: false
@@ -96,7 +100,7 @@ clickhouse-keeper:
   # !! DO NOT CHANGE AFTER INITIAL DEPLOYMENT
   replicaCount: 3
 
-altinity-clickhouse-operator:
+operator:
   # -- Whether to enabled the Altinity Operator for ClickHouse.
   # Disable if you already have the Operator installed cluster-wide.
   enabled: true

@@ -1,7 +1,0 @@
-clickhouse:
-  replicaCount: 3
-  clickhouse-keeper:
-    enabled: true
-    replicaCount: 3
-  altinity-clickhouse-operator:
-    enabled: false
