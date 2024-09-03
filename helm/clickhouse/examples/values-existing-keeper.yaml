@@ -1,9 +1,9 @@
 replicaCount: 3
+clickhouse:
+  keeper:
+    # use keeper instance created by replicated example
+    host: "replicated-clickhouse-keeper"
 keeper:
-  # use keeper instance created by replicated example
-  # must be in same namespace
-  host: "replicated-clickhouse-keeper"
-clickhouse-keeper:
   enabled: false
-altinity-clickhouse-operator:
+operator:
   enabled: false

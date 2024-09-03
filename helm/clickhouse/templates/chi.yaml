@@ -26,9 +26,9 @@ spec:
 
   configuration:
     users:
-      {{ .Values.defaultUser.user }}/networks/ip: {{ include "clickhouse.defaultUser.ip" . | quote }}
-      {{ .Values.defaultUser.user }}/access_management: 1
-      {{ .Values.defaultUser.user }}/password:
+      {{ .Values.clickhouse.defaultUser.user }}/networks/ip: {{ include "clickhouse.defaultUser.ip" . | quote }}
+      {{ .Values.clickhouse.defaultUser.user }}/access_management: 1
+      {{ .Values.clickhouse.defaultUser.user }}/password:
         valueFrom:
           secretKeyRef:
             name: {{ include "clickhouse.credentialsName" . }}

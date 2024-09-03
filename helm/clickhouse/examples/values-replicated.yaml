@@ -3,10 +3,9 @@ zones:
   - us-east-1a
   - us-east-2a
 
-clickhouse-keeper:
+keeper:
   enabled: true
   replicaCount: 3
 # use operator created by simple example
-# must be in same namespace
-altinity-clickhouse-operator:
+operator:
   enabled: false

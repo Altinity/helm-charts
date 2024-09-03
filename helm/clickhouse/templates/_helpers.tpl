@@ -130,11 +130,11 @@ User Credentials Name
 User Host IP
 */}}
 {{- define "clickhouse.defaultUser.ip" -}}
-{{- if .Values.defaultUser.allowExternalAccess -}}
+{{- if .Values.clickhouse.defaultUser.allowExternalAccess -}}
 0.0.0.0/0
 {{- else -}}
-{{- if .Values.defaultUser.hostIP -}}
-{{ .Values.defaultUser.hostIP }}
+{{- if .Values.clickhouse.defaultUser.hostIP -}}
+{{ .Values.clickhouse.defaultUser.hostIP }}
 {{- else -}}
 127.0.0.1/32
 {{- end -}}
@@ -149,7 +149,7 @@ Keeper Host
     {{ .Values.clickhouse.keeper.host }}
   {{- else -}}
     {{- if .Values.keeper.enabled -}}
-      {{- include "clickhouse-keeper.fullname" (dict "Chart" (index .Subcharts "clickhouse-keeper" "Chart") "Release" .Release "Values" (index .Values "clickhouse-keeper")) -}}
+      {{- include "clickhouse-keeper.fullname" (dict "Chart" (index .Subcharts "keeper" "Chart") "Release" .Release "Values" (index .Values "keeper")) -}}
     {{- else -}}
       ""
     {{- end -}}
