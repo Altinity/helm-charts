@@ -10,16 +10,16 @@ spec:
     templates:
       serviceTemplate: {{ include "clickhouse.serviceTemplateName" . }}
       podTemplate: {{ include "clickhouse.podTemplateName" . }}
-      {{- if .Values.persistence.enabled }}
+      {{- if .Values.clickhouse.persistence.enabled }}
       dataVolumeClaimTemplate: {{ include "clickhouse.volumeClaimTemplateName" . }}
       {{- end }}
   useTemplates:
     - name: {{ include "clickhouse.serviceTemplateName" . }}
     - name: {{ include "clickhouse.podTemplateName" . }}
     - name: {{ include "clickhouse.volumeClaimTemplateName" . }}
-    {{- if not (empty .Values.zones) -}}
+    {{- if not (empty .Values.clickhouse.zones) -}}
     {{- $originalContext := . -}}
-    {{- range .Values.zones }}
+    {{- range .Values.clickhouse.zones }}
     - name: {{ include "clickhouse.podTemplateName" $originalContext }}-{{ . }}
     {{- end -}}
     {{- end }}
@@ -36,14 +36,14 @@ spec:
     clusters:
       - name: {{ include "clickhouse.clustername" . }}
         layout:
-          {{- if (empty .Values.zones) }}
+          {{- if (empty .Values.clickhouse.zones) }}
           shardsCount: 1
-          replicasCount: {{ .Values.replicaCount }}
+          replicasCount: {{ .Values.clickhouse.replicasCount }}
           {{- else }}
           shards:
             - replicas:
               {{- $originalContext := . -}}
-              {{- range .Values.zones }}
+              {{- range .Values.clickhouse.zones }}
                 - templates: 
                     podTemplate: {{ include "clickhouse.podTemplateName" $originalContext }}-{{ . }}
               {{- end -}}

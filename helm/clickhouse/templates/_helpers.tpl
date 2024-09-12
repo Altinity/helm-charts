@@ -42,49 +42,45 @@ Pod Template Base
 */}}
 {{- define "clickhouse.podTemplateBase" }}
         metadata:
-          {{- with .Values.podAnnotations }}
+          {{- with .Values.clickhouse.podAnnotations }}
           annotations:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           labels:
             {{- include "clickhouse.labels" . | nindent 12 }}
-            {{- with .Values.podLabels }}
+            {{- with .Values.clickhouse.podLabels }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
         podDistribution:
-          {{- toYaml .Values.podDistribution | nindent 12 }}
+          {{- toYaml .Values.clickhouse.podDistribution | nindent 12 }}
         spec:
-          {{- with .Values.imagePullSecrets }}
+          {{- with .Values.clickhouse.imagePullSecrets }}
           imagePullSecrets:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           securityContext:
-            {{- toYaml .Values.podSecurityContext | nindent 12 }}
+            {{- toYaml .Values.clickhouse.podSecurityContext | nindent 12 }}
           containers:
             - name: {{ .Chart.Name }}
               securityContext:
-                {{- toYaml .Values.securityContext | nindent 16 }}
-              image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-              imagePullPolicy: {{ .Values.image.pullPolicy }}
-              {{- with .Values.livenessProbe }}
+                {{- toYaml .Values.clickhouse.securityContext | nindent 16 }}
+              image: "{{ .Values.clickhouse.image.repository }}:{{ .Values.clickhouse.image.tag | default .Chart.AppVersion }}"
+              imagePullPolicy: {{ .Values.clickhouse.image.pullPolicy }}
+              {{- with .Values.clickhouse.livenessProbe }}
               livenessProbe:
                 {{- toYaml . | nindent 16 }}
               {{- end }}
               resources:
-                {{- toYaml .Values.resources | nindent 16 }}
-          volumes:
-          {{- with .Values.volumes }}
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- with .Values.nodeSelector }}
+                {{- toYaml .Values.clickhouse.resources | nindent 16 }}
+          {{- with .Values.clickhouse.nodeSelector }}
           nodeSelector:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.affinity }}
+          {{- with .Values.clickhouse.affinity }}
           affinity:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.tolerations }}
+          {{- with .Values.clickhouse.tolerations }}
           tolerations:
             {{- toYaml . | nindent 12 }}
           {{- end }}

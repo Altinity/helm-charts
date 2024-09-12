@@ -1,5 +1,5 @@
 ---
-{{- if .Values.persistence.enabled }}
+{{- if .Values.clickhouse.persistence.enabled }}
 apiVersion: "clickhouse.altinity.com/v1"
 kind: ClickHouseInstallationTemplate
 metadata:
@@ -11,25 +11,15 @@ spec:
     volumeClaimTemplates:
       - name: {{ include "clickhouse.volumeClaimTemplateName" . }}
         reclaimPolicy: Retain
-        metadata:
-          {{- with .Values.podAnnotations }}
-          annotations:
-            {{- toYaml . | nindent 10 }}
-          {{- end }}
-          labels:
-            {{- include "clickhouse.labels" . | nindent 10 }}
-            {{- with .Values.podLabels }}
-            {{- toYaml . | nindent 10 }}
-            {{- end }}
         spec:
-          {{- with .Values.persistence.accessMode }}
+          {{- with .Values.clickhouse.persistence.accessMode }}
           accessModes:
             - {{ . }}
           {{- end }}
-          {{- with .Values.persistence.storageClass }}
+          {{- with .Values.clickhouse.persistence.storageClass }}
           storageClassName: {{ . }}
           {{- end }}
           resources:
             requests:
-              storage: {{ .Values.persistence.size }}
+              storage: {{ .Values.clickhouse.persistence.size }}
 {{- end }}

@@ -1,4 +1,4 @@
-{{- if .Values.persistence.logs.enabled }}
+{{- if .Values.clickhouse.persistence.logs.enabled }}
 apiVersion: "clickhouse.altinity.com/v1"
 kind: ClickHouseInstallationTemplate
 metadata:
@@ -10,25 +10,15 @@ spec:
     volumeClaimTemplates:
       - name: {{ include "clickhouse.logsVolumeClaimTemplateName" . }}
         reclaimPolicy: Retain
-        metadata:
-          {{- with .Values.podAnnotations }}
-          annotations:
-            {{- toYaml . | nindent 10 }}
-          {{- end }}
-          labels:
-            {{- include "clickhouse.labels" . | nindent 10 }}
-            {{- with .Values.podLabels }}
-            {{- toYaml . | nindent 10 }}
-            {{- end }}
         spec:
-          {{- with .Values.persistence.logs.accessMode }}
+          {{- with .Values.clickhouse.persistence.logs.accessMode }}
           accessModes:
             - {{ . }}
           {{- end }}
-          {{- with .Values.persistence.logs.storageClass }}
+          {{- with .Values.clickhouse.persistence.logs.storageClass }}
           storageClassName: {{ . }}
           {{- end }}
           resources:
             requests:
-              storage: {{ .Values.persistence.logs.size }}
+              storage: {{ .Values.clickhouse.persistence.logs.size }}
 {{- end }}

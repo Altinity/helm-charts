@@ -20,7 +20,7 @@ spec:
             {{- toYaml . | nindent 10 }}
             {{- end }}
         spec:
-          type: {{ .Values.service.type }}
+          type: {{ .Values.clickhouse.service.type }}
           ports:
             - name: http
               port: 8123
