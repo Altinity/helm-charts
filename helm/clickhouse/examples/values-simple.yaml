@@ -1,4 +1,5 @@
-defaultUser:
-  password: "password"
-persistence:
-  size: 5Gi
+clickhouse:
+  defaultUser:
+    password: "password"
+  persistence:
+    size: 5Gi

@@ -38,6 +38,16 @@ Cluster Name
 {{- end }}
 
 {{/*
+Pod Distribution
+*/}}
+{{- define "clickhouse.podDistribution" -}}
+{{- if .Values.clickhouse.antiAffinity -}}
+- type: ClickHouseAntiAffinity
+  scope: ClickHouseInstallation
+{{- end }}
+{{- end }}
+
+{{/*
 Pod Template Base
 */}}
 {{- define "clickhouse.podTemplateBase" }}
@@ -52,7 +62,7 @@ Pod Template Base
             {{- toYaml . | nindent 12 }}
             {{- end }}
         podDistribution:
-          {{- toYaml .Values.clickhouse.podDistribution | nindent 12 }}
+          {{- include "clickhouse.podDistribution" . | nindent 10 }}
         spec:
           {{- with .Values.clickhouse.imagePullSecrets }}
           imagePullSecrets:
