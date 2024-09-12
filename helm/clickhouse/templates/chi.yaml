@@ -55,3 +55,5 @@ spec:
           - host: {{ $keeper_host }}
             port: {{ .Values.keeper.port }}
     {{- end }}
+
+{{ include "validate.clickhouse.keeper" . }}
