@@ -147,7 +147,6 @@ Keeper Host
     {{- if .Values.keeper.enabled -}}
       {{- include "clickhouse-keeper.fullname" (dict "Chart" (index .Subcharts "keeper" "Chart") "Release" .Release "Values" (index .Values "keeper")) -}}
     {{- else -}}
-      ""
     {{- end -}}
   {{- end -}}
 {{- end -}}
