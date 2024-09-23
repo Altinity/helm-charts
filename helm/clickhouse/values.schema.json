@@ -1,0 +1,162 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "nameOverride": {
+      "type": "string",
+      "description": "Overrides the name of the chart."
+    },
+    "fullnameOverride": {
+      "type": "string",
+      "description": "Overrides the full name of the chart."
+    },
+    "clickhouse": {
+      "type": "object",
+      "properties": {
+        "defaultUser": {
+          "type": "object",
+          "properties": {
+            "password": {
+              "type": "string",
+              "description": "Password for the default ClickHouse user."
+            },
+            "allowExternalAccess": {
+              "type": "boolean",
+              "description": "Allow the default user to access ClickHouse from any IP."
+            },
+            "hostIP": {
+              "type": "string",
+              "description": "Mask for IPs allowed for the default user.",
+              "default": "127.0.0.1/32"
+            }
+          }
+        },
+        "replicasCount": {
+          "type": "integer",
+          "description": "Number of ClickHouse replicas. If greater than 1, Keeper must be enabled or a Keeper host must be provided.",
+          "default": 1
+        },
+        "zones": {
+          "type": "array",
+          "description": "Specify the zones for ClickHouse pods.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "antiAffinity": {
+          "type": "boolean",
+          "description": "If enabled, prevents ClickHouse pods from running on the same node."
+        },
+        "keeper": {
+          "type": "object",
+          "properties": {
+            "host": {
+              "type": "string",
+              "description": "Keeper host, if specified."
+            },
+            "port": {
+              "type": "integer",
+              "description": "Override the default Keeper port.",
+              "default": 2181
+            }
+          }
+        },
+        "persistence": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable storage for ClickHouse."
+            },
+            "size": {
+              "type": "string",
+              "description": "Volume size for ClickHouse storage."
+            },
+            "accessMode": {
+              "type": "string",
+              "description": "Access mode for ClickHouse storage."
+            },
+            "storageClass": {
+              "type": "string",
+              "description": "Storage class for the persistent volume."
+            },
+            "logs": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Enable PVC for logs."
+                },
+                "size": {
+                  "type": "string",
+                  "description": "Volume size for logs."
+                },
+                "accessMode": {
+                  "type": "string",
+                  "description": "Access mode for logs storage."
+                }
+              }
+            }
+          }
+        },
+        "image": {
+          "type": "object",
+          "properties": {
+            "repository": {
+              "type": "string",
+              "description": "Repository for the ClickHouse image."
+            },
+            "pullPolicy": {
+              "type": "string",
+              "description": "Image pull policy."
+            },
+            "tag": {
+              "type": "string",
+              "description": "Tag for the ClickHouse image."
+            }
+          }
+        },
+        "service": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "Service type, e.g., LoadBalancer or ClusterIP."
+            }
+          }
+        },
+        "podAnnotations": {
+          "type": "object",
+          "description": "Annotations for ClickHouse pods."
+        },
+        "podLabels": {
+          "type": "object",
+          "description": "Labels for ClickHouse pods."
+        }
+      }
+    },
+    "keeper": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable Keeper for ClickHouse replication."
+        },
+        "replicaCount": {
+          "type": "integer",
+          "description": "Number of Keeper replicas. Must be an odd number.",
+          "default": 3
+        }
+      }
+    },
+    "operator": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable Altinity Operator for ClickHouse."
+        }
+      }
+    }
+  }
+}

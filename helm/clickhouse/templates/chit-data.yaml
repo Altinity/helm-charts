@@ -1,0 +1,25 @@
+---
+{{- if .Values.clickhouse.persistence.enabled }}
+apiVersion: "clickhouse.altinity.com/v1"
+kind: ClickHouseInstallationTemplate
+metadata:
+  name: {{ include "clickhouse.volumeClaimTemplateName" . }}
+  labels:
+    {{- include "clickhouse.labels" . | nindent 4 }}
+spec:
+  templates:
+    volumeClaimTemplates:
+      - name: {{ include "clickhouse.volumeClaimTemplateName" . }}
+        reclaimPolicy: Retain
+        spec:
+          {{- with .Values.clickhouse.persistence.accessMode }}
+          accessModes:
+            - {{ . }}
+          {{- end }}
+          {{- with .Values.clickhouse.persistence.storageClass }}
+          storageClassName: {{ . }}
+          {{- end }}
+          resources:
+            requests:
+              storage: {{ .Values.clickhouse.persistence.size }}
+{{- end }}

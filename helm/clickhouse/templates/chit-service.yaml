@@ -1,0 +1,32 @@
+---
+apiVersion: "clickhouse.altinity.com/v1"
+kind: ClickHouseInstallationTemplate
+metadata:
+  name: {{ include "clickhouse.serviceTemplateName" . }}
+  labels:
+    {{- include "clickhouse.labels" . | nindent 4 }}
+spec:
+  templates:
+    serviceTemplates:
+      - name: {{ include "clickhouse.serviceTemplateName" . }}
+        metadata:
+          {{- with .Values.podAnnotations }}
+          annotations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          labels:
+            {{- include "clickhouse.labels" . | nindent 12 }}
+            {{- with .Values.podLabels }}
+            {{- toYaml . | nindent 10 }}
+            {{- end }}
+        spec:
+          type: {{ .Values.clickhouse.service.type }}
+          ports:
+            - name: http
+              port: 8123
+              targetPort: 8123
+            - name: tcp
+              port: 9000
+              targetPort: 9000
+          selector:
+            {{- include "clickhouse.selectorLabels" . | nindent 12 }}

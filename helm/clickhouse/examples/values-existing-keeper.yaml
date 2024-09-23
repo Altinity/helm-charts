@@ -1,0 +1,11 @@
+clickhouse:
+  replicaCount: 2
+  keeper:
+    # use keeper instance at another host
+    host: "replicated-clickhouse-keeper"
+# disable the built in keeper instance
+keeper:
+  enabled: false
+# disable the built in operator installation
+operator:
+  enabled: false

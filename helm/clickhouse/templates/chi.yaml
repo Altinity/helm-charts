@@ -1,0 +1,59 @@
+---
+apiVersion: "clickhouse.altinity.com/v1"
+kind: ClickHouseInstallation
+metadata:
+  name: {{ include "clickhouse.fullname" . }}
+  labels:
+    {{- include "clickhouse.labels" . | nindent 4 }}
+spec:
+  defaults:
+    templates:
+      serviceTemplate: {{ include "clickhouse.serviceTemplateName" . }}
+      podTemplate: {{ include "clickhouse.podTemplateName" . }}
+      {{- if .Values.clickhouse.persistence.enabled }}
+      dataVolumeClaimTemplate: {{ include "clickhouse.volumeClaimTemplateName" . }}
+      {{- end }}
+  useTemplates:
+    - name: {{ include "clickhouse.serviceTemplateName" . }}
+    - name: {{ include "clickhouse.podTemplateName" . }}
+    - name: {{ include "clickhouse.volumeClaimTemplateName" . }}
+    {{- if not (empty .Values.clickhouse.zones) -}}
+    {{- $originalContext := . -}}
+    {{- range .Values.clickhouse.zones }}
+    - name: {{ include "clickhouse.podTemplateName" $originalContext }}-{{ . }}
+    {{- end -}}
+    {{- end }}
+
+  configuration:
+    users:
+      default/networks/ip: {{ include "clickhouse.defaultUser.ip" . | quote }}
+      default/access_management: 1
+      default/password:
+        valueFrom:
+          secretKeyRef:
+            name: {{ include "clickhouse.credentialsName" . }}
+            key: password
+    clusters:
+      - name: {{ include "clickhouse.clustername" . }}
+        layout:
+          {{- if (empty .Values.clickhouse.zones) }}
+          shardsCount: 1
+          replicasCount: {{ .Values.clickhouse.replicasCount }}
+          {{- else }}
+          shards:
+            - replicas:
+              {{- $originalContext := . -}}
+              {{- range .Values.clickhouse.zones }}
+                - templates: 
+                    podTemplate: {{ include "clickhouse.podTemplateName" $originalContext }}-{{ . }}
+              {{- end -}}
+          {{- end -}}
+    {{- $keeper_host := tpl (include "clickhouse.keeper.host" . ) . -}}
+    {{- if not (empty $keeper_host) }}
+    zookeeper:
+        nodes:
+          - host: {{ $keeper_host }}
+            port: {{ .Values.keeper.port }}
+    {{- end }}
+
+{{ include "validate.clickhouse.keeper" . }}

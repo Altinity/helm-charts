@@ -1,0 +1,36 @@
+{{ if .Release.IsInstall }}
+  
+---------------------------------------------------------------------------------
+                  Thank you for using Altinity Helm Charts!
+---------------------------------------------------------------------------------
+
+{{- if .Values.operator.enabled }}
+
+The Altinity Operator for ClickHouse is being installed first.
+
+{{- else }}
+
+Your configuration requires the Altinity Operator for ClickHouse in your cluster.
+Visit the Altinity docs for instructions on how to install the Operator:
+
+https://docs.altinity.com/
+
+{{- end }}
+
+Your ClickHouseInstallation resource has been created.
+
+Once the cluster is available you can connect with:
+
+  kubectl -n {{ .Release.Namespace }} exec -it \
+    chi-{{ include "clickhouse.clustername" . }}-clickhouse-{{ include "clickhouse.clustername" . }}-0-0-0 \
+    clickhouse-client
+
+Or if you'd like to connect a client you can use port forwarding:
+
+  kubectl -n {{ .Release.Namespace }} port-forward \
+    services/{{ include "clickhouse.serviceTemplateName" . }} \
+    9000:9000
+
+Happy querying!
+
+{{- end }}

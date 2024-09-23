@@ -1,0 +1,22 @@
+---
+apiVersion: "clickhouse.altinity.com/v1"
+kind: ClickHouseInstallationTemplate
+metadata:
+  name: {{ include "clickhouse.podTemplateName" . }}
+  labels:
+    {{- include "clickhouse.labels" . | nindent 4 }}
+spec:
+  templates:
+    podTemplates:
+      - name: {{ include "clickhouse.podTemplateName" . }}
+        {{ include "clickhouse.podTemplateBase" . }}
+      {{- if not (empty .Values.zones) -}}
+      {{- $originalContext := . -}}
+      {{- range .Values.zones }}
+      - name: {{ include "clickhouse.podTemplateName" $originalContext }}-{{ . }}
+        {{ include "clickhouse.podTemplateBase" $originalContext }}
+        zone:
+          values:
+            - {{ . }}
+      {{- end -}}
+      {{- end -}}

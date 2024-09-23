@@ -1,0 +1,103 @@
+# @ignore
+nameOverride: ""
+# @ignore
+fullnameOverride: ""
+
+# Configure ClickHouse Installation and Pod Template
+clickhouse:
+  defaultUser:
+    password: ""
+    # -- Allow the default user to access ClickHouse from any IP.
+    # If set, will override `hostIP` to always be `0.0.0.0/0`.
+    allowExternalAccess: false
+    # defaultUser.hostIP -- (string) Set a mask for IPs allowed for the default user.
+    # Should not be set if allowExternalAccess is set.
+    # @default -- 127.0.0.1/32
+    hostIP: 127.0.0.1/32
+
+  # -- number of replicas. If greater than 1, keeper must be enabled
+  # or a keeper host should be provided under clickhouse.keeper.host. 
+  # Will be ignored if `zones` is set.
+  replicasCount: 1
+
+  # Specify which zones to run in.
+  # `replicaCount` will applied within each zone.
+  zones: []
+
+  # If enabled, will prevent ClickHouse pods from running on the same node
+  antiAffinity: false
+ 
+  # -- Keeper connection settings for ClickHouse instances.
+  keeper:
+    # -- Specify a keeper host.
+    # Should be left empty if `clickhouse-keeper.enabled` is `true`.
+    # Will override the defaults set from `clickhouse-keeper.enabled`.
+    host: ""
+    # -- Override the default keeper port
+    port: 2181
+
+  persistence:
+    # -- enable storage
+    enabled: true
+    # -- volume size (per replica)
+    size: 10Gi
+    accessMode: ReadWriteOnce
+    ## -- StorageClass for PV (e.g. gp2, standard, ...)
+    storageClass: ""
+    logs:
+      # -- enable pvc for logs
+      enabled: false
+      # -- size for logs pvc
+      size: 10Gi
+      accessMode: ReadWriteOnce
+
+  image:
+    repository: altinity/clickhouse-server
+    pullPolicy: IfNotPresent
+    # -- Override the image tag for a specific version
+    tag: "23.8.8.21.altinitystable"
+
+  service:
+    # e.g. `LoadBalancer`, `NodePort`
+    type: ClusterIP
+
+
+  # @ignore
+  imagePullSecrets: []
+
+
+  podAnnotations: {}
+  podLabels: {}
+
+  # @ignore
+  podSecurityContext: {}
+    # runAsUser: 101
+    # runAsGroup: 101
+
+  # @ignore
+  securityContext: {}
+
+  # @ignore
+  nodeSelector: {}
+
+  # @ignore
+  tolerations: []
+
+  # @ignore
+  affinity: {}
+
+
+# Subcharts (with aliases) 
+keeper:
+  # -- Whether to enable Keeper.
+  # Required for replicated tables.
+  enabled: false
+  # -- Number of keeper replicas.
+  # Must be an odd number.
+  # !! DO NOT CHANGE AFTER INITIAL DEPLOYMENT
+  replicaCount: 3
+
+operator:
+  # -- Whether to enabled the Altinity Operator for ClickHouse.
+  # Disable if you already have the Operator installed cluster-wide.
+  enabled: true

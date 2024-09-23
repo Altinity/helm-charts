@@ -1,0 +1,9 @@
+clickhouse:
+  antiAffinity: true
+  zones:
+    - us-east-1a
+    - us-east-2a
+
+keeper:
+  enabled: true
+  replicaCount: 3
