@@ -1,9 +1,9 @@
 dependencies:
 - name: clickhouse-keeper
-  repository: file://../clickhouse-keeper
+  repository: file://../clickhouse-keeper-sts
   version: 0.1.3
 - name: altinity-clickhouse-operator
   repository: https://altinity.github.io/clickhouse-operator
   version: 0.23.6
-digest: sha256:20bac898dc740826582e9eaba756ad4b1d4fd573e7518e21b49f9bc541ddb411
-generated: "2024-08-20T14:19:43.875512-04:00"
+digest: sha256:52faf0d507728e0e4303f8c09e266c687ec4954522732497de498643b7e9cf5f
+generated: "2024-09-25T12:50:47.326094-04:00"
