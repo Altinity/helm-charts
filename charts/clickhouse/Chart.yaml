@@ -12,7 +12,7 @@ dependencies:
     alias: keeper
     condition: keeper.enabled
   - name: altinity-clickhouse-operator
-    repository: https://altinity.github.io/clickhouse-operator
+    repository: https://docs.altinity.com/clickhouse-operator
     version: 0.23.6
     alias: operator
     condition: operator.enabled
