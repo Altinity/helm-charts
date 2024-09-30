@@ -21,6 +21,10 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
+      - name: Add Operator Chart Repo
+        run: |
+          helm repo add altinity-operator https://docs.altinity.com/altinity-operator
+
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
         with:
