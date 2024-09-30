@@ -10,9 +10,9 @@ spec:
     podTemplates:
       - name: {{ include "clickhouse.podTemplateName" . }}
         {{ include "clickhouse.podTemplateBase" . }}
-      {{- if not (empty .Values.zones) -}}
+      {{- if not (empty .Values.clickhouse.zones) -}}
       {{- $originalContext := . -}}
-      {{- range .Values.zones }}
+      {{- range .Values.clickhouse.zones }}
       - name: {{ include "clickhouse.podTemplateName" $originalContext }}-{{ . }}
         {{ include "clickhouse.podTemplateBase" $originalContext }}
         zone:

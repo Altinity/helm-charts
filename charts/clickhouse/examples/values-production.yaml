@@ -1,8 +1,10 @@
 clickhouse:
   antiAffinity: true
   zones:
-    - us-west-1a
     - us-west-2a
+    - us-west-2b
+  nodeSelector:
+    node.kubernetes.io/instance-type: "m6i.large"
 
 keeper:
   enabled: true
