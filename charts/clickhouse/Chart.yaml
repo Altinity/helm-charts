@@ -6,7 +6,7 @@ version: 0.1.1
 appVersion: "23.8.8.21"
 
 dependencies:
-  - name: clickhouse-keeper
+  - name: clickhouse-keeper-sts
     repository: "file://../clickhouse-keeper-sts"
     version: 0.1.3
     alias: keeper
