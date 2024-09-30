@@ -17,8 +17,9 @@ To get started, you'll need to:
 * Get administrative access to Kubernetes. For testing, [Minikube](https://minikube.sigs.k8s.io/docs/start/) will do the job.
 * Install [kubectl](https://kubernetes.io/docs/tasks/tools/)
 * Install [helm](https://helm.sh/docs/intro/install/)
-* Use helm to install the [clickhouse-operator](https://github.com/Altinity/clickhouse-operator/tree/master/deploy/helm) using the commands shown below.
+* (Optional) Use helm to install the [clickhouse-operator](https://github.com/Altinity/clickhouse-operator/tree/master/deploy/helm) using the commands shown below.
 
+**Installing the Operator first provides better control when uninstalling clusters.**
 
 ```sh
 helm repo add clickhouse-operator https://docs.altinity.com/clickhouse-operator/
@@ -29,20 +30,29 @@ helm install clickhouse-operator clickhouse-operator/altinity-clickhouse-operato
 
 ## Helm Charts
 
-- **[clickhouse-eks](./charts/clickhouse-eks/)**: Deploys ClickHouse optimized for AWS EKS.
-- **[keeper-sts](./charts/keeper-sts/)**: Deploys ClickHouse Keeper using StatefulSets for better data persistence.
+- **[clickhouse](./charts/clickhouse/)**: Deploys a ClickHouse cluster with dependencies.
+- **[clickhouse-keeper-sts](./charts/clickhouse-keeper-sts/)**: Deploys ClickHouse Keeper using StatefulSets for better data persistence.
 
 ### How to Install a Chart
 
 ```sh
 # add the kubernetes-blueprints-for-clickhouse chart repository
-helm repo add kubernetes-blueprints-for-clickhouse https://altinity.github.io/kubernetes-blueprints-for-clickhouse
+helm repo add altinity https://helm.altinity.com
 
 # use this command to install any of the avaiable charts
-helm install ch kubernetes-blueprints-for-clickhouse/[chart-name] --namespace clickhouse --create-namespace
+helm install release-name altinity/[chart-name] --namespace clickhouse --create-namespace
 
 # check chart release status
-helm status ch --namespace clickhouse
+helm status release-name --namespace clickhouse
+```
+
+### Using Examples
+
+There are several [examples](./charts/clickhouse/examples) available. You can use them with a command like:
+
+
+```sh
+helm install release-name --namespace clickhouse --create-namespace -f path/to/examples/values-simple.yaml 
 ```
 
 > Please refer to any of helm charts `README` file for detailed instructions about each of the them.
