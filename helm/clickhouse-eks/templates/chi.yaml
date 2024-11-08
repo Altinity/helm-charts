@@ -51,6 +51,11 @@ spec:
             image: {{ $.Values.clickhouse.image }}
           nodeSelector:
             node.kubernetes.io/instance-type: {{ $.Values.clickhouse.node_selector }}
+          tolerations:
+          - key: "dedicated"
+            operator: "EQUAL"
+            value: "clickhouse"
+            effect: "NO_SCHEDULE"
       {{- end }}
     volumeClaimTemplates:
       - name: storage
