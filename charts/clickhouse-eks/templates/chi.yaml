@@ -53,9 +53,9 @@ spec:
             node.kubernetes.io/instance-type: {{ $.Values.clickhouse.node_selector }}
           tolerations:
             - key: "dedicated"
-              operator: "EQUAL"
+              operator: "Equal"
               value: "clickhouse"
-              effect: "NO_SCHEDULE"
+              effect: "NoSchedule"
       {{- end }}
     volumeClaimTemplates:
       - name: storage
