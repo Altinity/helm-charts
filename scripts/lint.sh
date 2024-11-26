@@ -2,7 +2,7 @@
 set -euo pipefail
 
 GIT_REPO_ROOT=$(git rev-parse --show-toplevel)
-CHARTS_DIRECTORY="${GIT_REPO_ROOT}/helm"
+CHARTS_DIRECTORY="${GIT_REPO_ROOT}/charts"
 
 FAILED=()
 
