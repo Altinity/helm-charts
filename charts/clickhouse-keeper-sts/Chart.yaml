@@ -1,6 +1,6 @@
 apiVersion: v2
 name: clickhouse-keeper-sts
-description: A ClickHouse Keeper chart for Kubernetes
+description: A ClickHouse® Keeper chart for Kubernetes
 type: application
 version: 0.1.5
 appVersion: "24.3.6.48"
