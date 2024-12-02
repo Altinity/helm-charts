@@ -1,9 +1,9 @@
 dependencies:
 - name: clickhouse-keeper-sts
   repository: https://helm.altinity.com
-  version: 0.1.3
+  version: 0.1.5
 - name: altinity-clickhouse-operator
   repository: https://docs.altinity.com/clickhouse-operator
   version: 0.23.6
-digest: sha256:b1a54d118af17fac6655b0b5d7d35622a4068b88b2bb988e3a7de9b6dc3885d5
-generated: "2024-09-30T12:51:25.997059-04:00"
+digest: sha256:939229b2beb0f969689638b7b7dcd581cbe3f6561052a5328b46e72986fe346d
+generated: "2024-12-02T13:25:33.014013-05:00"
