@@ -33,6 +33,12 @@ spec:
           secretKeyRef:
             name: {{ include "clickhouse.credentialsName" . }}
             key: password
+    settings:
+      remote_servers/{{ include "clickhouse.clustername" . }}/secret:
+        valueFrom:
+          secretKeyRef:
+            name: {{ include "clickhouse.credentialsName" . }}
+            key: password
     clusters:
       - name: {{ include "clickhouse.clustername" . }}
         layout:
