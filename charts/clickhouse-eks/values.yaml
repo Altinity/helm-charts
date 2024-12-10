@@ -27,7 +27,7 @@ clickhouse:
   storage: 50Gi
 
   # -- ClickHouse server image
-  image: "altinity/clickhouse-server:23.8.8.21.altinitystable"
+  image: "altinity/clickhouse-server:24.3.12.76.altinitystable"
 
   # -- Possible service types are `cluster-ip`, `internal-loadbalancer` and `external-loadbalancer`
   service_type: cluster-ip
