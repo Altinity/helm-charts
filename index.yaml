@@ -92,6 +92,17 @@ entries:
   clickhouse-eks:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2024-12-10T17:34:15.152801081Z"
+    description: A Helm chart for ClickHouse running on AWS EKS across AZs using a
+      nodeSelector to pin resources to run on specific VMs types
+    digest: de7745abbf68e4433eb1eb21ecebb17eaf77eb70fc6fbb3b0bc7dde92e7f3319
+    name: clickhouse-eks
+    type: application
+    urls:
+    - https://github.com/Altinity/helm-charts/releases/download/clickhouse-eks-0.1.8/clickhouse-eks-0.1.8.tgz
+    version: 0.1.8
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2024-12-02T18:00:22.919829891Z"
     description: A Helm chart for ClickHouse running on AWS EKS across AZs using a
       nodeSelector to pin resources to run on specific VMs types
@@ -229,4 +240,4 @@ entries:
     urls:
     - https://github.com/Altinity/kubernetes-blueprints-for-clickhouse/releases/download/keeper-sts-0.1.1/keeper-sts-0.1.1.tgz
     version: 0.1.1
-generated: "2024-12-02T18:26:16.897722969Z"
+generated: "2024-12-10T17:34:15.152871583Z"
