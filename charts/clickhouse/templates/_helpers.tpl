@@ -103,6 +103,10 @@ Pod Template Base
           tolerations:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- with .Values.clickhouse.topologySpreadConstraints }}
+          topologySpreadConstraints:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
 {{- end -}}
 
 {{/*
@@ -164,7 +168,7 @@ Keeper Host
     {{ .Values.clickhouse.keeper.host }}
   {{- else -}}
     {{- if .Values.keeper.enabled -}}
-      {{- include "clickhouse-keeper.fullname" (dict "Chart" (index .Subcharts "keeper" "Chart") "Release" .Release "Values" (index .Values "keeper")) -}}
+      {{- printf "keeper-%s" (include "clickhouse.fullname" .) | replace "+" "_" | trunc 63 | trimSuffix "-" }}
     {{- else -}}
     {{- end -}}
   {{- end -}}
