@@ -93,7 +93,7 @@ clickhouse:
   affinity: {}
 
   # @ignore
-  topologySpreadConstraints: {}
+  topologySpreadConstraints: []
 
 
 # CHK parameters
@@ -108,7 +108,7 @@ keeper:
   image: "altinity/clickhouse-keeper"
   tag: "24.3.12.76.altinitystable"
   # allows configure multiple aspects and behavior for `clickhouse-keeper` instance
-  settings: []
+  settings: {}
   localStorage:
     size: 5Gi
     storageClass: ""
@@ -119,10 +119,10 @@ keeper:
   zoneSpread: false
   metricsPort: ""
   resources:
-    cpuRequestsMs: "250m"
-    memoryRequestsMiB: "128Mi"
-    cpuLimitsMs: "500m"
-    memoryLimitsMiB: "128Mi"
+    cpuRequestsMs: "2"
+    memoryRequestsMiB: "3Gi"
+    cpuLimitsMs: "3"
+    memoryLimitsMiB: "3Gi"
 
 operator:
   # -- Whether to enabled the Altinity Operator for ClickHouse.

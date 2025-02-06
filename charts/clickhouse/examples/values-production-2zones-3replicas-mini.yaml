@@ -1,12 +1,15 @@
 clickhouse:
   antiAffinity: true
   replicasCount: 3
+  lbService:
+    enabled: true
+    serviceAnnotations:
+      minikube.io/lb: "internal"
   nodeSelector:
-    node.kubernetes.io/instance-type: "m7i.large"
+    node.kubernetes.io/instance-type: "minikube-node"
   persistence:
     enabled: true
-    size: 50Gi
-    storageClass: gp3-encrypted
+    size: 5Gi
   topologySpreadConstraints:
   - maxSkew: 1
     topologyKey: topology.kubernetes.io/zone
@@ -20,8 +23,7 @@ keeper:
   replicaCount: 3
   zoneSpread: true
   localStorage:
-    size: 5Gi
-    storageClass: gp3-encrypted
+    size: 1Gi
   metricsPort: 7000
   settings:
     prometheus/endpoint: /metrics
@@ -33,3 +35,8 @@ keeper:
   podAnnotations:
     prometheus.io/port: "7000"
     prometheus.io/scrape: "true"
+  resources:
+    cpuRequestsMs: "250m"
+    memoryRequestsMiB: "128Mi"
+    cpuLimitsMs: "500m"
+    memoryLimitsMiB: "128Mi"

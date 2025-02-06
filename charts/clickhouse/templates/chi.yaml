@@ -19,7 +19,9 @@ spec:
       {{- end }}
   useTemplates:
     - name: {{ $service_name }}
+    {{- if .Values.clickhouse.lbService.enabled }}
     - name: {{ $service_name }}-lb
+    {{- end }}
     - name: {{ include "clickhouse.podTemplateName" . }}
     - name: {{ include "clickhouse.volumeClaimTemplateName" . }}
     {{- if not (empty .Values.clickhouse.zones) -}}

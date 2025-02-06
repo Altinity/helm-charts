@@ -92,7 +92,7 @@ spec:
           topologySpreadConstraints:
           {{- if $.Values.keeper.zoneSpread }}
           - maxSkew: 1
-            topologyKey: zone
+            topologyKey: topology.kubernetes.io/zone
             whenUnsatisfiable: ScheduleAnyway
             labelSelector:
               matchLabels:
@@ -104,14 +104,9 @@ spec:
             labelSelector:
               matchLabels:
                 clickhouse-keeper.altinity.com/cluster: "{{ $cluster_name }}"
-          {{- if $.Values.keeper.tolerations }}
+          {{- with $.Values.keeper.tolerations }}
           tolerations:
-            {{- range $.Values.keeper.tolerations }}
-            - key: "{{ .Key }}"
-              operator: "{{ .Operator }}"
-              value: "{{ .Value }}"
-              effect: "{{ .Effect }}"
-            {{- end }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           containers:
             - name: clickhouse-keeper
