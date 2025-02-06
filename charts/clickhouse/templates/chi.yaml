@@ -37,11 +37,12 @@ spec:
       - name: {{ include "clickhouse.clustername" . }}
         layout:
           {{- if (empty .Values.clickhouse.zones) }}
-          shardsCount: {{ .Values.clickhouse.shardCount }}
+          shardsCount: {{ .Values.clickhouse.shardCount | default 1 }}
           replicasCount: {{ .Values.clickhouse.replicasCount }}
           {{- else }}
           shards:
-            {{- range $shardIndex := until (int .Values.clickhouse.shardCount) -}}
+            {{- $shardCount := .Values.clickhouse.shardCount | default 1 }}
+            {{- range $shardIndex := until (int $shardCount) -}}
             - replicas:
               {{- $originalContext := . -}}
               {{- range .Values.clickhouse.zones }}
