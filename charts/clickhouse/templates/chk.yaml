@@ -1,0 +1,127 @@
+{{- if .Values.keeper.enabled }}
+{{- $cluster_name := tpl (include "clickhouse.clustername" . ) . -}}
+{{- $keeper_host := tpl (include "clickhouse.keeper.host" . ) . -}}
+{{- $count := (.Values.keeper.replicaCount | int) -}}
+---
+apiVersion: "clickhouse-keeper.altinity.com/v1"
+kind: "ClickHouseKeeperInstallation"
+metadata:
+  name: {{ include "clickhouse.fullname" . }}
+  labels:
+    {{- include "clickhouse.labels" . | nindent 4 }}
+spec:
+  configuration:
+    clusters:
+      - name: "{{ $cluster_name }}"
+        layout:
+          replicas:
+        {{- range $i, $e := until $count }}
+            - name: "keeper-{{ $i }}"
+              templates:
+                podTemplate: "keeper-{{ $i }}"
+                dataVolumeClaimTemplate: "keeper-{{ $i }}"
+                replicaServiceTemplate: "keeper-{{ $i }}"
+        {{- end }}
+    {{- if not (empty .Values.keeper.settings) }}
+    settings:
+    {{- range $k, $v := .Values.keeper.settings }}
+      {{ $k }}: {{ $v }}
+    {{- end }}
+    {{- end }}
+  defaults:
+    storageManagement:
+      provisioner: Operator
+      reclaimPolicy: Retain
+  templates:
+    serviceTemplates:  
+    {{- range $i, $e := until $count }}
+      - name: "keeper-{{ $i }}"
+        generateName: "{{ $keeper_host }}-{{ $i }}"
+        spec:
+          type: ClusterIP
+          publishNotReadyAddresses: true
+          ports:
+            - name: zk
+              port: 2181
+              targetPort: 2181
+            - name: raft
+              port: 9444
+              targetPort: 9444
+            {{- if not (empty $.Values.keeper.metricsPort) }}
+            - name: metrics
+              port: {{ $.Values.keeper.metricsPort }}
+              targetPort: {{ $.Values.keeper.metricsPort }}
+            {{- end }}
+    {{- end }}
+    volumeClaimTemplates: 
+      {{- range $i, $e := until $count }}
+      - name: "keeper-{{ $i }}"
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: {{ $.Values.keeper.localStorage.size }}
+          {{- if $.Values.keeper.localStorage.storageClass }}
+          storageClassName: "{{ $.Values.keeper.localStorage.storageClass }}"
+          {{- end }}
+      {{- end }}
+    podTemplates:
+    {{- range $i, $e := until $count }}
+      - name: "keeper-{{ $i }}"
+        generateName: "{{ $keeper_host }}-{{ $i }}"
+        {{- with $.Values.keeper.podAnnotations }}
+        metadata:
+          annotations:
+            {{- toYaml . | nindent 12 }}
+        {{- end }}
+        spec:
+          {{- if $.Values.keeper.nodeSelector }}
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      {{- range $k, $v := $.Values.keeper.nodeSelector }}
+                      - key: {{ $k }}
+                        operator: In
+                        values:
+                          - {{ $v }}
+                      {{- end }}
+          {{- end }}
+          topologySpreadConstraints:
+          {{- if $.Values.keeper.zoneSpread }}
+          - maxSkew: 1
+            topologyKey: topology.kubernetes.io/zone
+            whenUnsatisfiable: ScheduleAnyway
+            labelSelector:
+              matchLabels:
+                clickhouse-keeper.altinity.com/cluster: "{{ $cluster_name }}"
+          {{- end }}
+          - maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: DoNotSchedule
+            labelSelector:
+              matchLabels:
+                clickhouse-keeper.altinity.com/cluster: "{{ $cluster_name }}"
+          {{- with $.Values.keeper.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          containers:
+            - name: clickhouse-keeper
+              image: "{{ $.Values.keeper.image }}:{{ $.Values.keeper.tag }}"
+              {{- if not (empty $.Values.keeper.metricsPort) }}
+              ports:
+              - name: metrics
+                containerPort: {{ $.Values.keeper.metricsPort }}
+              {{- end }}
+              resources:
+                requests:
+                  cpu: "{{ $.Values.keeper.resources.cpuRequestsMs }}"
+                  memory: "{{ $.Values.keeper.resources.memoryRequestsMiB }}"
+                limits:
+                  cpu: "{{ $.Values.keeper.resources.cpuLimitsMs }}"
+                  memory: "{{ $.Values.keeper.resources.memoryLimitsMiB }}"
+    {{- end }}
+{{- end }}

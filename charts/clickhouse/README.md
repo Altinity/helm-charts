@@ -10,8 +10,7 @@ A Helm chart for creating a ClickHouse Cluster with the Altinity Operator for Cl
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://docs.altinity.com/clickhouse-operator | operator(altinity-clickhouse-operator) | 0.23.6 |
-| https://helm.altinity.com | keeper(clickhouse-keeper-sts) | 0.1.3 |
+| https://docs.altinity.com/clickhouse-operator | operator(altinity-clickhouse-operator) | 0.24.3 |
 
 ## Installing the Chart
 
@@ -20,7 +19,7 @@ A Helm chart for creating a ClickHouse Cluster with the Altinity Operator for Cl
 helm repo add kubernetes-blueprints-for-clickhouse https://altinity.github.io/kubernetes-blueprints-for-clickhouse
 
 # use this command to install clickhouse chart (it will also create a `clickhouse` namespace)
-helm install ch kubernetes-blueprints-for-clickhouse/clickhouse --namespace clickhouse --create-namespace
+helm install --create-namespace --namespace clickhouse eks-dev  --set keeper.enabled=true --set clickhouse.replicasCount=2
 ```
 
 > Use `-f` flag to override default values: `helm install -f newvalues.yaml`
@@ -65,7 +64,7 @@ kubectl exec -it chi-eks-dev-0-0-0 --namespace clickhouse -- clickhouse-client
 | clickhouse.defaultUser.password | string | `""` |  |
 | clickhouse.image.pullPolicy | string | `"IfNotPresent"` |  |
 | clickhouse.image.repository | string | `"altinity/clickhouse-server"` |  |
-| clickhouse.image.tag | string | `"23.8.8.21.altinitystable"` | Override the image tag for a specific version |
+| clickhouse.image.tag | string | `"24.3.12.76.altinitystable"` | Override the image tag for a specific version |
 | clickhouse.keeper | object | `{"host":"","port":2181}` | Keeper connection settings for ClickHouse instances. |
 | clickhouse.keeper.host | string | `""` | Specify a keeper host. Should be left empty if `clickhouse-keeper.enabled` is `true`. Will override the defaults set from `clickhouse-keeper.enabled`. |
 | clickhouse.keeper.port | int | `2181` | Override the default keeper port |
@@ -80,7 +79,22 @@ kubectl exec -it chi-eks-dev-0-0-0 --namespace clickhouse -- clickhouse-client
 | clickhouse.podLabels | object | `{}` |  |
 | clickhouse.replicasCount | int | `1` | number of replicas. If greater than 1, keeper must be enabled or a keeper host should be provided under clickhouse.keeper.host.  Will be ignored if `zones` is set. |
 | clickhouse.service.type | string | `"ClusterIP"` |  |
+| clickhouse.service.lbService.enable | bool | `false` | additional cluster LB service |
+| clickhouse.service.lbService.serviceAnnotations | object | `""` | annotations for the LB service |
 | clickhouse.zones | list | `[]` |  |
 | keeper.enabled | bool | `false` | Whether to enable Keeper. Required for replicated tables. |
 | keeper.replicaCount | int | `3` | Number of keeper replicas. Must be an odd number. !! DO NOT CHANGE AFTER INITIAL DEPLOYMENT |
+| keeper.image | string | `"altinity/clickhouse-keeper"` |  |
+| keeper.tag | string | `"24.3.12.76.altinitystable"` |  |
+| keeper.settings | object | `[]` | `clickhouse-keeper` global config, for example: `prometheus/port: "7000"` |
+| keeper.localStorage.size | string | `"5Gi"` | size for keeper PV |
+| keeper.localStorage.storageClass | string | `""` | storage class for keeper PV |
+| keeper.nodeSelector | object | `{}` |  |
+| keeper.tolerations | object | `{}` |  |
+| keeper.zoneSpread | bool | `false` | topologySpreadConstraints over `zone`, by deafult there is only podAntiAffinity by hostname |
+| keeper.metricsPort | string | `""` | add metrics port to the service and pod |
+| keeper.resources.cpuRequestsMs | string | `"250m"` |  |
+| keeper.resources.memoryRequestsMiB | string | `"128Mi"` |  |
+| keeper.resources.cpuLimitsMs | string | `"500m"` |  |
+| keeper.resources.memoryLimitsMiB | string | `"128Mi"` |  |
 | operator.enabled | bool | `true` | Whether to enabled the Altinity Operator for ClickHouse. Disable if you already have the Operator installed cluster-wide. |
