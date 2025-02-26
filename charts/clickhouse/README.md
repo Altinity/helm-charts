@@ -16,28 +16,19 @@ A Helm chart for creating a ClickHouse Cluster with the Altinity Operator for Cl
 
 ```sh
 # add the kubernetes-blueprints-for-clickhouse chart repository
-helm repo add kubernetes-blueprints-for-clickhouse https://altinity.github.io/kubernetes-blueprints-for-clickhouse
+helm repo add altinity https://helm.altinity.com
 
 # use this command to install clickhouse chart (it will also create a `clickhouse` namespace)
-helm install --create-namespace --namespace clickhouse eks-dev  --set keeper.enabled=true --set clickhouse.replicasCount=2
+helm install clickhouse-dev --create-namespace --namespace clickhouse altinity/clickhouse  --set keeper.enabled=true --set clickhouse.replicasCount=2
 ```
 
 > Use `-f` flag to override default values: `helm install -f newvalues.yaml`
-
-## Upgrading the Chart
-```sh
-# get latest repository versions
-helm repo update
-
-# upgrade to a newer version using the release name (`ch`)
-helm upgrade ch kubernetes-blueprints-for-clickhouse/clickhouse --namespace clickhouse
-```
 
 ## Uninstalling the Chart
 
 ```sh
 # uninstall using the release name (`ch`)
-helm uninstall ch --namespace clickhouse
+helm uninstall clickhouse-dev --namespace clickhouse
 ```
 
 > This command removes all the Kubernetes components associated with the chart and deletes the release.
