@@ -1,14 +1,10 @@
-# Kubernetes Blueprints for ClickHouse
+# Altinity Helm Charts for ClickHouse®
 
-> Collection of samples to getting started with ClickHouse and ClickHouse Keeper
+> Helm charts for getting started with ClickHouse® and ClickHouse Keeper.
 
 These samples demonstrate straightforward Helm charts that can be used to deploy ClickHouse and ClickHouse Keeper. The examples are intended as starting points for more complex configurations and do not cover all possible uses cases.
 
-**⚠️ Important notes:**
-
-1. ClickHouse Keeper resources (CHK) are not stable yet and should not be used in production environments.
-2. Connections are unencrypted. Avoid using them for sensitive data.
-3. Selecting the external `LoadBalancer` service type in `values.yaml` will expose one or more ports to the Internet, which can pose security risks.
+For more complex configurations, consider applying your own `ClickHouseInstallation` and `ClickHouseKeeperInstallation` resources. The [cluster settings documentation](https://docs.altinity.com/altinitykubernetesoperator/kubernetesoperatorguide/kubernetesconfigurationguide/clustersettings/) is a good starting point.
 
 ## Prerequisites
 
@@ -30,8 +26,15 @@ helm install clickhouse-operator clickhouse-operator/altinity-clickhouse-operato
 
 ## Helm Charts
 
-- **[clickhouse](./charts/clickhouse/)**: Deploys a ClickHouse cluster with dependencies.
+- **[clickhouse](./charts/clickhouse/)**: All-in-one chart to deploy a ClickHouse cluster (and optionally Keeper and the Altinity Operator)
+- **[clickhouse](./charts/clickhouse-eks/)**: An EKS-specific chart for high-availability ClickHouse clusters. 
+
+### Deprecated Charts
+
+Since [Release 0.24.0](https://docs.altinity.com/releasenotes/altinity-kubernetes-operator-release-notes/#release-0240) keeper can be managed with a custom resource. These charts are deprecated and may not receive further updates:
+
 - **[clickhouse-keeper-sts](./charts/clickhouse-keeper-sts/)**: Deploys ClickHouse Keeper using StatefulSets for better data persistence.
+- **[keeper-sts](./charts/clickhouse-keeper-sts/)**: Deploys ClickHouse Keeper using StatefulSets for better data persistence.
 
 ### How to Install a Chart
 
@@ -52,7 +55,7 @@ There are several [examples](./charts/clickhouse/examples) available. You can us
 
 
 ```sh
-helm install release-name --namespace clickhouse --create-namespace -f path/to/examples/values-simple.yaml 
+helm install release-name --namespace clickhouse --create-namespace -f path/to/examples/values-simple.yaml altinity/clickhouse
 ```
 
 > Please refer to any of helm charts `README` file for detailed instructions about each of the them.
@@ -62,4 +65,4 @@ We welcome contributions from the community! If you encounter issues or have imp
 
 ## Legal
 All code, unless specified otherwise, is licensed under the [Apache-2.0](LICENSE) license.
-Copyright (c) 2024 Altinity, Inc.
+Copyright (c) 2025 Altinity, Inc.
