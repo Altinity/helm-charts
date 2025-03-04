@@ -2,7 +2,7 @@
 
 # clickhouse-eks
 
-![Version: 0.1.6](https://img.shields.io/badge/Version-0.1.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.16.0](https://img.shields.io/badge/AppVersion-1.16.0-informational?style=flat-square)
+![Version: 0.1.8](https://img.shields.io/badge/Version-0.1.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.16.0](https://img.shields.io/badge/AppVersion-1.16.0-informational?style=flat-square)
 
 A Helm chart for ClickHouse running on AWS EKS across AZs using a nodeSelector to pin resources to run on specific VMs types
 
@@ -10,10 +10,10 @@ A Helm chart for ClickHouse running on AWS EKS across AZs using a nodeSelector t
 
 ```sh
 # add the kubernetes-blueprints-for-clickhouse chart repository
-helm repo add kubernetes-blueprints-for-clickhouse https://altinity.github.io/kubernetes-blueprints-for-clickhouse
+helm repo add altinity https://helm.altinity.com
 
 # use this command to install clickhouse-eks chart (it will also create a `clickhouse` namespace)
-helm install ch kubernetes-blueprints-for-clickhouse/clickhouse-eks --namespace clickhouse --create-namespace
+helm install ch altinity/clickhouse-eks --namespace clickhouse --create-namespace
 ```
 
 > Use `-f` flag to override default values: `helm install -f newvalues.yaml`
@@ -54,7 +54,7 @@ kubectl exec -it chi-eks-dev-0-0-0 --namespace clickhouse -- clickhouse-client
 |-----|------|---------|-------------|
 | all.metadata.labels.application_group | string | `"eks"` | The name of the application group |
 | clickhouse.cluster | string | `"dev"` | Cluster name |
-| clickhouse.image | string | `"altinity/clickhouse-server:23.8.8.21.altinitystable"` | ClickHouse server image |
+| clickhouse.image | string | `"altinity/clickhouse-server:24.3.12.76.altinitystable"` | ClickHouse server image |
 | clickhouse.keeper_name | string | `"keeper-eks"` | Name of the keeper cluster |
 | clickhouse.name | string | `"eks"` | Metadata name |
 | clickhouse.node_selector | string | `"m6i.large"` | AWS instance type |
