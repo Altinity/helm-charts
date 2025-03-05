@@ -37,19 +37,20 @@ spec:
       - name: {{ include "clickhouse.clustername" . }}
         layout:
           {{- if (empty .Values.clickhouse.zones) }}
-          shardsCount: {{ .Values.clickhouse.shardCount | default 1 }}
+          shardsCount: {{ .Values.clickhouse.shardsCount | default 1 }}
           replicasCount: {{ .Values.clickhouse.replicasCount }}
           {{- else }}
           shards:
-            {{- $shardCount := .Values.clickhouse.shardCount | default 1 }}
-            {{- range $shardIndex := until (int $shardCount) -}}
-            - replicas:
-              {{- $originalContext := . -}}
-              {{- range .Values.clickhouse.zones }}
-                - templates: 
+            {{- $originalContext := . -}}
+            {{- $shardsCount := .Values.clickhouse.shardsCount | default 1 }}
+            {{- range $shardIndex := until (int $shardsCount) -}}
+            - name: shard{{- $shardIndex -}}
+              replicas:
+              {{- range .Values.clickhouse.zones -}}
+                - templates:
                     podTemplate: {{ include "clickhouse.podTemplateName" $originalContext }}-{{ . }}
               {{- end -}}
-            {{- end -}}  
+            {{- end -}}
           {{- end -}}
     {{- $keeper_host := tpl (include "clickhouse.keeper.host" . ) . -}}
     {{- if not (empty $keeper_host) }}

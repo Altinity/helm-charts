@@ -21,7 +21,7 @@ clickhouse:
   replicasCount: 1
 
   # -- number of shards. 
-  shardCount: 1
+  shardsCount: 1
 
   # Specify which zones to run in.
   # `replicaCount` will applied within each zone.
