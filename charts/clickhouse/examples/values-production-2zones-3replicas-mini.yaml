@@ -1,0 +1,42 @@
+clickhouse:
+  antiAffinity: true
+  replicasCount: 3
+  lbService:
+    enabled: true
+    serviceAnnotations:
+      minikube.io/lb: "internal"
+  nodeSelector:
+    node.kubernetes.io/instance-type: "minikube-node"
+  persistence:
+    enabled: true
+    size: 5Gi
+  topologySpreadConstraints:
+  - maxSkew: 1
+    topologyKey: topology.kubernetes.io/zone
+    whenUnsatisfiable: ScheduleAnyway
+    labelSelector:
+      matchLabels:
+        clickhouse-keeper.altinity.com/cluster: chk-test
+
+keeper:
+  enabled: true
+  replicaCount: 3
+  zoneSpread: true
+  localStorage:
+    size: 1Gi
+  metricsPort: 7000
+  settings:
+    prometheus/endpoint: /metrics
+    prometheus/port: 7000
+    prometheus/metrics: true
+    prometheus/events: true
+    prometheus/asynchronous_metrics: true
+    prometheus/status_info: true
+  podAnnotations:
+    prometheus.io/port: "7000"
+    prometheus.io/scrape: "true"
+  resources:
+    cpuRequestsMs: "250m"
+    memoryRequestsMiB: "128Mi"
+    cpuLimitsMs: "500m"
+    memoryLimitsMiB: "128Mi"

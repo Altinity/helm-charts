@@ -58,12 +58,18 @@ clickhouse:
     repository: altinity/clickhouse-server
     pullPolicy: IfNotPresent
     # -- Override the image tag for a specific version
-    tag: "23.8.8.21.altinitystable"
+    tag: "24.3.12.76.altinitystable"
 
   service:
     # e.g. `LoadBalancer`, `NodePort`
     type: ClusterIP
+    serviceAnnotations: {}
+    serviceLabels: {}
 
+  lbService:
+    enable: false
+    serviceAnnotations: {}
+    serviceLabels: {}
 
   # @ignore
   imagePullSecrets: []
@@ -89,8 +95,11 @@ clickhouse:
   # @ignore
   affinity: {}
 
+  # @ignore
+  topologySpreadConstraints: []
 
-# Subcharts (with aliases) 
+
+# CHK parameters
 keeper:
   # -- Whether to enable Keeper.
   # Required for replicated tables.
@@ -99,6 +108,24 @@ keeper:
   # Must be an odd number.
   # !! DO NOT CHANGE AFTER INITIAL DEPLOYMENT
   replicaCount: 3
+  image: "altinity/clickhouse-keeper"
+  tag: "24.3.12.76.altinitystable"
+  # allows configure multiple aspects and behavior for `clickhouse-keeper` instance
+  settings: {}
+  localStorage:
+    size: 5Gi
+    storageClass: ""
+  nodeSelector: {}
+  tolerations: {}
+  podAnnotations: {}
+  # topologySpreadConstraints over `zone`, by deafult there is only podAntiAffinity by hostname 
+  zoneSpread: false
+  metricsPort: ""
+  resources:
+    cpuRequestsMs: "2"
+    memoryRequestsMiB: "3Gi"
+    cpuLimitsMs: "3"
+    memoryLimitsMiB: "3Gi"
 
 operator:
   # -- Whether to enabled the Altinity Operator for ClickHouse.

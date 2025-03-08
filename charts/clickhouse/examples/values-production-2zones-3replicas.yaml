@@ -1,14 +1,19 @@
 clickhouse:
   antiAffinity: true
-  zones:
-    - us-west-2a
-    - us-west-2b
+  replicasCount: 3
   nodeSelector:
     node.kubernetes.io/instance-type: "m7i.large"
   persistence:
     enabled: true
     size: 50Gi
     storageClass: gp3-encrypted
+  topologySpreadConstraints:
+  - maxSkew: 1
+    topologyKey: topology.kubernetes.io/zone
+    whenUnsatisfiable: ScheduleAnyway
+    labelSelector:
+      matchLabels:
+        clickhouse-keeper.altinity.com/cluster: chk-test
 
 keeper:
   enabled: true
