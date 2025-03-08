@@ -38,7 +38,7 @@ spec:
         layout:
           {{- if (empty .Values.clickhouse.zones) }}
           shardsCount: {{ .Values.clickhouse.shardsCount | default 1 }}
-          replicasCount: {{ .Values.clickhouse.replicasCount }}
+          replicasCount: {{ .Values.clickhouse.replicasCount | default 1 }}
           {{- else }}
           shards:
             {{- $originalContext := . -}}
