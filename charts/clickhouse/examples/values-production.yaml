@@ -5,7 +5,6 @@ clickhouse:
     - us-west-2b
   nodeSelector:
     node.kubernetes.io/instance-type: "m6i.large"
-  shardsCount: 2
 keeper:
   enabled: true
   replicaCount: 3
