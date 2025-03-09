@@ -15,17 +15,14 @@ clickhouse:
     # @default -- 127.0.0.1/32
     hostIP: 127.0.0.1/32
 
-  # -- number of replicas. If greater than 1, keeper must be enabled
-  # or a keeper host should be provided under clickhouse.keeper.host. 
-  # Will be ignored if `zones` is set.
-  replicasCount: 1
-
   # -- number of shards. 
   shardsCount: 1
 
   # Specify which zones to run in.
   # `replicaCount` will applied within each zone.
-  zones: []
+  zones: 
+    - ap-south-1
+    - ap-south-2
 
   # If enabled, will prevent ClickHouse pods from running on the same node
   antiAffinity: false
@@ -35,7 +32,7 @@ clickhouse:
     # -- Specify a keeper host.
     # Should be left empty if `clickhouse-keeper.enabled` is `true`.
     # Will override the defaults set from `clickhouse-keeper.enabled`.
-    host: ""
+    host: "localhost"
     # -- Override the default keeper port
     port: 2181
 
