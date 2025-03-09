@@ -50,7 +50,8 @@ spec:
           {{- $originalContext := . -}}
           {{- $shardsCount := .Values.clickhouse.shardsCount | default 1 | int -}}
           {{- range $shardIndex := until $shardsCount }}
-            - replicas:
+            - name: shard{{ $shardIndex }}
+              replicas:
                 {{- range $zone :=  $originalContext.Values.clickhouse.zones }}
                 - templates:
                     podTemplate: {{ include "clickhouse.podTemplateName" $originalContext }}-{{ $zone }}
