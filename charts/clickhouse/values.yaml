@@ -27,7 +27,6 @@ clickhouse:
   # `replicaCount` will applied within each zone.
   zones: []
 
-
   # If enabled, will prevent ClickHouse pods from running on the same node
   antiAffinity: false
  
