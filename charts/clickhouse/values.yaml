@@ -20,6 +20,9 @@ clickhouse:
   # Will be ignored if `zones` is set.
   replicasCount: 1
 
+  # -- number of shards. 
+  shardsCount: 1
+
   # Specify which zones to run in.
   # `replicaCount` will applied within each zone.
   zones: []
