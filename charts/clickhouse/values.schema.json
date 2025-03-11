@@ -132,6 +132,10 @@
         "podLabels": {
           "type": "object",
           "description": "Labels for ClickHouse pods."
+        },
+        "extra_config": {
+          "type": "string"
+          "description": "Additional XML config for ClickHouse"
         }
       }
     },

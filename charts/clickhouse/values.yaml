@@ -95,8 +95,14 @@ clickhouse:
   # @ignore
   affinity: {}
 
+<<<<<<< HEAD
   # @ignore
   topologySpreadConstraints: []
+=======
+extra_config: |
+  <clickhouse>
+  </clickhouse>
+>>>>>>> 033a6ee (adds extra config value for bluehoover demo @TODO: make it proper)
 
 
 # CHK parameters
