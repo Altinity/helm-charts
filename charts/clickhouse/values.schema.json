@@ -36,6 +36,11 @@
           "description": "Number of ClickHouse replicas. If greater than 1, Keeper must be enabled or a Keeper host must be provided.",
           "default": 1
         },
+        "shardsCount": {
+          "type": "integer",
+          "description": "Number of shards.",
+          "default": 1
+        },
         "zones": {
           "type": "array",
           "description": "Specify the zones for ClickHouse pods.",
@@ -122,7 +127,39 @@
             "type": {
               "type": "string",
               "description": "Service type, e.g., LoadBalancer or ClusterIP."
+            },
+            "serviceAnnotations": {
+              "type": "object",
+              "description": "Annotations for ClickHouse service."
+            },
+            "serviceLabels": {
+              "type": "object",
+              "description": "Labels for ClickHouse service."
             }
+          }
+        },
+        "lbService": {
+          "type": "object",
+          "properties": {
+            "enable": {
+              "type": "boolean",
+              "description": "Enable LoadBalancer service for ClickHouse."
+            },
+            "serviceAnnotations": {
+              "type": "object",
+              "description": "Annotations for LoadBalancer service."
+            },
+            "serviceLabels": {
+              "type": "object",
+              "description": "Labels for LoadBalancer service."
+            }
+          }
+        },
+        "imagePullSecrets": {
+          "type": "array",
+          "description": "Image pull secrets for ClickHouse pods.",
+          "items": {
+            "type": "object"
           }
         },
         "podAnnotations": {
@@ -132,6 +169,40 @@
         "podLabels": {
           "type": "object",
           "description": "Labels for ClickHouse pods."
+        },
+        "podSecurityContext": {
+          "type": "object",
+          "description": "Pod security context for ClickHouse pods."
+        },
+        "securityContext": {
+          "type": "object",
+          "description": "Security context for ClickHouse containers."
+        },
+        "nodeSelector": {
+          "type": "object",
+          "description": "Node selector for ClickHouse pods."
+        },
+        "tolerations": {
+          "type": "array",
+          "description": "Tolerations for ClickHouse pods.",
+          "items": {
+            "type": "object"
+          }
+        },
+        "affinity": {
+          "type": "object",
+          "description": "Affinity for ClickHouse pods."
+        },
+        "topologySpreadConstraints": {
+          "type": "array",
+          "description": "Topology spread constraints for ClickHouse pods.",
+          "items": {
+            "type": "object"
+          }
+        },
+        "extra_config": {
+          "type": "string",
+          "description": "Additional XML config for ClickHouse."
         }
       }
     },
@@ -146,6 +217,72 @@
           "type": "integer",
           "description": "Number of Keeper replicas. Must be an odd number.",
           "default": 3
+        },
+        "image": {
+          "type": "string",
+          "description": "Image repository for Keeper."
+        },
+        "tag": {
+          "type": "string",
+          "description": "Image tag for Keeper."
+        },
+        "settings": {
+          "type": "object",
+          "description": "Configuration settings for ClickHouse Keeper."
+        },
+        "localStorage": {
+          "type": "object",
+          "properties": {
+            "size": {
+              "type": "string",
+              "description": "Volume size for Keeper storage."
+            },
+            "storageClass": {
+              "type": "string",
+              "description": "Storage class for Keeper persistent volume."
+            }
+          }
+        },
+        "nodeSelector": {
+          "type": "object",
+          "description": "Node selector for Keeper pods."
+        },
+        "tolerations": {
+          "type": "object",
+          "description": "Tolerations for Keeper pods."
+        },
+        "podAnnotations": {
+          "type": "object",
+          "description": "Annotations for Keeper pods."
+        },
+        "zoneSpread": {
+          "type": "boolean",
+          "description": "Enable topology spread constraints over zone for Keeper."
+        },
+        "metricsPort": {
+          "type": "string",
+          "description": "Port for Keeper metrics."
+        },
+        "resources": {
+          "type": "object",
+          "properties": {
+            "cpuRequestsMs": {
+              "type": "number",
+              "description": "CPU requests in millicores for Keeper."
+            },
+            "memoryRequestsMiB": {
+              "type": "string",
+              "description": "Memory requests for Keeper."
+            },
+            "cpuLimitsMs": {
+              "type": "number",
+              "description": "CPU limits in millicores for Keeper."
+            },
+            "memoryLimitsMiB": {
+              "type": "string",
+              "description": "Memory limits for Keeper."
+            }
+          }
         }
       }
     },

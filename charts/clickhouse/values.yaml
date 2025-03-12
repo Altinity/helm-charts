@@ -1,3 +1,4 @@
+---
 # @ignore
 nameOverride: ""
 # @ignore
@@ -10,17 +11,17 @@ clickhouse:
     # -- Allow the default user to access ClickHouse from any IP.
     # If set, will override `hostIP` to always be `0.0.0.0/0`.
     allowExternalAccess: false
-    # defaultUser.hostIP -- (string) Set a mask for IPs allowed for the default user.
-    # Should not be set if allowExternalAccess is set.
+    # defaultUser.hostIP -- (string) Set a mask for IPs allowed for the
+    # default user. Should not be set if allowExternalAccess is set.
     # @default -- 127.0.0.1/32
     hostIP: 127.0.0.1/32
 
   # -- number of replicas. If greater than 1, keeper must be enabled
-  # or a keeper host should be provided under clickhouse.keeper.host. 
+  # or a keeper host should be provided under clickhouse.keeper.host.
   # Will be ignored if `zones` is set.
   replicasCount: 1
 
-  # -- number of shards. 
+  # -- number of shards.
   shardsCount: 1
 
   # Specify which zones to run in.
@@ -29,7 +30,7 @@ clickhouse:
 
   # If enabled, will prevent ClickHouse pods from running on the same node
   antiAffinity: false
- 
+
   # -- Keeper connection settings for ClickHouse instances.
   keeper:
     # -- Specify a keeper host.
@@ -98,6 +99,10 @@ clickhouse:
   # @ignore
   topologySpreadConstraints: []
 
+  # -- Miscellanous config for ClickHouse (in xml format)
+  extra_config: |
+    <clickhouse>
+    </clickhouse>
 
 # CHK parameters
 keeper:
@@ -110,7 +115,8 @@ keeper:
   replicaCount: 3
   image: "altinity/clickhouse-keeper"
   tag: "24.3.12.76.altinitystable"
-  # allows configure multiple aspects and behavior for `clickhouse-keeper` instance
+  # allows configure multiple aspects and behavior for `clickhouse-keeper`
+  # instance
   settings: {}
   localStorage:
     size: 5Gi
@@ -118,14 +124,15 @@ keeper:
   nodeSelector: {}
   tolerations: {}
   podAnnotations: {}
-  # topologySpreadConstraints over `zone`, by deafult there is only podAntiAffinity by hostname 
+  # topologySpreadConstraints over `zone`, by deafult there is only
+  # podAntiAffinity by hostname
   zoneSpread: false
   metricsPort: ""
   resources:
-    cpuRequestsMs: "2"
-    memoryRequestsMiB: "3Gi"
-    cpuLimitsMs: "3"
-    memoryLimitsMiB: "3Gi"
+    cpuRequestsMs: 2
+    memoryRequestsMiB: 3Gi
+    cpuLimitsMs: 3
+    memoryLimitsMiB: 3Gi
 
 operator:
   # -- Whether to enabled the Altinity Operator for ClickHouse.

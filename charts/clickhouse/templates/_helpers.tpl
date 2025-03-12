@@ -175,6 +175,15 @@ Keeper Host
 {{- end -}}
 
 {{/*
+Extra Config
+*/}}
+{{- define "clickhouse.extra_config" -}}
+  {{- if not (empty .Values.extra_config) -}}
+    {{ .Values.extra_config }}
+  {{- else -}}
+  {{- end -}}
+{{- end -}}
+{{/*
 Common labels
 */}}
 {{- define "clickhouse.labels" -}}
