@@ -65,11 +65,11 @@ spec:
           - host: {{ $keeper_host }}
             port: {{ .Values.clickhouse.keeper.port }}
     {{- end }}
-    {{- $extra_config := tpl (include "clickhouse.extra_config" . ) . -}}
-    {{- if not (empty $extra_config) }}
+    {{- $extraConfig := tpl (include "clickhouse.extraConfig" . ) . -}}
+    {{- if not (empty $extraConfig) }}
     files:
         config.d/extra_config.xml: | 
-          {{- tpl $extra_config . | nindent 10 }}
+          {{- tpl $extraConfig . | nindent 10 }}
     {{- end }}
 
 {{ include "validate.clickhouse.keeper" . }}
