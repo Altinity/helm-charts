@@ -27,7 +27,7 @@ helm install clickhouse-operator clickhouse-operator/altinity-clickhouse-operato
 ## Helm Charts
 
 - **[clickhouse](./charts/clickhouse/)**: All-in-one chart to deploy a ClickHouse cluster (and optionally Keeper and the Altinity Operator)
-- **[clickhouse](./charts/clickhouse-eks/)**: An EKS-specific chart for high-availability ClickHouse clusters. 
+- **[clickhouse-eks](./charts/clickhouse-eks/)**: An EKS-specific chart for high-availability ClickHouse clusters. 
 
 ### Deprecated Charts
 

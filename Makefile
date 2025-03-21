@@ -5,7 +5,7 @@ VERSION ?= $(shell git describe --tags --always --dirty)
 $(shell mkdir -p ${BUILD_DIR})
 
 docs:
-	helm-docs --template-files=templates/install.gotmpl --template-files=templates/README.md.gotmpl
+	helm-docs --template-files=templates/install.gotmpl --template-files=README.md.gotmpl
 
 verify:
 	${REPO_ROOT}/scripts/validate.sh

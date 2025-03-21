@@ -1,10 +1,18 @@
 
 
-# clickhouse
+# All-in-One Chart for ClickHouse®
 
-![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 24.3.12.76](https://img.shields.io/badge/AppVersion-24.3.12.76-informational?style=flat-square)
+![Version: 0.2.2](https://img.shields.io/badge/Version-0.2.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 24.3.12.76](https://img.shields.io/badge/AppVersion-24.3.12.76-informational?style=flat-square)
 
 A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for ClickHouse
+
+## Features
+
+- Single-node or multi-node ClickHouse clusters
+- Sharding and replication
+- ClickHouse Keeper integration
+- Persistent storage configuration
+- Init scripts
 
 ## Requirements
 
@@ -16,10 +24,10 @@ A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for 
 
 ```sh
 # add the kubernetes-blueprints-for-clickhouse chart repository
-helm repo add kubernetes-blueprints-for-clickhouse https://altinity.github.io/kubernetes-blueprints-for-clickhouse
+helm repo add altinity https://helm.altinity.com/
 
 # use this command to install clickhouse chart (it will also create a `clickhouse` namespace)
-helm install ch kubernetes-blueprints-for-clickhouse/clickhouse --namespace clickhouse --create-namespace
+helm install ch altinity/clickhouse --namespace clickhouse --create-namespace
 ```
 
 > Use `-f` flag to override default values: `helm install -f newvalues.yaml`
@@ -29,15 +37,23 @@ helm install ch kubernetes-blueprints-for-clickhouse/clickhouse --namespace clic
 # get latest repository versions
 helm repo update
 
-# upgrade to a newer version using the release name (`ch`)
-helm upgrade ch kubernetes-blueprints-for-clickhouse/clickhouse --namespace clickhouse
+# upgrade to a newer version using the release name (`clickhouse`)
+helm upgrade clickhouse altinity/clickhouse --namespace clickhouse
 ```
 
 ## Uninstalling the Chart
 
 ```sh
-# uninstall using the release name (`ch`)
-helm uninstall ch --namespace clickhouse
+# uninstall using the release name (`clickhouse`)
+helm uninstall clickhouse --namespace clickhouse
+```
+
+**Note:** If you installed the Altinity Operator with this chart, your ClickHouse Installations will hang because the Operator will be deleted before their finalizers complete. To resolve this you must manually edit each `chi` resource and remove the finalizer.
+
+PVCs created by this helm chart will not be automatically deleted and must be deleted manually. An easy way to do this is to delete the namespace:
+
+```sh
+kubectl delete namespace clickhouse
 ```
 
 > This command removes all the Kubernetes components associated with the chart and deletes the release.
@@ -49,10 +65,57 @@ helm uninstall ch --namespace clickhouse
 kubectl get pods --namespace clickhouse
 
 # pick any of your available pods and connect through the clickhouse-client
-kubectl exec -it chi-eks-dev-0-0-0 --namespace clickhouse -- clickhouse-client
+kubectl exec -it chi-clickhouse-0-0-0 --namespace clickhouse -- clickhouse-client
 ```
 
 > Use `kubectl port forward` to access your ClickHouse cluster from outside: `kubectl port-forward service clickhouse-eks 9000:9000 & clickhouse-client`
+
+## Using Init Scripts with ConfigMap
+
+The chart allows mounting a ConfigMap containing initialization scripts that will be executed during the ClickHouse container startup.
+
+### How to use:
+
+1. Create a ConfigMap containing your initialization scripts:
+
+```bash
+kubectl create configmap my-init-scripts --from-file=01_create_database.sh --from-file=02_create_tables.sh
+```
+
+2. Enable the initScripts feature in your Helm values:
+
+```yaml
+clickhouse:
+  initScripts:
+    enabled: true
+    configMapName: my-init-scripts
+    alwaysRun: true  # Set to true to always run scripts on container restart
+```
+
+The scripts will be mounted at `/docker-entrypoint-initdb.d/` in the ClickHouse container and executed in alphabetical order during startup.
+
+### Example Script Format
+
+```bash
+#!/bin/bash
+set -e
+clickhouse client -n <<-EOSQL
+  CREATE DATABASE IF NOT EXISTS my_database;
+  CREATE TABLE IF NOT EXISTS my_database.my_table (
+    id UInt64,
+    data String
+  ) ENGINE = MergeTree()
+  ORDER BY id;
+EOSQL
+```
+
+**Homepage:** <https://github.com/Altinity/helm-charts/charts/clickhouse>
+
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| Altinity | <info@altinity.com> | <https://altinity.com> |
 
 ## Values
 
@@ -62,9 +125,14 @@ kubectl exec -it chi-eks-dev-0-0-0 --namespace clickhouse -- clickhouse-client
 | clickhouse.defaultUser.allowExternalAccess | bool | `false` | Allow the default user to access ClickHouse from any IP. If set, will override `hostIP` to always be `0.0.0.0/0`. |
 | clickhouse.defaultUser.hostIP | string | `"127.0.0.1/32"` |  |
 | clickhouse.defaultUser.password | string | `""` |  |
+| clickhouse.extraConfig | string | `"<clickhouse>\n</clickhouse>\n"` | Miscellanous config for ClickHouse (in xml format) |
 | clickhouse.image.pullPolicy | string | `"IfNotPresent"` |  |
 | clickhouse.image.repository | string | `"altinity/clickhouse-server"` |  |
 | clickhouse.image.tag | string | `"24.3.12.76.altinitystable"` | Override the image tag for a specific version |
+| clickhouse.initScripts | object | `{"alwaysRun":true,"configMapName":"","enabled":false}` | Init scripts ConfigMap configuration |
+| clickhouse.initScripts.alwaysRun | bool | `true` | Set to true to always run init scripts on container startup |
+| clickhouse.initScripts.configMapName | string | `""` | Name of an existing ConfigMap containing init scripts The scripts will be mounted at /docker-entrypoint-initdb.d/ |
+| clickhouse.initScripts.enabled | bool | `false` | Set to true to enable init scripts feature |
 | clickhouse.keeper | object | `{"host":"","port":2181}` | Keeper connection settings for ClickHouse instances. |
 | clickhouse.keeper.host | string | `""` | Specify a keeper host. Should be left empty if `clickhouse-keeper.enabled` is `true`. Will override the defaults set from `clickhouse-keeper.enabled`. |
 | clickhouse.keeper.port | int | `2181` | Override the default keeper port |
@@ -80,10 +148,11 @@ kubectl exec -it chi-eks-dev-0-0-0 --namespace clickhouse -- clickhouse-client
 | clickhouse.persistence.storageClass | string | `""` |  |
 | clickhouse.podAnnotations | object | `{}` |  |
 | clickhouse.podLabels | object | `{}` |  |
-| clickhouse.replicasCount | int | `1` | number of replicas. If greater than 1, keeper must be enabled or a keeper host should be provided under clickhouse.keeper.host.  Will be ignored if `zones` is set. |
+| clickhouse.replicasCount | int | `1` | number of replicas. If greater than 1, keeper must be enabled or a keeper host should be provided under clickhouse.keeper.host. Will be ignored if `zones` is set. |
 | clickhouse.service.serviceAnnotations | object | `{}` |  |
 | clickhouse.service.serviceLabels | object | `{}` |  |
 | clickhouse.service.type | string | `"ClusterIP"` |  |
+| clickhouse.shardsCount | int | `1` | number of shards. |
 | clickhouse.zones | list | `[]` |  |
 | keeper.enabled | bool | `false` | Whether to enable Keeper. Required for replicated tables. |
 | keeper.image | string | `"altinity/clickhouse-keeper"` |  |
@@ -93,8 +162,8 @@ kubectl exec -it chi-eks-dev-0-0-0 --namespace clickhouse -- clickhouse-client
 | keeper.nodeSelector | object | `{}` |  |
 | keeper.podAnnotations | object | `{}` |  |
 | keeper.replicaCount | int | `3` | Number of keeper replicas. Must be an odd number. !! DO NOT CHANGE AFTER INITIAL DEPLOYMENT |
-| keeper.resources.cpuLimitsMs | string | `"3"` |  |
-| keeper.resources.cpuRequestsMs | string | `"2"` |  |
+| keeper.resources.cpuLimitsMs | int | `3` |  |
+| keeper.resources.cpuRequestsMs | int | `2` |  |
 | keeper.resources.memoryLimitsMiB | string | `"3Gi"` |  |
 | keeper.resources.memoryRequestsMiB | string | `"3Gi"` |  |
 | keeper.settings | object | `{}` |  |

@@ -4,3 +4,4 @@ description: A Helm chart for setting up ClickHouse Keeper using StatefulSet
 type: application
 version: 0.1.2
 appVersion: "1.16.0"
+deprecated: true

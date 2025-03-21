@@ -10,10 +10,10 @@ A Helm chart for ClickHouse running on AWS EKS across AZs using a nodeSelector t
 
 ```sh
 # add the kubernetes-blueprints-for-clickhouse chart repository
-helm repo add altinity https://helm.altinity.com
+helm repo add kubernetes-blueprints-for-clickhouse https://altinity.github.io/kubernetes-blueprints-for-clickhouse
 
 # use this command to install clickhouse-eks chart (it will also create a `clickhouse` namespace)
-helm install ch altinity/clickhouse-eks --namespace clickhouse --create-namespace
+helm install ch kubernetes-blueprints-for-clickhouse/clickhouse-eks --namespace clickhouse --create-namespace
 ```
 
 > Use `-f` flag to override default values: `helm install -f newvalues.yaml`
