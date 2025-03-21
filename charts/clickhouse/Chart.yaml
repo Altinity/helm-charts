@@ -4,6 +4,11 @@ description: A Helm chart for creating a ClickHouse® Cluster with the Altinity 
 type: application
 version: 0.2.2
 appVersion: "24.3.12.76"
+home: https://github.com/Altinity/helm-charts/charts/clickhouse
+maintainers:
+  - name: Altinity
+    email: info@altinity.com
+    url: https://altinity.com
 
 dependencies:
   - name: altinity-clickhouse-operator
