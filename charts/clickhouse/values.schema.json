@@ -200,12 +200,29 @@
             "type": "object"
           }
         },
-        "extra_config": {
+        "extraConfig": {
           "type": "string",
-          "description": "Additional XML config for ClickHouse."
-        "extra_config": {
-          "type": "string"
-          "description": "Additional XML config for ClickHouse"
+          "description": "Miscellaneous config for ClickHouse in XML format."
+        },
+        "initScripts": {
+          "type": "object",
+          "description": "Configuration for init scripts via ConfigMap.",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable init scripts feature.",
+              "default": false
+            },
+            "configMapName": {
+              "type": "string",
+              "description": "Name of an existing ConfigMap containing init scripts to be mounted at /docker-entrypoint-initdb.d/."
+            },
+            "alwaysRun": {
+              "type": "boolean",
+              "description": "Set to true to always run init scripts on container startup.",
+              "default": true
+            }
+          }
         }
       }
     },

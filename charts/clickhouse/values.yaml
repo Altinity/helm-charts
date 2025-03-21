@@ -96,19 +96,23 @@ clickhouse:
   # @ignore
   affinity: {}
 
-<<<<<<< HEAD
   # @ignore
   topologySpreadConstraints: []
-=======
-extra_config: |
-  <clickhouse>
-  </clickhouse>
->>>>>>> 033a6ee (adds extra config value for bluehoover demo @TODO: make it proper)
 
   # -- Miscellanous config for ClickHouse (in xml format)
-  extra_config: |
+  extraConfig: |
     <clickhouse>
     </clickhouse>
+
+  # -- Init scripts ConfigMap configuration
+  initScripts:
+    # -- Set to true to enable init scripts feature
+    enabled: false
+    # -- Name of an existing ConfigMap containing init scripts
+    # The scripts will be mounted at /docker-entrypoint-initdb.d/
+    configMapName: ""
+    # -- Set to true to always run init scripts on container startup
+    alwaysRun: true
 
 # CHK parameters
 keeper:
