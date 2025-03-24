@@ -15,11 +15,11 @@ A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for 
 ## Installing the Chart
 
 ```sh
-# add the kubernetes-blueprints-for-clickhouse chart repository
-helm repo add kubernetes-blueprints-for-clickhouse https://altinity.github.io/kubernetes-blueprints-for-clickhouse
+# add the altinity chart repository
+helm repo add altinity https://helm.altinity.com
 
 # use this command to install clickhouse chart (it will also create a `clickhouse` namespace)
-helm install ch kubernetes-blueprints-for-clickhouse/clickhouse --namespace clickhouse --create-namespace
+helm install release-name altinity/clickhouse --namespace clickhouse --create-namespace
 ```
 
 > Use `-f` flag to override default values: `helm install -f newvalues.yaml`
