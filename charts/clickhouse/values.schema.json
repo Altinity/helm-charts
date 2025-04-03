@@ -248,8 +248,11 @@
           "description": "Node selector for Keeper pods."
         },
         "tolerations": {
-          "type": "object",
-          "description": "Tolerations for Keeper pods."
+          "type": "array",
+          "description": "Tolerations for Keeper pods.",
+          "items": {
+            "type": "object"
+          }
         },
         "podAnnotations": {
           "type": "object",
