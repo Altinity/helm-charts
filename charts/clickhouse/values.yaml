@@ -100,7 +100,7 @@ clickhouse:
   topologySpreadConstraints: []
 
   # -- Miscellanous config for ClickHouse (in xml format)
-  extra_config: |
+  extraConfig: |
     <clickhouse>
     </clickhouse>
 

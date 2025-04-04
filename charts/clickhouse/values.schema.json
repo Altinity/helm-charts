@@ -200,7 +200,7 @@
             "type": "object"
           }
         },
-        "extra_config": {
+        "extraConfig": {
           "type": "string",
           "description": "Additional XML config for ClickHouse."
         }
