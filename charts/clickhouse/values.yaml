@@ -122,7 +122,7 @@ keeper:
     size: 5Gi
     storageClass: ""
   nodeSelector: {}
-  tolerations: {}
+  tolerations: []
   podAnnotations: {}
   # topologySpreadConstraints over `zone`, by deafult there is only
   # podAntiAffinity by hostname
