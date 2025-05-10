@@ -89,8 +89,24 @@ Pod Template Base
               livenessProbe:
                 {{- toYaml . | nindent 16 }}
               {{- end }}
+              {{- if .Values.clickhouse.initScripts.enabled }}
+              env:
+                {{- if .Values.clickhouse.initScripts.alwaysRun }}
+                - name: CLICKHOUSE_ALWAYS_RUN_INITDB_SCRIPTS
+                  value: "true"
+                {{- end }}
+              volumeMounts:
+                - name: init-scripts-configmap
+                  mountPath: /docker-entrypoint-initdb.d
+              {{- end }}
               resources:
                 {{- toYaml .Values.clickhouse.resources | nindent 16 }}
+          {{- if .Values.clickhouse.initScripts.enabled }}
+          volumes:
+            - name: init-scripts-configmap
+              configMap:
+                name: {{ .Values.clickhouse.initScripts.configMapName }}
+          {{- end }}
           {{- with .Values.clickhouse.nodeSelector }}
           nodeSelector:
             {{- toYaml . | nindent 12 }}
