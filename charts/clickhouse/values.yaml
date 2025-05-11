@@ -124,7 +124,7 @@ keeper:
   # !! DO NOT CHANGE AFTER INITIAL DEPLOYMENT
   replicaCount: 3
   image: "altinity/clickhouse-keeper"
-  tag: "24.3.12.76.altinitystable"
+  tag: "24.8.14.10459.altinitystable"
   # allows configure multiple aspects and behavior for `clickhouse-keeper`
   # instance
   settings: {}
