@@ -1,10 +1,16 @@
-
-
 # clickhouse
 
 ![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 24.3.12.76](https://img.shields.io/badge/AppVersion-24.3.12.76-informational?style=flat-square)
 
 A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for ClickHouse
+
+## Features
+
+- Single-node or multi-node ClickHouse clusters
+- Sharding and replication
+- ClickHouse Keeper integration
+- Persistent storage configuration
+- Init scripts
 
 ## Requirements
 
@@ -29,15 +35,23 @@ helm install release-name altinity/clickhouse --namespace clickhouse --create-na
 # get latest repository versions
 helm repo update
 
-# upgrade to a newer version using the release name (`ch`)
-helm upgrade ch kubernetes-blueprints-for-clickhouse/clickhouse --namespace clickhouse
+# upgrade to a newer version using the release name (`clickhouse`)
+helm upgrade clickhouse altinity/clickhouse --namespace clickhouse
 ```
 
 ## Uninstalling the Chart
 
 ```sh
-# uninstall using the release name (`ch`)
-helm uninstall ch --namespace clickhouse
+# uninstall using the release name (`clickhouse`)
+helm uninstall clickhouse --namespace clickhouse
+```
+
+**Note:** If you installed the Altinity Operator with this chart, your ClickHouse Installations will hang because the Operator will be deleted before their finalizers complete. To resolve this you must manually edit each `chi` resource and remove the finalizer.
+
+PVCs created by this helm chart will not be automatically deleted and must be deleted manually. An easy way to do this is to delete the namespace:
+
+```sh
+kubectl delete namespace clickhouse
 ```
 
 > This command removes all the Kubernetes components associated with the chart and deletes the release.
@@ -49,10 +63,49 @@ helm uninstall ch --namespace clickhouse
 kubectl get pods --namespace clickhouse
 
 # pick any of your available pods and connect through the clickhouse-client
-kubectl exec -it chi-eks-dev-0-0-0 --namespace clickhouse -- clickhouse-client
+kubectl exec -it chi-clickhouse-0-0-0 --namespace clickhouse -- clickhouse-client
 ```
 
 > Use `kubectl port forward` to access your ClickHouse cluster from outside: `kubectl port-forward service clickhouse-eks 9000:9000 & clickhouse-client`
+
+## Using Init Scripts with ConfigMap
+
+The chart allows mounting a ConfigMap containing initialization scripts that will be executed during the ClickHouse container startup.
+
+### How to use:
+
+1. Create a ConfigMap containing your initialization scripts:
+
+```bash
+kubectl create configmap my-init-scripts --from-file=01_create_database.sh --from-file=02_create_tables.sh
+```
+
+2. Enable the initScripts feature in your Helm values:
+
+```yaml
+clickhouse:
+  initScripts:
+    enabled: true
+    configMapName: my-init-scripts
+    alwaysRun: true  # Set to true to always run scripts on container restart
+```
+
+The scripts will be mounted at `/docker-entrypoint-initdb.d/` in the ClickHouse container and executed in alphabetical order during startup.
+
+### Example Script Format
+
+```bash
+#!/bin/bash
+set -e
+clickhouse client -n <<-EOSQL
+  CREATE DATABASE IF NOT EXISTS my_database;
+  CREATE TABLE IF NOT EXISTS my_database.my_table (
+    id UInt64,
+    data String
+  ) ENGINE = MergeTree()
+  ORDER BY id;
+EOSQL
+```
 
 ## Values
 
@@ -62,9 +115,13 @@ kubectl exec -it chi-eks-dev-0-0-0 --namespace clickhouse -- clickhouse-client
 | clickhouse.defaultUser.allowExternalAccess | bool | `false` | Allow the default user to access ClickHouse from any IP. If set, will override `hostIP` to always be `0.0.0.0/0`. |
 | clickhouse.defaultUser.hostIP | string | `"127.0.0.1/32"` |  |
 | clickhouse.defaultUser.password | string | `""` |  |
+| clickhouse.extraConfig | string | `<clickhouse>\n</clickhouse>` | Miscellaneous config for ClickHouse in XML format |
 | clickhouse.image.pullPolicy | string | `"IfNotPresent"` |  |
 | clickhouse.image.repository | string | `"altinity/clickhouse-server"` |  |
 | clickhouse.image.tag | string | `"24.3.12.76.altinitystable"` | Override the image tag for a specific version |
+| clickhouse.initScripts.enabled | bool | `false` | Enable init scripts ConfigMap |
+| clickhouse.initScripts.configMapName | string | `""` | Name of ConfigMap with init scripts |
+| clickhouse.initScripts.alwaysRun | bool | `true` | Always run init scripts on startup |
 | clickhouse.keeper | object | `{"host":"","port":2181}` | Keeper connection settings for ClickHouse instances. |
 | clickhouse.keeper.host | string | `""` | Specify a keeper host. Should be left empty if `clickhouse-keeper.enabled` is `true`. Will override the defaults set from `clickhouse-keeper.enabled`. |
 | clickhouse.keeper.port | int | `2181` | Override the default keeper port |
