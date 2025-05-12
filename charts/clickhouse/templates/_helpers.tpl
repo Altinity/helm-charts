@@ -193,7 +193,7 @@ Keeper Host
 {{/*
 Extra Config
 */}}
-{{- define "clickhouse.extra_config" -}}
+{{- define "clickhouse.extraConfig" -}}
   {{- if not (empty .Values.clickhouse.extraConfig) -}}
     {{ .Values.clickhouse.extraConfig }}
   {{- else -}}
