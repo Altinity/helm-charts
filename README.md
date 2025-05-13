@@ -19,7 +19,7 @@ To get started, you'll need to:
 
 ```sh
 helm repo add clickhouse-operator https://docs.altinity.com/clickhouse-operator/
-helm install clickhouse-operator clickhouse-operator/altinity-clickhouse-operator
+helm install clickhouse-operator clickhouse-operator/altinity-clickhouse-operator --namespace kube-system
 ```
 
 > Please refer to the Altinity Operator project instructions for details on operator upgrade with Helm, including running custom resource definition files independently.
