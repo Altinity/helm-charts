@@ -34,6 +34,9 @@ spec:
     users:
       default/networks/ip: {{ include "clickhouse.defaultUser.ip" . | quote }}
       default/access_management: 1
+      default/named_collection_control: 1
+      default/show_named_collections: 1
+      default/show_named_collections_secrets: 1
       default/password:
         valueFrom:
           secretKeyRef:
