@@ -133,7 +133,7 @@ Pod Template Base
 Pod Template Name
 */}}
 {{- define "clickhouse.podTemplateName" -}}
-{{- printf "%s-%s-pod" (include "clickhouse.fullname" .) (include "clickhouse.version" .) | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- printf "%s-%s-pod" (include "clickhouse.fullname" .) (include "clickhouse.version" .) | replace "." "_" | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
