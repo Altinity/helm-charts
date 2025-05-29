@@ -32,6 +32,10 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 {{- end }}
 
+{{- define "clickhouse.version" -}}
+{{ .Values.clickhouse.image.tag | default .Chart.AppVersion }}
+{{- end }}
+
 {{/*
 Create chart name and version as used by the chart label.
 */}}
@@ -129,7 +133,7 @@ Pod Template Base
 Pod Template Name
 */}}
 {{- define "clickhouse.podTemplateName" -}}
-{{- printf "%s-pod" (include "clickhouse.fullname" .) | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- printf "%s-%s-pod" (include "clickhouse.fullname" .) (include "clickhouse.version" .) | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
