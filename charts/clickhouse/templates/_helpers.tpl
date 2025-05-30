@@ -133,7 +133,8 @@ Pod Template Base
 Pod Template Name
 */}}
 {{- define "clickhouse.podTemplateName" -}}
-{{- $podHash := include "clickhouse.version" . | sha256sum | trunc 8 }} 
+{{- $podDescString := printf "%s-%s" (include "clickhouse.fullname" .) (include "clickhouse.version" .) }}
+{{- $podHash := $podDescString | sha256sum | trunc 8 }} 
 {{- printf "%s-%s-pod" (include "clickhouse.fullname" .) $podHash | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
