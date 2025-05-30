@@ -33,7 +33,7 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 
 {{- define "clickhouse.version" -}}
-{{ .Values.clickhouse.image.tag | default .Chart.AppVersion }}
+{{ .Values.clickhouse.image.repository }}:{{ .Values.clickhouse.image.tag | default .Chart.AppVersion }}
 {{- end }}
 
 {{/*
@@ -135,7 +135,7 @@ Pod Template Name
 {{- define "clickhouse.podTemplateName" -}}
 {{- $podDescString := printf "%s-%s" (include "clickhouse.fullname" .) (include "clickhouse.version" .) }}
 {{- $podHash := $podDescString | sha256sum | trunc 8 }} 
-{{- printf "%s-%s-pod" (include "clickhouse.fullname" .) $podHash | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- printf "%s-pod-%s" (include "clickhouse.fullname" .) $podHash | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
