@@ -1,6 +1,6 @@
 # Altinity Helm Charts for ClickHouse®
 
-> Helm charts for getting started with ClickHouse® and ClickHouse Keeper.
+> Helm charts for getting started with ClickHouse and ClickHouse Keeper.
 
 These samples demonstrate straightforward Helm charts that can be used to deploy ClickHouse and ClickHouse Keeper. The examples are intended as starting points for more complex configurations and do not cover all possible uses cases.
 
@@ -63,6 +63,20 @@ helm install release-name --namespace clickhouse --create-namespace -f path/to/e
 ## Contributing
 We welcome contributions from the community! If you encounter issues or have improvements to suggest, please log an issue or submit a PR.
 
+## Community Support
+These helm charts are maintained by Altinity for use with the Altinity Operator for ClickHouse. You can reach us directly in our community slack:
+
+- [Slack](https://altinity.com/slack) - Talk directly with ClickHouse users and Altinity devs.
+
+## Commercial Support 
+[Altinity](https://altinity.com) offers a range of services related to ClickHouse and analytic applications on Kubernetes:
+
+- [Altinity.Cloud](https://altinity.com/cloud-database/) - Run ClickHouse in our cloud or yours.
+- [Altinity Support](https://altinity.com/support/) - Get Enterprise-class support for ClickHouse.
+- [Contact us](https://hubs.la/Q020sH3Z0) - Contact Altinity with your questions or issues.
+- [Free consultation](https://hubs.la/Q020sHkv0) - Get a free consultation with a ClickHouse expert today.
+
 ## Legal
 All code, unless specified otherwise, is licensed under the [Apache-2.0](LICENSE) license.
 Copyright (c) 2025 Altinity, Inc.
+Altinity®, Altinity.Cloud®, and Altinity Stable® are registered trademarks of Altinity, Inc. ClickHouse® is a registered trademark of ClickHouse, Inc.; Altinity is not affiliated with or associated with ClickHouse, Inc.
