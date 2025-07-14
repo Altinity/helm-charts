@@ -21,13 +21,6 @@ For more complex configurations, follow the [Installation Guide](https://docs.al
 
 > Please refer to the Altinity Operator project instructions for details on operator upgrade with Helm, including running custom resource definition files independently.
 
-## Community
-
-These charts are a community effort sponsored by Altinity. The best way to reach us or ask questions is:
-
-* Join the [Altinity Slack](https://altinity.com/slack) - Chat with the developers and other users
-* Log an [issue on GitHub](https://github.com/Altinity/helm-charts/issues) - Ask questions, log bugs and feature requests
-
 ## Helm Charts
 
 - **[clickhouse](./charts/clickhouse/)**: All-in-one chart to deploy a ClickHouse cluster (and optionally Keeper and the Altinity Operator)
@@ -39,6 +32,13 @@ Since [Release 0.24.0](https://docs.altinity.com/releasenotes/altinity-kubernete
 
 - **[clickhouse-keeper-sts](./charts/clickhouse-keeper-sts/)**: Deploys ClickHouse Keeper using StatefulSets for better data persistence.
 - **[keeper-sts](./charts/clickhouse-keeper-sts/)**: Deploys ClickHouse Keeper using StatefulSets for better data persistence.
+
+## Community
+
+These charts are a community effort sponsored by Altinity. The best way to reach us or ask questions is:
+
+* Join the [Altinity Slack](https://altinity.com/slack) - Chat with the developers and other users
+* Log an [issue on GitHub](https://github.com/Altinity/helm-charts/issues) - Ask questions, log bugs and feature requests
 
 ## Contributing
 We welcome contributions from the community! If you encounter issues or have improvements to suggest, please log an issue or submit a PR.
