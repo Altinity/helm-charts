@@ -1,26 +1,23 @@
 # Altinity Helm Charts for ClickHouse®
 
-> Helm charts for getting started with ClickHouse® and ClickHouse Keeper.
+Helm charts for use with the Altinity Operator for ClickHouse®
+
+## Running ClickHouse on Kubernetes with the Altinity Operator
+A complete Kubernetes deployment of ClickHouse includes:
+
+ - The Altinity Operator for ClickHouse
+ - The Altinity Operator CRDs
+ - A `ClickHouseInstallation` Custom Resource defining your ClickHouse cluster settings
+ - A `ClickHouseKeeperInstallation` Custom Resource defining your Keeper deployment (optional for single-node instances)
+ - A custom storage class (optional) - we recommend gp3 in production.
+
+For convenience, the [ClickHouse](./charts/clickhouse) chart in this repo includes the [Operator Helm Chart](https://github.com/Altinity/clickhouse-operator/tree/master/deploy/helm/clickhouse-operator) as a dependency. 
 
 These samples demonstrate straightforward Helm charts that can be used to deploy ClickHouse and ClickHouse Keeper. The examples are intended as starting points for more complex configurations and do not cover all possible uses cases.
 
-For more complex configurations, consider applying your own `ClickHouseInstallation` and `ClickHouseKeeperInstallation` resources. The [cluster settings documentation](https://docs.altinity.com/altinitykubernetesoperator/kubernetesoperatorguide/kubernetesconfigurationguide/clustersettings/) is a good starting point.
-
-## Prerequisites
-
-To get started, you'll need to:
-
-* Get administrative access to Kubernetes. For testing, [Minikube](https://minikube.sigs.k8s.io/docs/start/) will do the job.
-* Install [kubectl](https://kubernetes.io/docs/tasks/tools/)
-* Install [helm](https://helm.sh/docs/intro/install/)
-* (Optional) Use helm to install the [clickhouse-operator](https://github.com/Altinity/clickhouse-operator/tree/master/deploy/helm) using the commands shown below.
+For more complex configurations, follow the [Installation Guide](https://docs.altinity.com/altinitykubernetesoperator/quickstartinstallation/) from the documentation to install the Operator and create a custom `ClickHouseInstallation` resource.
 
 **Installing the Operator first provides better control when uninstalling clusters.**
-
-```sh
-helm repo add clickhouse-operator https://docs.altinity.com/clickhouse-operator/
-helm install clickhouse-operator clickhouse-operator/altinity-clickhouse-operator --namespace kube-system
-```
 
 > Please refer to the Altinity Operator project instructions for details on operator upgrade with Helm, including running custom resource definition files independently.
 
@@ -36,29 +33,12 @@ Since [Release 0.24.0](https://docs.altinity.com/releasenotes/altinity-kubernete
 - **[clickhouse-keeper-sts](./charts/clickhouse-keeper-sts/)**: Deploys ClickHouse Keeper using StatefulSets for better data persistence.
 - **[keeper-sts](./charts/clickhouse-keeper-sts/)**: Deploys ClickHouse Keeper using StatefulSets for better data persistence.
 
-### How to Install a Chart
+## Community
 
-```sh
-# add the kubernetes-blueprints-for-clickhouse chart repository
-helm repo add altinity https://helm.altinity.com
+These charts are a community effort sponsored by Altinity. The best way to reach us or ask questions is:
 
-# use this command to install any of the avaiable charts
-helm install release-name altinity/[chart-name] --namespace clickhouse --create-namespace
-
-# check chart release status
-helm status release-name --namespace clickhouse
-```
-
-### Using Examples
-
-There are several [examples](./charts/clickhouse/examples) available. You can use them with a command like:
-
-
-```sh
-helm install release-name --namespace clickhouse --create-namespace -f path/to/examples/values-simple.yaml altinity/clickhouse
-```
-
-> Please refer to any of helm charts `README` file for detailed instructions about each of the them.
+* Join the [Altinity Slack](https://altinity.com/slack) - Chat with the developers and other users
+* Log an [issue on GitHub](https://github.com/Altinity/helm-charts/issues) - Ask questions, log bugs and feature requests
 
 ## Contributing
 We welcome contributions from the community! If you encounter issues or have improvements to suggest, please log an issue or submit a PR.
@@ -66,3 +46,17 @@ We welcome contributions from the community! If you encounter issues or have imp
 ## Legal
 All code, unless specified otherwise, is licensed under the [Apache-2.0](LICENSE) license.
 Copyright (c) 2025 Altinity, Inc.
+Altinity.Cloud®, and Altinity Stable® are registered trademarks of Altinity, Inc. ClickHouse® is a registered trademark of ClickHouse, Inc.; Altinity is not affiliated with or associated with ClickHouse, Inc. Kubernetes, MySQL, and PostgreSQL are trademarks and property of their respective owners.
+
+## Commercial Support
+
+Altinity is the primary maintainer of the operator. It is the basis of Altinity.Cloud and
+is also used in self-managed installations. Altinity offers a range of 
+services related to ClickHouse and analytic applications on Kubernetes. 
+
+- [Official website](https://altinity.com/) - Get a high level overview of Altinity and our offerings.
+- [Altinity.Cloud](https://altinity.com/cloud-database/) - Run ClickHouse in our cloud or yours.
+- [Altinity Support](https://altinity.com/support/) - Get Enterprise-class support for ClickHouse.
+- [Slack](https://altinity.com/slack) - Talk directly with ClickHouse users and Altinity devs.
+- [Contact us](https://hubs.la/Q020sH3Z0) - Contact Altinity with your questions or issues.
+- [Free consultation](https://hubs.la/Q020sHkv0) - Get a free consultation with a ClickHouse expert today.
