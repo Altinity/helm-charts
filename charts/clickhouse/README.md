@@ -44,7 +44,8 @@ helm install clickhouse-operator altinity-docs/altinity-clickhouse-operator \
 helm repo add altinity https://helm.altinity.com
 
 # install the clickhouse chart without the operator
-helm install release-name altinity/clickhouse --namespace clickhouse
+helm install release-name altinity/clickhouse --namespace clickhouse \
+--set operator.enabled=false
 ```
 
 ## Upgrading the Chart
@@ -53,8 +54,7 @@ helm install release-name altinity/clickhouse --namespace clickhouse
 helm repo update
 
 # upgrade to a newer version using the release name (`clickhouse`)
-helm upgrade clickhouse altinity/clickhouse --namespace clickhouse \
---set operator.enabled=false
+helm upgrade clickhouse altinity/clickhouse --namespace clickhouse
 ```
 
 > Yes, we're aware that the domains for the helm repos are a bit odd. We're working on it.
