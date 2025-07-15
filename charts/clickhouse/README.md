@@ -48,6 +48,8 @@ helm install release-name altinity/clickhouse --namespace clickhouse \
 --set operator.enabled=false
 ```
 
+> Yes, we're aware that the domains for the helm repos are a bit odd. We're working on it.
+
 ## Upgrading the Chart
 ```sh
 # get latest repository versions
@@ -56,8 +58,6 @@ helm repo update
 # upgrade to a newer version using the release name (`clickhouse`)
 helm upgrade clickhouse altinity/clickhouse --namespace clickhouse
 ```
-
-> Yes, we're aware that the domains for the helm repos are a bit odd. We're working on it.
 
 ## Uninstalling the Chart
 
