@@ -14,7 +14,77 @@
 
 {{ template "chart.requirementsSection" . }}
 
-{{ template "extra.clickhouse.install" . }}
+## Installing the Chart
+
+```sh
+# add the altinity chart repository
+helm repo add altinity https://helm.altinity.com
+
+# use this command to install clickhouse chart (it will also create a `clickhouse` namespace)
+helm install release-name altinity/clickhouse --namespace clickhouse --create-namespace
+```
+
+Note that by default the chart includes the Altinity Operator. For most production use cases you will want to disable this and install the operator explicitly from its own helm chart.
+
+
+```sh
+# add the altinity operator chart repository
+helm repo add altinity-operator https://docs.altinity.com/clickhouse-operator
+
+# create the namespace
+kubectl create namespace clickhouse
+
+# install operator into namespace
+helm install clickhouse-operator altinity-docs/altinity-clickhouse-operator \
+--namespace clickhouse
+
+# add the altinity chart repository
+helm repo add altinity https://helm.altinity.com
+
+# install the clickhouse chart without the operator
+helm install release-name altinity/clickhouse --namespace clickhouse 
+```
+
+## Upgrading the Chart
+```sh
+# get latest repository versions
+helm repo update
+
+# upgrade to a newer version using the release name (`clickhouse`)
+helm upgrade clickhouse altinity/clickhouse --namespace clickhouse \
+--set operator.enabled=false
+```
+
+> Yes, we're aware that the domains for the helm repos are a bit odd. We're working on it.
+
+## Uninstalling the Chart
+
+```sh
+# uninstall using the release name (`clickhouse`)
+helm uninstall clickhouse --namespace clickhouse
+```
+
+**Note:** If you installed the Altinity Operator with this chart, your ClickHouse Installations will hang because the Operator will be deleted before their finalizers complete. To resolve this you must manually edit each `chi` resource and remove the finalizer.
+
+PVCs created by this helm chart will not be automatically deleted and must be deleted manually. An easy way to do this is to delete the namespace:
+
+```sh
+kubectl delete namespace clickhouse
+```
+
+> This command removes all the Kubernetes components associated with the chart and deletes the release.
+
+## Connecting to your ClickHouse Cluster
+
+```sh
+# list your pods
+kubectl get pods --namespace clickhouse
+
+# pick any of your available pods and connect through the clickhouse-client
+kubectl exec -it chi-clickhouse-0-0-0 --namespace clickhouse -- clickhouse-client
+```
+
+> Use `kubectl port forward` to access your ClickHouse cluster from outside: `kubectl port-forward service clickhouse-eks 9000:9000 & clickhouse-client`
 
 {{ template "chart.homepageLine" . }}
 

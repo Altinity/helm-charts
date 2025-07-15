@@ -1,5 +1,4 @@
 # clickhouse
-
 ![Version: 0.2.5](https://img.shields.io/badge/Version-0.2.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 24.8.14.10459](https://img.shields.io/badge/AppVersion-24.8.14.10459-informational?style=flat-square)
 
 A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for ClickHouse
@@ -28,7 +27,25 @@ helm repo add altinity https://helm.altinity.com
 helm install release-name altinity/clickhouse --namespace clickhouse --create-namespace
 ```
 
-> Use `-f` flag to override default values: `helm install -f newvalues.yaml`
+Note that by default the chart includes the Altinity Operator. For most production use cases you will want to disable this and install the operator explicitly from its own helm chart.
+
+```sh
+# add the altinity operator chart repository
+helm repo add altinity-operator https://docs.altinity.com/clickhouse-operator
+
+# create the namespace
+kubectl create namespace clickhouse
+
+# install operator into namespace
+helm install clickhouse-operator altinity-docs/altinity-clickhouse-operator \
+--namespace clickhouse
+
+# add the altinity chart repository
+helm repo add altinity https://helm.altinity.com
+
+# install the clickhouse chart without the operator
+helm install release-name altinity/clickhouse --namespace clickhouse
+```
 
 ## Upgrading the Chart
 ```sh
@@ -36,8 +53,11 @@ helm install release-name altinity/clickhouse --namespace clickhouse --create-na
 helm repo update
 
 # upgrade to a newer version using the release name (`clickhouse`)
-helm upgrade clickhouse altinity/clickhouse --namespace clickhouse
+helm upgrade clickhouse altinity/clickhouse --namespace clickhouse \
+--set operator.enabled=false
 ```
+
+> Yes, we're aware that the domains for the helm repos are a bit odd. We're working on it.
 
 ## Uninstalling the Chart
 
