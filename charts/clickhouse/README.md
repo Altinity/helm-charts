@@ -1,6 +1,6 @@
 # clickhouse
 
-![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 24.3.12.76](https://img.shields.io/badge/AppVersion-24.3.12.76-informational?style=flat-square)
+![Version: 0.2.5](https://img.shields.io/badge/Version-0.2.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 24.8.14.10459](https://img.shields.io/badge/AppVersion-24.8.14.10459-informational?style=flat-square)
 
 A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for ClickHouse
 
@@ -115,13 +115,14 @@ EOSQL
 | clickhouse.defaultUser.allowExternalAccess | bool | `false` | Allow the default user to access ClickHouse from any IP. If set, will override `hostIP` to always be `0.0.0.0/0`. |
 | clickhouse.defaultUser.hostIP | string | `"127.0.0.1/32"` |  |
 | clickhouse.defaultUser.password | string | `""` |  |
-| clickhouse.extraConfig | string | `<clickhouse>\n</clickhouse>` | Miscellaneous config for ClickHouse in XML format |
+| clickhouse.extraConfig | string | `"<clickhouse>\n</clickhouse>\n"` | Miscellanous config for ClickHouse (in xml format) |
 | clickhouse.image.pullPolicy | string | `"IfNotPresent"` |  |
 | clickhouse.image.repository | string | `"altinity/clickhouse-server"` |  |
 | clickhouse.image.tag | string | `"24.3.12.76.altinitystable"` | Override the image tag for a specific version |
-| clickhouse.initScripts.enabled | bool | `false` | Enable init scripts ConfigMap |
-| clickhouse.initScripts.configMapName | string | `""` | Name of ConfigMap with init scripts |
-| clickhouse.initScripts.alwaysRun | bool | `true` | Always run init scripts on startup |
+| clickhouse.initScripts | object | `{"alwaysRun":true,"configMapName":"","enabled":false}` | Init scripts ConfigMap configuration |
+| clickhouse.initScripts.alwaysRun | bool | `true` | Set to true to always run init scripts on container startup |
+| clickhouse.initScripts.configMapName | string | `""` | Name of an existing ConfigMap containing init scripts The scripts will be mounted at /docker-entrypoint-initdb.d/ |
+| clickhouse.initScripts.enabled | bool | `false` | Set to true to enable init scripts feature |
 | clickhouse.keeper | object | `{"host":"","port":2181}` | Keeper connection settings for ClickHouse instances. |
 | clickhouse.keeper.host | string | `""` | Specify a keeper host. Should be left empty if `clickhouse-keeper.enabled` is `true`. Will override the defaults set from `clickhouse-keeper.enabled`. |
 | clickhouse.keeper.port | int | `2181` | Override the default keeper port |
@@ -137,10 +138,11 @@ EOSQL
 | clickhouse.persistence.storageClass | string | `""` |  |
 | clickhouse.podAnnotations | object | `{}` |  |
 | clickhouse.podLabels | object | `{}` |  |
-| clickhouse.replicasCount | int | `1` | number of replicas. If greater than 1, keeper must be enabled or a keeper host should be provided under clickhouse.keeper.host.  Will be ignored if `zones` is set. |
+| clickhouse.replicasCount | int | `1` | number of replicas. If greater than 1, keeper must be enabled or a keeper host should be provided under clickhouse.keeper.host. Will be ignored if `zones` is set. |
 | clickhouse.service.serviceAnnotations | object | `{}` |  |
 | clickhouse.service.serviceLabels | object | `{}` |  |
 | clickhouse.service.type | string | `"ClusterIP"` |  |
+| clickhouse.shardsCount | int | `1` | number of shards. |
 | clickhouse.zones | list | `[]` |  |
 | keeper.enabled | bool | `false` | Whether to enable Keeper. Required for replicated tables. |
 | keeper.image | string | `"altinity/clickhouse-keeper"` |  |
@@ -150,12 +152,12 @@ EOSQL
 | keeper.nodeSelector | object | `{}` |  |
 | keeper.podAnnotations | object | `{}` |  |
 | keeper.replicaCount | int | `3` | Number of keeper replicas. Must be an odd number. !! DO NOT CHANGE AFTER INITIAL DEPLOYMENT |
-| keeper.resources.cpuLimitsMs | string | `"3"` |  |
-| keeper.resources.cpuRequestsMs | string | `"2"` |  |
+| keeper.resources.cpuLimitsMs | int | `3` |  |
+| keeper.resources.cpuRequestsMs | int | `2` |  |
 | keeper.resources.memoryLimitsMiB | string | `"3Gi"` |  |
 | keeper.resources.memoryRequestsMiB | string | `"3Gi"` |  |
 | keeper.settings | object | `{}` |  |
-| keeper.tag | string | `"24.3.12.76.altinitystable"` |  |
-| keeper.tolerations | object | `{}` |  |
+| keeper.tag | string | `"24.8.14.10459.altinitystable"` |  |
+| keeper.tolerations | list | `[]` |  |
 | keeper.zoneSpread | bool | `false` |  |
 | operator.enabled | bool | `true` | Whether to enabled the Altinity Operator for ClickHouse. Disable if you already have the Operator installed cluster-wide. |

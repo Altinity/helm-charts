@@ -1,0 +1,64 @@
+{{ template "chart.header" . }}
+
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+## Features
+
+- Single-node or multi-node ClickHouse clusters
+- Sharding and replication
+- ClickHouse Keeper integration
+- Persistent storage configuration
+- Init scripts
+
+{{ template "chart.requirementsSection" . }}
+
+{{ template "extra.clickhouse.install" . }}
+
+{{ template "chart.homepageLine" . }}
+
+{{ template "chart.maintainersSection" . }}
+
+{{ template "chart.sourcesSection" . }}
+
+## Using Init Scripts with ConfigMap
+
+The chart allows mounting a ConfigMap containing initialization scripts that will be executed during the ClickHouse container startup.
+
+### How to use:
+
+1. Create a ConfigMap containing your initialization scripts:
+
+```bash
+kubectl create configmap my-init-scripts --from-file=01_create_database.sh --from-file=02_create_tables.sh
+```
+
+2. Enable the initScripts feature in your Helm values:
+
+```yaml
+clickhouse:
+  initScripts:
+    enabled: true
+    configMapName: my-init-scripts
+    alwaysRun: true  # Set to true to always run scripts on container restart
+```
+
+The scripts will be mounted at `/docker-entrypoint-initdb.d/` in the ClickHouse container and executed in alphabetical order during startup.
+
+### Example Script Format
+
+```bash
+#!/bin/bash
+set -e
+clickhouse client -n <<-EOSQL
+  CREATE DATABASE IF NOT EXISTS my_database;
+  CREATE TABLE IF NOT EXISTS my_database.my_table (
+    id UInt64,
+    data String
+  ) ENGINE = MergeTree()
+  ORDER BY id;
+EOSQL
+```
+
+{{ template "chart.valuesSection" . }}

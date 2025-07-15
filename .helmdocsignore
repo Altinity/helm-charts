@@ -1,0 +1,4 @@
+# Ignore the clickhouse chart when processing other charts
+charts/clickhouse
+# Ignore the clickhouse-eks chart when processing deprecated charts
+charts/clickhouse-eks

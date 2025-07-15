@@ -1,4 +1,4 @@
-{{ define "extra.install" -}}
+{{ define "extra.clickhouse.install" -}}
 
 ## Installing the Chart
 
@@ -7,7 +7,7 @@
 helm repo add altinity https://helm.altinity.com
 
 # use this command to install {{ template "chart.name" . }} chart (it will also create a `clickhouse` namespace)
-helm install clickhouse altinity/{{ template "chart.name" . }} --namespace clickhouse --create-namespace
+helm install release-name altinity/{{ template "chart.name" . }} --namespace clickhouse --create-namespace
 ```
 
 > Use `-f` flag to override default values: `helm install -f newvalues.yaml`
@@ -28,6 +28,14 @@ helm upgrade clickhouse altinity/{{ template "chart.name" . }} --namespace click
 helm uninstall clickhouse --namespace clickhouse
 ```
 
+**Note:** If you installed the Altinity Operator with this chart, your ClickHouse Installations will hang because the Operator will be deleted before their finalizers complete. To resolve this you must manually edit each `chi` resource and remove the finalizer.
+
+PVCs created by this helm chart will not be automatically deleted and must be deleted manually. An easy way to do this is to delete the namespace:
+
+```sh
+kubectl delete namespace clickhouse
+```
+
 > This command removes all the Kubernetes components associated with the chart and deletes the release.
 
 ## Connecting to your ClickHouse Cluster
@@ -37,11 +45,10 @@ helm uninstall clickhouse --namespace clickhouse
 kubectl get pods --namespace clickhouse
 
 # pick any of your available pods and connect through the clickhouse-client
-kubectl exec -it chi-eks-dev-0-0-0 --namespace clickhouse -- clickhouse-client
+kubectl exec -it chi-clickhouse-0-0-0 --namespace clickhouse -- clickhouse-client
 ```
 
 > Use `kubectl port forward` to access your ClickHouse cluster from outside: `kubectl port-forward service clickhouse-eks 9000:9000 & clickhouse-client`
 
 {{- end }}
-
 
