@@ -45,8 +45,8 @@ We welcome contributions from the community! If you encounter issues or have imp
 
 ## Legal
 All code, unless specified otherwise, is licensed under the [Apache-2.0](LICENSE) license.
-
 Copyright (c) 2025 Altinity, Inc.
+Altinity.Cloud®, and Altinity Stable® are registered trademarks of Altinity, Inc. ClickHouse® is a registered trademark of ClickHouse, Inc.; Altinity is not affiliated with or associated with ClickHouse, Inc. Kubernetes, MySQL, and PostgreSQL are trademarks and property of their respective owners.
 
 ## Commercial Support
 
