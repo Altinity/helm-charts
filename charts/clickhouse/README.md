@@ -15,7 +15,7 @@ A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for 
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://docs.altinity.com/clickhouse-operator | operator(altinity-clickhouse-operator) | 0.24.3 |
+| https://docs.altinity.com/clickhouse-operator | operator(altinity-clickhouse-operator) | 0.25.2 |
 
 ## Installing the Chart
 

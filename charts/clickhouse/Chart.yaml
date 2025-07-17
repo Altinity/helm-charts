@@ -8,6 +8,6 @@ appVersion: "24.8.14.10459"
 dependencies:
   - name: altinity-clickhouse-operator
     repository: https://docs.altinity.com/clickhouse-operator
-    version: 0.24.3
+    version: 0.25.2
     alias: operator
     condition: operator.enabled
