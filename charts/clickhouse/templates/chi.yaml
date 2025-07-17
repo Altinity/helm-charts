@@ -17,6 +17,9 @@ spec:
       {{- if .Values.clickhouse.persistence.enabled }}
       dataVolumeClaimTemplate: {{ include "clickhouse.volumeClaimTemplateName" . }}
       {{- end }}
+      {{- if .Values.clickhouse.persistence.logs.enabled }}
+      logVolumeClaimTemplate: {{ include "clickhouse.logsVolumeClaimTemplateName" . }}
+      {{- end }}
   useTemplates:
     - name: {{ $service_name }}
     {{- if .Values.clickhouse.lbService.enabled }}
@@ -24,6 +27,9 @@ spec:
     {{- end }}
     - name: {{ include "clickhouse.podTemplateName" . }}
     - name: {{ include "clickhouse.volumeClaimTemplateName" . }}
+    {{- if .Values.clickhouse.persistence.logs.enabled }}
+    - name: {{ include "clickhouse.logsVolumeClaimTemplateName" . }}
+    {{- end }}
     {{- if not (empty .Values.clickhouse.zones) -}}
     {{- $originalContext := . -}}
     {{- range .Values.clickhouse.zones }}
