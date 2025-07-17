@@ -162,6 +162,9 @@ EOSQL
 | clickhouse.service.serviceAnnotations | object | `{}` |  |
 | clickhouse.service.serviceLabels | object | `{}` |  |
 | clickhouse.service.type | string | `"ClusterIP"` |  |
+| clickhouse.serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
+| clickhouse.serviceAccount.create | bool | `false` | Specifies whether a service account should be created |
+| clickhouse.serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | clickhouse.shardsCount | int | `1` | number of shards. |
 | clickhouse.zones | list | `[]` |  |
 | keeper.enabled | bool | `false` | Whether to enable Keeper. Required for replicated tables. |

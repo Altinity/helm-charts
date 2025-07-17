@@ -77,6 +77,9 @@ Pod Template Base
           imagePullSecrets:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- if or .Values.clickhouse.serviceAccount.create .Values.clickhouse.serviceAccount.name }}
+          serviceAccountName: {{ include "clickhouse.serviceAccountName" . }}
+          {{- end }}
           securityContext:
             {{- toYaml .Values.clickhouse.podSecurityContext | nindent 12 }}
           containers:
@@ -217,4 +220,15 @@ Selector labels
 {{- define "clickhouse.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "clickhouse.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
+Create the name of the service account to use
+*/}}
+{{- define "clickhouse.serviceAccountName" -}}
+{{- if .Values.clickhouse.serviceAccount.create }}
+{{- default (include "clickhouse.fullname" .) .Values.clickhouse.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.clickhouse.serviceAccount.name }}
+{{- end }}
 {{- end }}
