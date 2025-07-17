@@ -50,6 +50,20 @@ spec:
             key: password
     clusters:
       - name: {{ include "clickhouse.clustername" . }}
+        {{- if .Values.clickhouse.clusterSecret.enabled }}
+        secure: "yes"
+        secret:
+          {{- if .Values.clickhouse.clusterSecret.auto }}
+          auto: "true"
+          {{- else if .Values.clickhouse.clusterSecret.value }}
+          value: {{ .Values.clickhouse.clusterSecret.value | quote }}
+          {{- else if .Values.clickhouse.clusterSecret.valueFrom.secretKeyRef.name }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.clickhouse.clusterSecret.valueFrom.secretKeyRef.name | quote }}
+              key: {{ .Values.clickhouse.clusterSecret.valueFrom.secretKeyRef.key | quote }}
+          {{- end }}
+        {{- end }}
         layout:
           {{- if (empty .Values.clickhouse.zones) }}
           shardsCount: {{ .Values.clickhouse.shardsCount | default 1 }}

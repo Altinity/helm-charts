@@ -132,6 +132,13 @@ EOSQL
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | clickhouse.antiAffinity | bool | `false` |  |
+| clickhouse.clusterSecret | object | `{"auto":true,"enabled":false,"value":"","valueFrom":{"secretKeyRef":{"key":"secret","name":""}}}` | Cluster secret configuration for secure inter-node communication |
+| clickhouse.clusterSecret.auto | bool | `true` | Auto-generate cluster secret (recommended for security) |
+| clickhouse.clusterSecret.enabled | bool | `false` | Whether to enable secure cluster communication |
+| clickhouse.clusterSecret.value | string | `""` | Plaintext cluster secret value (not recommended for production) |
+| clickhouse.clusterSecret.valueFrom | object | `{"secretKeyRef":{"key":"secret","name":""}}` | Reference to an existing Kubernetes secret containing the cluster secret |
+| clickhouse.clusterSecret.valueFrom.secretKeyRef.key | string | `"secret"` | Key in the secret that contains the cluster secret value |
+| clickhouse.clusterSecret.valueFrom.secretKeyRef.name | string | `""` | Name of the secret containing the cluster secret |
 | clickhouse.defaultUser.allowExternalAccess | bool | `false` | Allow the default user to access ClickHouse from any IP. If set, will override `hostIP` to always be `0.0.0.0/0`. |
 | clickhouse.defaultUser.hostIP | string | `"127.0.0.1/32"` |  |
 | clickhouse.defaultUser.password | string | `""` |  |
