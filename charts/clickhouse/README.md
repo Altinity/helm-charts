@@ -1,5 +1,5 @@
 # clickhouse
-![Version: 0.2.5](https://img.shields.io/badge/Version-0.2.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 24.8.14.10459](https://img.shields.io/badge/AppVersion-24.8.14.10459-informational?style=flat-square)
+![Version: 0.2.6](https://img.shields.io/badge/Version-0.2.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 24.8.14.10459](https://img.shields.io/badge/AppVersion-24.8.14.10459-informational?style=flat-square)
 
 A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for ClickHouse
 
@@ -15,7 +15,7 @@ A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for 
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://docs.altinity.com/clickhouse-operator | operator(altinity-clickhouse-operator) | 0.24.3 |
+| https://docs.altinity.com/clickhouse-operator | operator(altinity-clickhouse-operator) | 0.25.2 |
 
 ## Installing the Chart
 
@@ -132,6 +132,13 @@ EOSQL
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | clickhouse.antiAffinity | bool | `false` |  |
+| clickhouse.clusterSecret | object | `{"auto":true,"enabled":false,"value":"","valueFrom":{"secretKeyRef":{"key":"secret","name":""}}}` | Cluster secret configuration for secure inter-node communication |
+| clickhouse.clusterSecret.auto | bool | `true` | Auto-generate cluster secret (recommended for security) |
+| clickhouse.clusterSecret.enabled | bool | `false` | Whether to enable secure cluster communication |
+| clickhouse.clusterSecret.value | string | `""` | Plaintext cluster secret value (not recommended for production) |
+| clickhouse.clusterSecret.valueFrom | object | `{"secretKeyRef":{"key":"secret","name":""}}` | Reference to an existing Kubernetes secret containing the cluster secret |
+| clickhouse.clusterSecret.valueFrom.secretKeyRef.key | string | `"secret"` | Key in the secret that contains the cluster secret value |
+| clickhouse.clusterSecret.valueFrom.secretKeyRef.name | string | `""` | Name of the secret containing the cluster secret |
 | clickhouse.defaultUser.allowExternalAccess | bool | `false` | Allow the default user to access ClickHouse from any IP. If set, will override `hostIP` to always be `0.0.0.0/0`. |
 | clickhouse.defaultUser.hostIP | string | `"127.0.0.1/32"` |  |
 | clickhouse.defaultUser.password | string | `""` |  |
@@ -162,6 +169,9 @@ EOSQL
 | clickhouse.service.serviceAnnotations | object | `{}` |  |
 | clickhouse.service.serviceLabels | object | `{}` |  |
 | clickhouse.service.type | string | `"ClusterIP"` |  |
+| clickhouse.serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
+| clickhouse.serviceAccount.create | bool | `false` | Specifies whether a service account should be created |
+| clickhouse.serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | clickhouse.shardsCount | int | `1` | number of shards. |
 | clickhouse.zones | list | `[]` |  |
 | keeper.enabled | bool | `false` | Whether to enable Keeper. Required for replicated tables. |

@@ -24,6 +24,22 @@ clickhouse:
   # -- number of shards.
   shardsCount: 1
 
+  # -- Cluster secret configuration for secure inter-node communication
+  clusterSecret:
+    # -- Whether to enable secure cluster communication
+    enabled: false
+    # -- Auto-generate cluster secret (recommended for security)
+    auto: true
+    # -- Plaintext cluster secret value (not recommended for production)
+    value: ""
+    # -- Reference to an existing Kubernetes secret containing the cluster secret
+    valueFrom:
+      secretKeyRef:
+        # -- Name of the secret containing the cluster secret
+        name: ""
+        # -- Key in the secret that contains the cluster secret value
+        key: "secret"
+
   # Specify which zones to run in.
   # `replicaCount` will applied within each zone.
   zones: []
@@ -75,6 +91,14 @@ clickhouse:
   # @ignore
   imagePullSecrets: []
 
+  serviceAccount:
+    # -- Specifies whether a service account should be created
+    create: false
+    # -- Annotations to add to the service account
+    annotations: {}
+    # -- The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
 
   podAnnotations: {}
   podLabels: {}

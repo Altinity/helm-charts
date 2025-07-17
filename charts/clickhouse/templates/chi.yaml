@@ -17,6 +17,9 @@ spec:
       {{- if .Values.clickhouse.persistence.enabled }}
       dataVolumeClaimTemplate: {{ include "clickhouse.volumeClaimTemplateName" . }}
       {{- end }}
+      {{- if .Values.clickhouse.persistence.logs.enabled }}
+      logVolumeClaimTemplate: {{ include "clickhouse.logsVolumeClaimTemplateName" . }}
+      {{- end }}
   useTemplates:
     - name: {{ $service_name }}
     {{- if .Values.clickhouse.lbService.enabled }}
@@ -24,6 +27,9 @@ spec:
     {{- end }}
     - name: {{ include "clickhouse.podTemplateName" . }}
     - name: {{ include "clickhouse.volumeClaimTemplateName" . }}
+    {{- if .Values.clickhouse.persistence.logs.enabled }}
+    - name: {{ include "clickhouse.logsVolumeClaimTemplateName" . }}
+    {{- end }}
     {{- if not (empty .Values.clickhouse.zones) -}}
     {{- $originalContext := . -}}
     {{- range .Values.clickhouse.zones }}
@@ -44,6 +50,20 @@ spec:
             key: password
     clusters:
       - name: {{ include "clickhouse.clustername" . }}
+        {{- if .Values.clickhouse.clusterSecret.enabled }}
+        secure: "yes"
+        secret:
+          {{- if .Values.clickhouse.clusterSecret.auto }}
+          auto: "true"
+          {{- else if .Values.clickhouse.clusterSecret.value }}
+          value: {{ .Values.clickhouse.clusterSecret.value | quote }}
+          {{- else if .Values.clickhouse.clusterSecret.valueFrom.secretKeyRef.name }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.clickhouse.clusterSecret.valueFrom.secretKeyRef.name | quote }}
+              key: {{ .Values.clickhouse.clusterSecret.valueFrom.secretKeyRef.key | quote }}
+          {{- end }}
+        {{- end }}
         layout:
           {{- if (empty .Values.clickhouse.zones) }}
           shardsCount: {{ .Values.clickhouse.shardsCount | default 1 }}

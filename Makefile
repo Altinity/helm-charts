@@ -13,7 +13,9 @@ docs:
 	helm-docs charts/clickhouse-keeper-sts --template-files=templates/README.md.gotmpl
 	helm-docs charts/keeper-sts --template-files=templates/README.md.gotmpl
 	# Trim whitespace from generated README files
-	find charts -name "README.md" -exec sed -i '' -e '1,2{/^[[:space:]]*$$/d;}' -e 's/[[:space:]]*$$//' {} \;
+	for file in $$(find charts -name "README.md"); do \
+		sed -i -e '1,2{/^[[:space:]]*$$/d;}' -e 's/[[:space:]]*$$//' "$$file"; \
+	done
 
 verify:
 	${REPO_ROOT}/scripts/validate.sh
