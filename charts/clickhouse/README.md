@@ -1,6 +1,6 @@
 # clickhouse
 
-![Version: 0.3.0-dev](https://img.shields.io/badge/Version-0.3.0--dev-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 24.8.14.10459](https://img.shields.io/badge/AppVersion-24.8.14.10459-informational?style=flat-square)
+![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 24.8.14.10459](https://img.shields.io/badge/AppVersion-24.8.14.10459-informational?style=flat-square)
 
 A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for ClickHouse
 
@@ -155,6 +155,11 @@ EOSQL
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| clickhouse.adminUser.allowExternalAccess | bool | `false` | Allow the admin user to access ClickHouse from any IP. If set, will override `hostIP` to always be `0.0.0.0/0`. |
+| clickhouse.adminUser.existingSecret | string | `""` | Name of an existing secret containing the password for the admin user. |
+| clickhouse.adminUser.existingSecretKey | string | `"password"` | Key in the existing secret containing the password. |
+| clickhouse.adminUser.hostIP | string | `"127.0.0.1/32"` |  |
+| clickhouse.adminUser.password | string | `""` | Password for the admin user. Will be ignored if existingSecret is set. |
 | clickhouse.antiAffinity | bool | `false` |  |
 | clickhouse.clusterSecret | object | `{"auto":true,"enabled":false,"value":"","valueFrom":{"secretKeyRef":{"key":"secret","name":""}}}` | Cluster secret configuration for secure inter-node communication |
 | clickhouse.clusterSecret.auto | bool | `true` | Auto-generate cluster secret (recommended for security) |
@@ -164,12 +169,15 @@ EOSQL
 | clickhouse.clusterSecret.valueFrom.secretKeyRef.key | string | `"secret"` | Key in the secret that contains the cluster secret value |
 | clickhouse.clusterSecret.valueFrom.secretKeyRef.name | string | `""` | Name of the secret containing the cluster secret |
 | clickhouse.defaultUser.allowExternalAccess | bool | `false` | Allow the default user to access ClickHouse from any IP. If set, will override `hostIP` to always be `0.0.0.0/0`. |
+| clickhouse.defaultUser.existingSecret | string | `""` | Name of an existing secret containing the password for the default user. |
+| clickhouse.defaultUser.existingSecretKey | string | `"password"` | Key in the existing secret containing the password. |
 | clickhouse.defaultUser.hostIP | string | `"127.0.0.1/32"` |  |
-| clickhouse.defaultUser.password | string | `""` |  |
+| clickhouse.defaultUser.password | string | `""` | Password for the default user. Will be ignored if existingSecret is set. |
 | clickhouse.extraConfig | string | `"<clickhouse>\n</clickhouse>\n"` | Miscellanous config for ClickHouse (in xml format) |
+| clickhouse.extraUsers | string | "" | Additional users configuration following ClickHouse's native format. Provide as a YAML string that will be parsed to support keys with slashes. |
 | clickhouse.image.pullPolicy | string | `"IfNotPresent"` |  |
 | clickhouse.image.repository | string | `"altinity/clickhouse-server"` |  |
-| clickhouse.image.tag | string | `"24.3.12.76.altinitystable"` | Override the image tag for a specific version |
+| clickhouse.image.tag | string | `"25.3.6.10034.altinitystable"` | Override the image tag for a specific version |
 | clickhouse.initScripts | object | `{"alwaysRun":true,"configMapName":"","enabled":false}` | Init scripts ConfigMap configuration |
 | clickhouse.initScripts.alwaysRun | bool | `true` | Set to true to always run init scripts on container startup |
 | clickhouse.initScripts.configMapName | string | `""` | Name of an existing ConfigMap containing init scripts The scripts will be mounted at /docker-entrypoint-initdb.d/ |

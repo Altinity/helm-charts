@@ -1,0 +1,57 @@
+# Example configuration showing extraUsers functionality
+# This demonstrates how to define additional ClickHouse users using the native format
+
+clickhouse:
+  adminUser:
+    password: "admin123"
+    allowExternalAccess: false
+    hostIP: "127.0.0.1/32"
+
+  # Define additional users using ClickHouse's native configuration format
+  extraUsers: |
+    # Analyst user with specific database access
+    analyst/password: "analyst_password"
+    analyst/networks/ip:
+      - "10.0.0.0/8" 
+      - "192.168.0.0/16"
+    analyst/profile: "default"
+    analyst/quota: "default"
+    analyst/access_management: 1
+    analyst/show_named_collections: 1
+    analyst/allow_databases/database:
+      - "analytics"
+      - "reporting"
+
+    # Read-only user for reporting
+    readonly/password_sha256_hex: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    readonly/networks/ip: "0.0.0.0/0"
+    readonly/profile: "readonly"
+    readonly/quota: "readonly_quota"
+    readonly/readonly: 1
+
+    # Application user with secret reference
+    # app_user/password:
+    #   valueFrom:
+    #     secretKeyRef:
+    #       name: app-secrets
+    #       key: db-password
+    # app_user/networks/ip:
+    #   - "172.16.0.0/16"
+    # app_user/profile: "default"
+    # app_user/access_management: 1
+    # app_user/allow_databases/database:
+    #   - "application"
+
+    # Service account user with hash
+    # service/password_double_sha1_hex: "cbe205a7351dd15397bf423957559512bd4be395"
+    # service/networks/ip: "10.100.0.0/16"
+    # service/profile: "service_profile"
+    # service/quota: "service_quota"
+
+  # Basic cluster configuration
+  replicasCount: 1
+  shardsCount: 1
+
+# Enable ClickHouse Keeper for multi-replica setups (not needed for this example)
+keeper:
+  enabled: false
