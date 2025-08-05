@@ -1,6 +1,6 @@
 # clickhouse
 
-![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 24.8.14.10459](https://img.shields.io/badge/AppVersion-24.8.14.10459-informational?style=flat-square)
+![Version: 0.3.0-dev](https://img.shields.io/badge/Version-0.3.0--dev-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 24.8.14.10459](https://img.shields.io/badge/AppVersion-24.8.14.10459-informational?style=flat-square)
 
 A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for ClickHouse
 
@@ -55,10 +55,10 @@ helm install release-name altinity/clickhouse --namespace clickhouse \
 
 ### Upgrading from 0.2.x to 0.3.0
 
-**IMPORTANT**: Version 0.3.0 introduces a breaking change that improves reconciliation performance by embedding templates directly in the ClickHouseInstallation resource instead of using separate ClickHouseInstallationTemplate resources.
+**IMPORTANT**: Version 0.3.0 introduces a change that improves reconciliation timing by embedding templates directly in the ClickHouseInstallation resource instead of using separate ClickHouseInstallationTemplate resources.
 
-**Before upgrading:**
-1. Delete the old ClickHouseInstallationTemplate resources that were created by version 0.2.x:
+After upgrading, delete the old ClickHouseInstallationTemplate resources that were created by version 0.2.x:
+
 ```sh
 # List all ClickHouseInstallationTemplate resources
 kubectl get clickhouseinstallationtemplates -n clickhouse
@@ -70,11 +70,6 @@ kubectl delete clickhouseinstallationtemplates -n clickhouse \
   <release-name>-clickhouse-service-lb \
   <release-name>-clickhouse-data \
   <release-name>-clickhouse-logs
-```
-
-2. Upgrade the chart:
-```sh
-helm upgrade clickhouse altinity/clickhouse --namespace clickhouse
 ```
 
 The ClickHouseInstallation will be updated automatically with embedded templates, resulting in faster reconciliation.

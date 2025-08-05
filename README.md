@@ -26,13 +26,6 @@ For more complex configurations, follow the [Installation Guide](https://docs.al
 - **[clickhouse](./charts/clickhouse/)**: All-in-one chart to deploy a ClickHouse cluster (and optionally Keeper and the Altinity Operator)
 - **[clickhouse-eks](./charts/clickhouse-eks/)**: An EKS-specific chart for high-availability ClickHouse clusters. 
 
-### Deprecated Charts
-
-Since [Release 0.24.0](https://docs.altinity.com/releasenotes/altinity-kubernetes-operator-release-notes/#release-0240) keeper can be managed with a custom resource. These charts are deprecated and may not receive further updates:
-
-- **[clickhouse-keeper-sts](./charts/clickhouse-keeper-sts/)**: Deploys ClickHouse Keeper using StatefulSets for better data persistence.
-- **[keeper-sts](./charts/clickhouse-keeper-sts/)**: Deploys ClickHouse Keeper using StatefulSets for better data persistence.
-
 ## Community
 
 These charts are a community effort sponsored by Altinity. The best way to reach us or ask questions is:
