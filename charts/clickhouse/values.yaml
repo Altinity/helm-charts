@@ -75,7 +75,7 @@ clickhouse:
     repository: altinity/clickhouse-server
     pullPolicy: IfNotPresent
     # -- Override the image tag for a specific version
-    tag: "24.3.12.76.altinitystable"
+    tag: "25.3.6.10034.altinitystable"
 
   service:
     # e.g. `LoadBalancer`, `NodePort`
