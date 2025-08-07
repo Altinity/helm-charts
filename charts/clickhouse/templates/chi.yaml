@@ -32,8 +32,8 @@ spec:
         zone:
           values:
             - {{ . }}
-      {{- end -}}
-      {{- end -}}
+      {{- end }}
+      {{- end }}
     serviceTemplates:
       - name: "{{ $service_name }}"
         metadata:
