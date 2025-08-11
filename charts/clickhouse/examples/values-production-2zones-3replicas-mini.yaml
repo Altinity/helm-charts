@@ -24,7 +24,7 @@ keeper:
   zoneSpread: true
   localStorage:
     size: 1Gi
-  metricsPort: 7000
+  metricsPort: "7000"
   settings:
     prometheus/endpoint: /metrics
     prometheus/port: 7000
@@ -36,7 +36,7 @@ keeper:
     prometheus.io/port: "7000"
     prometheus.io/scrape: "true"
   resources:
-    cpuRequestsMs: "250m"
+    cpuRequestsMs: 250
     memoryRequestsMiB: "128Mi"
-    cpuLimitsMs: "500m"
+    cpuLimitsMs: 500
     memoryLimitsMiB: "128Mi"

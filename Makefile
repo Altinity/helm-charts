@@ -9,9 +9,6 @@ docs:
 	helm-docs --chart-search-root=charts/clickhouse --ignore-file=/dev/null --template-files=templates/clickhouse-README.md.gotmpl
 	# Generate docs for clickhouse-eks chart with install template (no deprecation notice)
 	helm-docs --chart-search-root=charts/clickhouse-eks --ignore-file=/dev/null --template-files=templates/install.gotmpl --template-files=templates/eks-README.md.gotmpl
-	# Generate docs for deprecated charts with deprecation notice
-	helm-docs charts/clickhouse-keeper-sts --template-files=templates/README.md.gotmpl
-	helm-docs charts/keeper-sts --template-files=templates/README.md.gotmpl
 	# Trim whitespace from generated README files
 	for file in $$(find charts -name "README.md"); do \
 		sed -i -e '1,2{/^[[:space:]]*$$/d;}' -e 's/[[:space:]]*$$//' "$$file"; \

@@ -1,5 +1,5 @@
 clickhouse:
-  replicaCount: 2
+  replicasCount: 2
   keeper:
     # use keeper instance at another host
     host: "replicated-clickhouse-keeper"

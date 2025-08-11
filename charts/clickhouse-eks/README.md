@@ -9,11 +9,11 @@ A Helm chart for ClickHouse running on AWS EKS across AZs using a nodeSelector t
 ## Installing the Chart
 
 ```sh
-# add the kubernetes-blueprints-for-clickhouse chart repository
+# add the altinity chart repository
 helm repo add altinity https://helm.altinity.com
 
 # use this command to install clickhouse-eks chart (it will also create a `clickhouse` namespace)
-helm install ch altinity/clickhouse-eks --namespace clickhouse --create-namespace
+helm install clickhouse altinity/clickhouse-eks --namespace clickhouse --create-namespace
 ```
 
 > Use `-f` flag to override default values: `helm install -f newvalues.yaml`
@@ -23,15 +23,15 @@ helm install ch altinity/clickhouse-eks --namespace clickhouse --create-namespac
 # get latest repository versions
 helm repo update
 
-# upgrade to a newer version using the release name (`ch`)
-helm upgrade ch kubernetes-blueprints-for-clickhouse/clickhouse-eks --namespace clickhouse
+# upgrade to a newer version using the release name (`clickhouse`)
+helm upgrade clickhouse altinity/clickhouse-eks --namespace clickhouse
 ```
 
 ## Uninstalling the Chart
 
 ```sh
-# uninstall using the release name (`ch`)
-helm uninstall ch --namespace clickhouse
+# uninstall using the release name (`clickhouse`)
+helm uninstall clickhouse --namespace clickhouse
 ```
 
 > This command removes all the Kubernetes components associated with the chart and deletes the release.

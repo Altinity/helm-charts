@@ -20,21 +20,102 @@ spec:
       {{- if .Values.clickhouse.persistence.logs.enabled }}
       logVolumeClaimTemplate: {{ include "clickhouse.logsVolumeClaimTemplateName" . }}
       {{- end }}
-  useTemplates:
-    - name: {{ $service_name }}
-    {{- if .Values.clickhouse.lbService.enabled }}
-    - name: {{ $service_name }}-lb
-    {{- end }}
-    - name: {{ include "clickhouse.podTemplateName" . }}
-    - name: {{ include "clickhouse.volumeClaimTemplateName" . }}
-    {{- if .Values.clickhouse.persistence.logs.enabled }}
-    - name: {{ include "clickhouse.logsVolumeClaimTemplateName" . }}
-    {{- end }}
-    {{- if not (empty .Values.clickhouse.zones) -}}
-    {{- $originalContext := . -}}
-    {{- range .Values.clickhouse.zones }}
-    - name: {{ include "clickhouse.podTemplateName" $originalContext }}-{{ . }}
-    {{- end -}}
+  templates:
+    podTemplates:
+      - name: {{ include "clickhouse.podTemplateName" . }}
+        {{ include "clickhouse.podTemplateBase" . }}
+      {{- if not (empty .Values.clickhouse.zones) -}}
+      {{- $originalContext := . -}}
+      {{- range .Values.clickhouse.zones }}
+      - name: {{ include "clickhouse.podTemplateName" $originalContext }}-{{ . }}
+        {{ include "clickhouse.podTemplateBase" $originalContext }}
+        zone:
+          values:
+            - {{ . }}
+      {{- end }}
+      {{- end }}
+    serviceTemplates:
+      - name: "{{ $service_name }}"
+        metadata:
+          {{- with .Values.clickhouse.service.serviceAnnotations }}
+          annotations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          labels:
+            {{- include "clickhouse.labels" . | nindent 12 }}
+            {{- with .Values.clickhouse.service.serviceLabels }}
+            {{- toYaml . | nindent 10 }}
+            {{- end }}
+        spec:
+          type: {{ .Values.clickhouse.service.type }}
+          ports:
+            - name: http
+              port: 8123
+              targetPort: 8123
+            - name: tcp
+              port: 9000
+              targetPort: 9000
+          selector:
+            {{- include "clickhouse.selectorLabels" . | nindent 12 }}
+      {{- if .Values.clickhouse.lbService.enabled }}
+      - name: "{{ $service_name }}-lb"
+        metadata:
+          labels:
+            {{- include "clickhouse.labels" . | nindent 12 }}
+            {{- with .Values.podLabels }}
+            {{- toYaml . | nindent 10 }}
+            {{- end }}
+            {{- with .Values.clickhouse.lbService.serviceLabels }}
+            {{- toYaml . | nindent 10 }}
+            {{- end }}
+          {{- with .Values.clickhouse.lbService.serviceAnnotations }}
+          annotations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        spec:
+          type: "LoadBalancer"
+          ports:
+            - name: http
+              port: 8123
+              targetPort: 8123
+            - name: tcp
+              port: 9000
+              targetPort: 9000
+          selector:
+            {{- include "clickhouse.selectorLabels" . | nindent 12 }}
+      {{- end }}
+    {{- if or .Values.clickhouse.persistence.enabled .Values.clickhouse.persistence.logs.enabled }}
+    volumeClaimTemplates:
+      {{- if .Values.clickhouse.persistence.enabled }}
+      - name: {{ include "clickhouse.volumeClaimTemplateName" . }}
+        reclaimPolicy: Retain
+        spec:
+          {{- with .Values.clickhouse.persistence.accessMode }}
+          accessModes:
+            - {{ . }}
+          {{- end }}
+          {{- with .Values.clickhouse.persistence.storageClass }}
+          storageClassName: {{ . }}
+          {{- end }}
+          resources:
+            requests:
+              storage: {{ .Values.clickhouse.persistence.size }}
+      {{- end }}
+      {{- if .Values.clickhouse.persistence.logs.enabled }}
+      - name: {{ include "clickhouse.logsVolumeClaimTemplateName" . }}
+        reclaimPolicy: Retain
+        spec:
+          {{- with .Values.clickhouse.persistence.logs.accessMode }}
+          accessModes:
+            - {{ . }}
+          {{- end }}
+          {{- with .Values.clickhouse.persistence.logs.storageClass }}
+          storageClassName: {{ . }}
+          {{- end }}
+          resources:
+            requests:
+              storage: {{ .Values.clickhouse.persistence.logs.size }}
+      {{- end }}
     {{- end }}
   configuration:
     users:

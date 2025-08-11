@@ -17,7 +17,7 @@ keeper:
   localStorage:
     size: 5Gi
     storageClass: gp3-encrypted
-  metricsPort: 7000
+  metricsPort: "7000"
   settings:
     prometheus/endpoint: /metrics
     prometheus/port: 7000
