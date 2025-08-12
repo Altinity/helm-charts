@@ -18,7 +18,16 @@
           "properties": {
             "password": {
               "type": "string",
-              "description": "Password for the default ClickHouse user."
+              "description": "Password for the default ClickHouse user. Will be ignored if existingSecret is set."
+            },
+            "existingSecret": {
+              "type": "string",
+              "description": "Name of an existing secret containing the password for the default user."
+            },
+            "existingSecretKey": {
+              "type": "string",
+              "description": "Key in the existing secret containing the password.",
+              "default": "password"
             },
             "allowExternalAccess": {
               "type": "boolean",
@@ -30,6 +39,37 @@
               "default": "127.0.0.1/32"
             }
           }
+        },
+        "adminUser": {
+          "type": "object",
+          "properties": {
+            "password": {
+              "type": "string",
+              "description": "Password for the admin ClickHouse user. Will be ignored if existingSecret is set."
+            },
+            "existingSecret": {
+              "type": "string",
+              "description": "Name of an existing secret containing the password for the admin user."
+            },
+            "existingSecretKey": {
+              "type": "string",
+              "description": "Key in the existing secret containing the password.",
+              "default": "password"
+            },
+            "allowExternalAccess": {
+              "type": "boolean",
+              "description": "Allow the admin user to access ClickHouse from any IP."
+            },
+            "hostIP": {
+              "type": "string",
+              "description": "Mask for IPs allowed for the admin user.",
+              "default": "127.0.0.1/32"
+            }
+          }
+        },
+        "extraUsers": {
+          "type": "string",
+          "description": "Additional users configuration following ClickHouse's native format. Provide as a YAML string that will be parsed to support keys with slashes."
         },
         "replicasCount": {
           "type": "integer",

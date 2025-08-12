@@ -180,6 +180,65 @@ User Host IP
 {{- end -}}
 
 {{/*
+Admin User Host IP
+*/}}
+{{- define "clickhouse.adminUser.ip" -}}
+{{- if .Values.clickhouse.adminUser.allowExternalAccess -}}
+0.0.0.0/0
+{{- else -}}
+{{- if .Values.clickhouse.adminUser.hostIP -}}
+{{ .Values.clickhouse.adminUser.hostIP }}
+{{- else -}}
+127.0.0.1/32
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Default User Secret Name
+*/}}
+{{- define "clickhouse.defaultUser.secretName" -}}
+{{- if .Values.clickhouse.defaultUser.existingSecret -}}
+{{ .Values.clickhouse.defaultUser.existingSecret }}
+{{- else -}}
+{{ include "clickhouse.credentialsName" . }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Default User Secret Key
+*/}}
+{{- define "clickhouse.defaultUser.secretKey" -}}
+{{- if .Values.clickhouse.defaultUser.existingSecret -}}
+{{ .Values.clickhouse.defaultUser.existingSecretKey }}
+{{- else -}}
+password
+{{- end -}}
+{{- end -}}
+
+{{/*
+Admin User Secret Name
+*/}}
+{{- define "clickhouse.adminUser.secretName" -}}
+{{- if .Values.clickhouse.adminUser.existingSecret -}}
+{{ .Values.clickhouse.adminUser.existingSecret }}
+{{- else -}}
+{{ include "clickhouse.credentialsName" . }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Admin User Secret Key
+*/}}
+{{- define "clickhouse.adminUser.secretKey" -}}
+{{- if .Values.clickhouse.adminUser.existingSecret -}}
+{{ .Values.clickhouse.adminUser.existingSecretKey }}
+{{- else -}}
+admin-password
+{{- end -}}
+{{- end -}}
+
+{{/*
 Keeper Host
 */}}
 {{- define "clickhouse.keeper.host" -}}

@@ -7,7 +7,12 @@ fullnameOverride: ""
 # Configure ClickHouse Installation and Pod Template
 clickhouse:
   defaultUser:
+    # -- Password for the default user. Will be ignored if existingSecret is set.
     password: ""
+    # -- Name of an existing secret containing the password for the default user.
+    existingSecret: ""
+    # -- Key in the existing secret containing the password.
+    existingSecretKey: "password"
     # -- Allow the default user to access ClickHouse from any IP.
     # If set, will override `hostIP` to always be `0.0.0.0/0`.
     allowExternalAccess: false
@@ -15,6 +20,42 @@ clickhouse:
     # default user. Should not be set if allowExternalAccess is set.
     # @default -- 127.0.0.1/32
     hostIP: 127.0.0.1/32
+
+  adminUser:
+    # -- Password for the admin user. Will be ignored if existingSecret is set.
+    password: ""
+    # -- Name of an existing secret containing the password for the admin user.
+    existingSecret: ""
+    # -- Key in the existing secret containing the password.
+    existingSecretKey: "password"
+    # -- Allow the admin user to access ClickHouse from any IP.
+    # If set, will override `hostIP` to always be `0.0.0.0/0`.
+    allowExternalAccess: false
+    # adminUser.hostIP -- (string) Set a mask for IPs allowed for the
+    # admin user. Should not be set if allowExternalAccess is set.
+    # @default -- 127.0.0.1/32
+    hostIP: 127.0.0.1/32
+
+  # -- Additional users configuration following ClickHouse's native format.
+  # Provide as a YAML string that will be parsed to support keys with slashes.
+  # @default -- ""
+  extraUsers: ""
+    # Example configuration:
+    # extraUsers: |
+    #   analyst/password: "plaintext_password"
+    #   analyst/networks/ip: 
+    #     - "10.0.0.0/8"
+    #     - "192.168.0.0/16"
+    #   analyst/profile: "default"
+    #   analyst/quota: "default"
+    #   analyst/access_management: 1
+    #   readonly/password:
+    #     valueFrom:
+    #       secretKeyRef:
+    #         name: my-secret
+    #         key: password
+    #   readonly/networks/ip: "0.0.0.0/0"
+    #   readonly/profile: "readonly"
 
   # -- number of replicas. If greater than 1, keeper must be enabled
   # or a keeper host should be provided under clickhouse.keeper.host.

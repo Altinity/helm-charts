@@ -127,8 +127,21 @@ spec:
       default/password:
         valueFrom:
           secretKeyRef:
-            name: {{ include "clickhouse.credentialsName" . }}
-            key: password
+            name: {{ include "clickhouse.defaultUser.secretName" . }}
+            key: {{ include "clickhouse.defaultUser.secretKey" . }}
+      admin/networks/ip: {{ include "clickhouse.adminUser.ip" . | quote }}
+      admin/access_management: 1
+      admin/named_collection_control: 1
+      admin/show_named_collections: 1
+      admin/show_named_collections_secrets: 1
+      admin/password:
+        valueFrom:
+          secretKeyRef:
+            name: {{ include "clickhouse.adminUser.secretName" . }}
+            key: {{ include "clickhouse.adminUser.secretKey" . }}
+      {{- if .Values.clickhouse.extraUsers }}
+      {{- .Values.clickhouse.extraUsers | fromYaml | toYaml | nindent 6 }}
+      {{- end }}
     clusters:
       - name: {{ include "clickhouse.clustername" . }}
         {{- if .Values.clickhouse.clusterSecret.enabled }}
