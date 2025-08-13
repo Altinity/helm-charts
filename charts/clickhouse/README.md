@@ -1,6 +1,6 @@
 # clickhouse
 
-![Version: 0.3.0-dev](https://img.shields.io/badge/Version-0.3.0--dev-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 24.8.14.10459](https://img.shields.io/badge/AppVersion-24.8.14.10459-informational?style=flat-square)
+![Version: 0.3.1](https://img.shields.io/badge/Version-0.3.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.3.6.10034](https://img.shields.io/badge/AppVersion-25.3.6.10034-informational?style=flat-square)
 
 A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for ClickHouse
 
@@ -169,7 +169,7 @@ EOSQL
 | clickhouse.extraConfig | string | `"<clickhouse>\n</clickhouse>\n"` | Miscellanous config for ClickHouse (in xml format) |
 | clickhouse.image.pullPolicy | string | `"IfNotPresent"` |  |
 | clickhouse.image.repository | string | `"altinity/clickhouse-server"` |  |
-| clickhouse.image.tag | string | `"24.3.12.76.altinitystable"` | Override the image tag for a specific version |
+| clickhouse.image.tag | string | `"25.3.6.10034.altinitystable"` | Override the image tag for a specific version |
 | clickhouse.initScripts | object | `{"alwaysRun":true,"configMapName":"","enabled":false}` | Init scripts ConfigMap configuration |
 | clickhouse.initScripts.alwaysRun | bool | `true` | Set to true to always run init scripts on container startup |
 | clickhouse.initScripts.configMapName | string | `""` | Name of an existing ConfigMap containing init scripts The scripts will be mounted at /docker-entrypoint-initdb.d/ |
@@ -211,7 +211,7 @@ EOSQL
 | keeper.resources.memoryLimitsMiB | string | `"3Gi"` |  |
 | keeper.resources.memoryRequestsMiB | string | `"3Gi"` |  |
 | keeper.settings | object | `{}` |  |
-| keeper.tag | string | `"24.8.14.10459.altinitystable"` |  |
+| keeper.tag | string | `"25.3.6.10034.altinitystable"` |  |
 | keeper.tolerations | list | `[]` |  |
 | keeper.zoneSpread | bool | `false` |  |
 | operator.enabled | bool | `true` | Whether to enabled the Altinity Operator for ClickHouse. Disable if you already have the Operator installed cluster-wide. |
