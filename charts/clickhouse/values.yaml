@@ -85,6 +85,10 @@ clickhouse:
 
   lbService:
     enabled: false
+    # -- Specify source IP ranges to the LoadBalancer service.
+    # If supported by the platform, this will restrict traffic through the cloud-provider load-balancer
+    # to the specified client IPs. This is ignored if the cloud-provider does not support the feature.
+    loadBalancerSourceRanges: []
     serviceAnnotations: {}
     serviceLabels: {}
 

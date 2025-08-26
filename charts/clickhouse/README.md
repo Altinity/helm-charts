@@ -178,6 +178,7 @@ EOSQL
 | clickhouse.keeper.host | string | `""` | Specify a keeper host. Should be left empty if `clickhouse-keeper.enabled` is `true`. Will override the defaults set from `clickhouse-keeper.enabled`. |
 | clickhouse.keeper.port | int | `2181` | Override the default keeper port |
 | clickhouse.lbService.enabled | bool | `false` |  |
+| clickhouse.lbService.loadBalancerSourceRanges | list | `[]` | Source IP CIDR ranges to restrict client IPs. (support dependent on cloud-provider) |
 | clickhouse.lbService.serviceAnnotations | object | `{}` |  |
 | clickhouse.lbService.serviceLabels | object | `{}` |  |
 | clickhouse.persistence.accessMode | string | `"ReadWriteOnce"` |  |

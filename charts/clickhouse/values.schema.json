@@ -145,6 +145,13 @@
               "type": "boolean",
               "description": "Enable LoadBalancer service for ClickHouse."
             },
+            "loadBalancerSourceRanges": {
+              "type": "array",
+              "description": "Restricts traffic to specified client IPs.",
+              "items": {
+                "type": "string"
+              }
+            },
             "serviceAnnotations": {
               "type": "object",
               "description": "Annotations for LoadBalancer service."
