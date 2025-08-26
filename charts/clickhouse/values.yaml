@@ -84,7 +84,7 @@ clickhouse:
     serviceLabels: {}
 
   lbService:
-    enable: false
+    enabled: false
     serviceAnnotations: {}
     serviceLabels: {}
 

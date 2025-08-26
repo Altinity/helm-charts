@@ -177,7 +177,7 @@ EOSQL
 | clickhouse.keeper | object | `{"host":"","port":2181}` | Keeper connection settings for ClickHouse instances. |
 | clickhouse.keeper.host | string | `""` | Specify a keeper host. Should be left empty if `clickhouse-keeper.enabled` is `true`. Will override the defaults set from `clickhouse-keeper.enabled`. |
 | clickhouse.keeper.port | int | `2181` | Override the default keeper port |
-| clickhouse.lbService.enable | bool | `false` |  |
+| clickhouse.lbService.enabled | bool | `false` |  |
 | clickhouse.lbService.serviceAnnotations | object | `{}` |  |
 | clickhouse.lbService.serviceLabels | object | `{}` |  |
 | clickhouse.persistence.accessMode | string | `"ReadWriteOnce"` |  |
