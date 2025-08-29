@@ -177,7 +177,8 @@ EOSQL
 | clickhouse.keeper | object | `{"host":"","port":2181}` | Keeper connection settings for ClickHouse instances. |
 | clickhouse.keeper.host | string | `""` | Specify a keeper host. Should be left empty if `clickhouse-keeper.enabled` is `true`. Will override the defaults set from `clickhouse-keeper.enabled`. |
 | clickhouse.keeper.port | int | `2181` | Override the default keeper port |
-| clickhouse.lbService.enable | bool | `false` |  |
+| clickhouse.lbService.enabled | bool | `false` |  |
+| clickhouse.lbService.loadBalancerSourceRanges | list | `[]` | Source IP CIDR ranges to restrict client IPs. (support dependent on cloud-provider) |
 | clickhouse.lbService.serviceAnnotations | object | `{}` |  |
 | clickhouse.lbService.serviceLabels | object | `{}` |  |
 | clickhouse.persistence.accessMode | string | `"ReadWriteOnce"` |  |
@@ -213,5 +214,6 @@ EOSQL
 | keeper.settings | object | `{}` |  |
 | keeper.tag | string | `"25.3.6.10034.altinitystable"` |  |
 | keeper.tolerations | list | `[]` |  |
+| keeper.volumeClaimAnnotations | object | `{}` |  |
 | keeper.zoneSpread | bool | `false` |  |
 | operator.enabled | bool | `true` | Whether to enabled the Altinity Operator for ClickHouse. Disable if you already have the Operator installed cluster-wide. |
