@@ -162,6 +162,7 @@ keeper:
   nodeSelector: {}
   tolerations: []
   podAnnotations: {}
+  volumeClaimAnnotations: {}
   # topologySpreadConstraints over `zone`, by deafult there is only
   # podAntiAffinity by hostname
   zoneSpread: false

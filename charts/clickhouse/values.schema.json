@@ -285,6 +285,10 @@
           "type": "object",
           "description": "Annotations for Keeper pods."
         },
+        "volumeClaimAnnotations": {
+          "type": "object",
+          "description": "Annotations for Keeper volume claims."
+        },
         "zoneSpread": {
           "type": "boolean",
           "description": "Enable topology spread constraints over zone for Keeper."

@@ -214,5 +214,6 @@ EOSQL
 | keeper.settings | object | `{}` |  |
 | keeper.tag | string | `"25.3.6.10034.altinitystable"` |  |
 | keeper.tolerations | list | `[]` |  |
+| keeper.volumeClaimAnnotations | object | `{}` |  |
 | keeper.zoneSpread | bool | `false` |  |
 | operator.enabled | bool | `true` | Whether to enabled the Altinity Operator for ClickHouse. Disable if you already have the Operator installed cluster-wide. |
