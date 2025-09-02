@@ -41,7 +41,7 @@ clickhouse:
         key: "secret"
 
   # Specify which zones to run in.
-  # `replicaCount` will applied within each zone.
+  # `replicaCount` will be applied within each zone.
   zones: []
 
   # If enabled, will prevent ClickHouse pods from running on the same node
@@ -149,7 +149,7 @@ keeper:
   replicaCount: 3
   image: "altinity/clickhouse-keeper"
   tag: "25.3.6.10034.altinitystable"
-  # allows configure multiple aspects and behavior for `clickhouse-keeper`
+  # allows to configure multiple aspects and behavior for `clickhouse-keeper`
   # instance
   settings: {}
   localStorage:
@@ -169,6 +169,6 @@ keeper:
     memoryLimitsMiB: 3Gi
 
 operator:
-  # -- Whether to enabled the Altinity Operator for ClickHouse.
+  # -- Whether to enable the Altinity Operator for ClickHouse.
   # Disable if you already have the Operator installed cluster-wide.
   enabled: true
