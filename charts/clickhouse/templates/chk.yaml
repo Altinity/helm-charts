@@ -56,6 +56,11 @@ spec:
     volumeClaimTemplates: 
       {{- range $i, $e := until $count }}
       - name: "keeper-{{ $i }}"
+        {{- with $.Values.keeper.volumeClaimAnnotations }}
+        metadata:
+          annotations:
+            {{- toYaml . | nindent 12 }}
+        {{- end }}
         spec:
           accessModes:
             - ReadWriteOnce

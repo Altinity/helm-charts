@@ -84,7 +84,11 @@ clickhouse:
     serviceLabels: {}
 
   lbService:
-    enable: false
+    enabled: false
+    # -- Specify source IP ranges to the LoadBalancer service.
+    # If supported by the platform, this will restrict traffic through the cloud-provider load-balancer
+    # to the specified client IPs. This is ignored if the cloud-provider does not support the feature.
+    loadBalancerSourceRanges: []
     serviceAnnotations: {}
     serviceLabels: {}
 
@@ -158,6 +162,7 @@ keeper:
   nodeSelector: {}
   tolerations: []
   podAnnotations: {}
+  volumeClaimAnnotations: {}
   # topologySpreadConstraints over `zone`, by deafult there is only
   # podAntiAffinity by hostname
   zoneSpread: false

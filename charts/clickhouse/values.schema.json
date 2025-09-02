@@ -141,9 +141,16 @@
         "lbService": {
           "type": "object",
           "properties": {
-            "enable": {
+            "enabled": {
               "type": "boolean",
               "description": "Enable LoadBalancer service for ClickHouse."
+            },
+            "loadBalancerSourceRanges": {
+              "type": "array",
+              "description": "Restricts traffic to specified client IPs.",
+              "items": {
+                "type": "string"
+              }
             },
             "serviceAnnotations": {
               "type": "object",
@@ -277,6 +284,10 @@
         "podAnnotations": {
           "type": "object",
           "description": "Annotations for Keeper pods."
+        },
+        "volumeClaimAnnotations": {
+          "type": "object",
+          "description": "Annotations for Keeper volume claims."
         },
         "zoneSpread": {
           "type": "boolean",

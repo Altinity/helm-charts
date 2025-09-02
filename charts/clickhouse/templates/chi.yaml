@@ -44,7 +44,7 @@ spec:
           labels:
             {{- include "clickhouse.labels" . | nindent 12 }}
             {{- with .Values.clickhouse.service.serviceLabels }}
-            {{- toYaml . | nindent 10 }}
+            {{- toYaml . | nindent 12 }}
             {{- end }}
         spec:
           type: {{ .Values.clickhouse.service.type }}
@@ -62,11 +62,8 @@ spec:
         metadata:
           labels:
             {{- include "clickhouse.labels" . | nindent 12 }}
-            {{- with .Values.podLabels }}
-            {{- toYaml . | nindent 10 }}
-            {{- end }}
             {{- with .Values.clickhouse.lbService.serviceLabels }}
-            {{- toYaml . | nindent 10 }}
+            {{- toYaml . | nindent 12 }}
             {{- end }}
           {{- with .Values.clickhouse.lbService.serviceAnnotations }}
           annotations:
@@ -74,6 +71,10 @@ spec:
           {{- end }}
         spec:
           type: "LoadBalancer"
+          {{- if .Values.clickhouse.lbService.loadBalancerSourceRanges }}
+          loadBalancerSourceRanges:
+            {{- toYaml .Values.clickhouse.lbService.loadBalancerSourceRanges | nindent 12 }}
+          {{- end }}
           ports:
             - name: http
               port: 8123
