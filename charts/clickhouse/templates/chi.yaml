@@ -130,6 +130,25 @@ spec:
           secretKeyRef:
             name: {{ include "clickhouse.credentialsName" . }}
             key: password
+      {{- range .Values.clickhouse.users }}
+      {{ required "A user must have a name" .name }}/access_management: {{ .accessManagement | default 0}}
+      {{ .name }}/networks/ip: {{ .hostIP | default "0.0.0.0/0" | quote }}
+      {{- if .grants }}
+      {{ .name }}/grants/query:
+      {{- range .grants }}
+      - {{ . | quote}}
+      {{- end }}
+      {{- end }}
+      {{- if .password_secret_name }}
+      {{ .name }}/password:
+        valueFrom:
+          secretKeyRef:
+            name: {{ .password_secret_name | quote }}
+            key: password
+      {{- else if .password_sha256_hex }}
+      {{ .name }}/password_sha256_hex: {{ .password_sha256_hex | quote }}
+      {{- end }}
+      {{- end }}
     clusters:
       - name: {{ include "clickhouse.clustername" . }}
         {{- if .Values.clickhouse.clusterSecret.enabled }}
@@ -173,7 +192,7 @@ spec:
     {{- $extraConfig := tpl (include "clickhouse.extraConfig" . ) . -}}
     {{- if not (empty $extraConfig) }}
     files:
-        config.d/extra_config.xml: | 
+        config.d/extra_config.xml: |
           {{- tpl $extraConfig . | nindent 10 }}
     {{- end }}
 
