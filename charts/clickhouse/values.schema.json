@@ -31,6 +31,44 @@
             }
           }
         },
+        "users": {
+          "type": "array",
+          "description": "Users to initialize in ClickHouse",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Name for the user",
+                "pattern": "^[a-zA-Z0-9]+$"
+              },
+              "hostIP": {
+                "type": "string",
+                "description": "Mask for IPs allowed for this user.",
+                "default": "0.0.0.0/0"
+              },
+              "password_secret_name": {
+                "type": "string",
+                "description": "Name of a Kubernetes secret containing the plaintext password"
+              },
+              "password_sha256_hex": {
+                "type": "string",
+                "description": "SHA256 of the password (ignored if password_secret_name is passed)"
+              },
+              "grants": {
+                "type": "array",
+                "description": "List of grants to provide for the user",
+                "items": {
+                  "type": "string",
+                  "examples": [
+                    "GRANT SELECT ON default.*",
+                    "GRANT SELECT, DELETE ON foo.bar"
+                  ]
+                }
+              }
+            }
+          }
+        },
         "replicasCount": {
           "type": "integer",
           "description": "Number of ClickHouse replicas. If greater than 1, Keeper must be enabled or a Keeper host must be provided.",
