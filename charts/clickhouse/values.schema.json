@@ -249,6 +249,10 @@
           "type": "string",
           "description": "Miscellaneous config for ClickHouse in XML format."
         },
+        "extraUsers": {
+          "type": "string",
+          "description": "Miscellaneous users config for ClickHouse in XML format."
+        },
         "initScripts": {
           "type": "object",
           "description": "Configuration for init scripts via ConfigMap.",

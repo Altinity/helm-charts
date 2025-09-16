@@ -195,5 +195,11 @@ spec:
         config.d/extra_config.xml: |
           {{- tpl $extraConfig . | nindent 10 }}
     {{- end }}
+    {{- $extraUsers := tpl (include "clickhouse.extraUsers" . ) . -}}
+    {{- if not (empty $extraUsers) }}
+    files:
+        users.d/extra_users.xml: |
+          {{- tpl $extraUsers . | nindent 10 }}
+    {{- end }}
 
 {{ include "validate.clickhouse.keeper" . }}
