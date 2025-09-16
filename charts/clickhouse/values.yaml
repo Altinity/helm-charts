@@ -134,6 +134,10 @@ clickhouse:
   extraConfig: |
     <clickhouse>
     </clickhouse>
+  # -- Additional users config for ClickHouse (in xml format)
+  extraUsers: |
+    <clickhouse>
+    </clickhouse>
 
   # -- Init scripts ConfigMap configuration
   initScripts:
