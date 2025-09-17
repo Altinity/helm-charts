@@ -202,5 +202,8 @@ spec:
           {{- tpl $extraUsers . | nindent 10 }}
         {{- end }}
     {{- end }}
+  {{- if not (empty .Values.namespaceDomainPattern) }}
+  namespaceDomainPattern: {{ .Values.namespaceDomainPattern | quote }}
+  {{- end }}
 
 {{ include "validate.clickhouse.keeper" . }}

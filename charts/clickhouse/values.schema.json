@@ -10,6 +10,10 @@
       "type": "string",
       "description": "Overrides the full name of the chart."
     },
+    "namespaceDomainPattern": {
+      "type": "string",
+      "description": "Custom cluster domain of Kubernetes cluster."
+    },
     "clickhouse": {
       "type": "object",
       "properties": {

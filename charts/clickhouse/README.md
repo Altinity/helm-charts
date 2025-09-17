@@ -155,6 +155,7 @@ EOSQL
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| namespaceDomainPattern | string |  | Custom domain pattern used for DNS names of `Service` and `Pod` resources. Typically defined by the custom cluster domain of the Kubernetes cluster. The pattern follows the `%s` C-style printf format, e.g. '%s.svc.my.test'. If not specified, the default namespace domain suffix is `.svc.cluster.local`. |
 | clickhouse.antiAffinity | bool | `false` |  |
 | clickhouse.clusterSecret | object | `{"auto":true,"enabled":false,"value":"","valueFrom":{"secretKeyRef":{"key":"secret","name":""}}}` | Cluster secret configuration for secure inter-node communication |
 | clickhouse.clusterSecret.auto | bool | `true` | Auto-generate cluster secret (recommended for security) |

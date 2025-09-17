@@ -129,4 +129,7 @@ spec:
                   cpu: "{{ $.Values.keeper.resources.cpuLimitsMs }}"
                   memory: "{{ $.Values.keeper.resources.memoryLimitsMiB }}"
     {{- end }}
+  {{- if not (empty .Values.namespaceDomainPattern) }}
+  namespaceDomainPattern: {{ .Values.namespaceDomainPattern | quote }}
+  {{- end }}
 {{- end }}
