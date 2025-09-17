@@ -190,16 +190,17 @@ spec:
             port: {{ .Values.clickhouse.keeper.port }}
     {{- end }}
     {{- $extraConfig := tpl (include "clickhouse.extraConfig" . ) . -}}
-    {{- if not (empty $extraConfig) }}
+    {{- $extraUsers := tpl (include "clickhouse.extraUsers" . ) . -}}
+    {{- if not (and (empty $extraConfig) (empty $extraUsers)) }}
     files:
+        {{- if not (empty $extraConfig) }}
         config.d/extra_config.xml: |
           {{- tpl $extraConfig . | nindent 10 }}
-    {{- end }}
-    {{- $extraUsers := tpl (include "clickhouse.extraUsers" . ) . -}}
-    {{- if not (empty $extraUsers) }}
-    files:
+        {{- end }}
+        {{- if not (empty $extraUsers) }}
         users.d/extra_users.xml: |
           {{- tpl $extraUsers . | nindent 10 }}
+        {{- end }}
     {{- end }}
 
 {{ include "validate.clickhouse.keeper" . }}
