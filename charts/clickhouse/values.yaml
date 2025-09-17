@@ -4,6 +4,12 @@ nameOverride: ""
 # @ignore
 fullnameOverride: ""
 
+# -- Custom domain pattern used for DNS names of `Service` and `Pod` resources.
+# Typically defined by the custom cluster domain of the Kubernetes cluster.
+# The pattern follows the `%s` C-style printf format, e.g. %s.svc.my.test.
+# If not specified, the default namespace domain suffix is `.svc.cluster.local`.
+namespaceDomainPattern: ""
+
 # Configure ClickHouse Installation and Pod Template
 clickhouse:
   defaultUser:
