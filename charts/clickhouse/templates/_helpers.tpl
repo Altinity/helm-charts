@@ -203,6 +203,15 @@ Extra Config
   {{- end -}}
 {{- end -}}
 {{/*
+Extra Users
+*/}}
+{{- define "clickhouse.extraUsers" -}}
+  {{- if not (empty .Values.clickhouse.extraUsers) -}}
+    {{ .Values.clickhouse.extraUsers }}
+  {{- else -}}
+  {{- end -}}
+{{- end -}}
+{{/*
 Common labels
 */}}
 {{- define "clickhouse.labels" -}}
