@@ -152,7 +152,9 @@ spec:
     clusters:
       - name: {{ include "clickhouse.clustername" . }}
         {{- if .Values.clickhouse.clusterSecret.enabled }}
+        {{- if .Values.clickhouse.clusterSecret.secure }}
         secure: "yes"
+        {{- end }}
         secret:
           {{- if .Values.clickhouse.clusterSecret.auto }}
           auto: "true"
