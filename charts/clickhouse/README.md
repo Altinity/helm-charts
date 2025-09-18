@@ -159,6 +159,7 @@ EOSQL
 | clickhouse.clusterSecret | object | `{"auto":true,"enabled":false,"value":"","valueFrom":{"secretKeyRef":{"key":"secret","name":""}}}` | Cluster secret configuration for secure inter-node communication |
 | clickhouse.clusterSecret.auto | bool | `true` | Auto-generate cluster secret (recommended for security) |
 | clickhouse.clusterSecret.enabled | bool | `false` | Whether to enable secure cluster communication |
+| clickhouse.clusterSecret.secure | bool | `false` | Whether to put inter-node communication behind the SSL port (WARNING: this requires that you use extraConfig to set up SSL) |
 | clickhouse.clusterSecret.value | string | `""` | Plaintext cluster secret value (not recommended for production) |
 | clickhouse.clusterSecret.valueFrom | object | `{"secretKeyRef":{"key":"secret","name":""}}` | Reference to an existing Kubernetes secret containing the cluster secret |
 | clickhouse.clusterSecret.valueFrom.secretKeyRef.key | string | `"secret"` | Key in the secret that contains the cluster secret value |
