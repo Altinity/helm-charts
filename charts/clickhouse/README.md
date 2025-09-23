@@ -1,5 +1,4 @@
 # clickhouse
-
 ![Version: 0.3.1](https://img.shields.io/badge/Version-0.3.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.3.6.10034](https://img.shields.io/badge/AppVersion-25.3.6.10034-informational?style=flat-square)
 
 A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for ClickHouse
@@ -167,6 +166,7 @@ EOSQL
 | clickhouse.defaultUser.hostIP | string | `"127.0.0.1/32"` |  |
 | clickhouse.defaultUser.password | string | `""` |  |
 | clickhouse.extraConfig | string | `"<clickhouse>\n</clickhouse>\n"` | Miscellanous config for ClickHouse (in xml format) |
+| clickhouse.extraUsers | string | `"<clickhouse>\n</clickhouse>\n"` | Additional users config for ClickHouse (in xml format) |
 | clickhouse.image.pullPolicy | string | `"IfNotPresent"` |  |
 | clickhouse.image.repository | string | `"altinity/clickhouse-server"` |  |
 | clickhouse.image.tag | string | `"25.3.6.10034.altinitystable"` | Override the image tag for a specific version |
@@ -178,7 +178,7 @@ EOSQL
 | clickhouse.keeper.host | string | `""` | Specify a keeper host. Should be left empty if `clickhouse-keeper.enabled` is `true`. Will override the defaults set from `clickhouse-keeper.enabled`. |
 | clickhouse.keeper.port | int | `2181` | Override the default keeper port |
 | clickhouse.lbService.enabled | bool | `false` |  |
-| clickhouse.lbService.loadBalancerSourceRanges | list | `[]` | Source IP CIDR ranges to restrict client IPs. (support dependent on cloud-provider) |
+| clickhouse.lbService.loadBalancerSourceRanges | list | `[]` | Specify source IP ranges to the LoadBalancer service. If supported by the platform, this will restrict traffic through the cloud-provider load-balancer to the specified client IPs. This is ignored if the cloud-provider does not support the feature. |
 | clickhouse.lbService.serviceAnnotations | object | `{}` |  |
 | clickhouse.lbService.serviceLabels | object | `{}` |  |
 | clickhouse.persistence.accessMode | string | `"ReadWriteOnce"` |  |
@@ -198,6 +198,7 @@ EOSQL
 | clickhouse.serviceAccount.create | bool | `false` | Specifies whether a service account should be created |
 | clickhouse.serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | clickhouse.shardsCount | int | `1` | number of shards. |
+| clickhouse.users | list | `[]` |  |
 | clickhouse.zones | list | `[]` |  |
 | keeper.enabled | bool | `false` | Whether to enable Keeper. Required for replicated tables. |
 | keeper.image | string | `"altinity/clickhouse-keeper"` |  |
@@ -216,4 +217,4 @@ EOSQL
 | keeper.tolerations | list | `[]` |  |
 | keeper.volumeClaimAnnotations | object | `{}` |  |
 | keeper.zoneSpread | bool | `false` |  |
-| operator.enabled | bool | `true` | Whether to enabled the Altinity Operator for ClickHouse. Disable if you already have the Operator installed cluster-wide. |
+| operator.enabled | bool | `true` | Whether to enable the Altinity Operator for ClickHouse. Disable if you already have the Operator installed cluster-wide. |
