@@ -35,8 +35,10 @@ clickhouse:
 
   # -- Cluster secret configuration for secure inter-node communication
   clusterSecret:
-    # -- Whether to enable secure cluster communication
+    # -- Whether to enable secret-based cluster communication
     enabled: false
+    # -- Whether to secure this behind the SSL port
+    secure: false
     # -- Auto-generate cluster secret (recommended for security)
     auto: true
     # -- Plaintext cluster secret value (not recommended for production)
