@@ -167,6 +167,7 @@ EOSQL
 | clickhouse.defaultUser.allowExternalAccess | bool | `false` | Allow the default user to access ClickHouse from any IP. If set, will override `hostIP` to always be `0.0.0.0/0`. |
 | clickhouse.defaultUser.hostIP | string | `"127.0.0.1/32"` |  |
 | clickhouse.defaultUser.password | string | `""` |  |
+| clickhouse.defaultUser.password_secret_name | string | `""` | Name of an existing Kubernetes secret containing the default user password. If set, the password will be read from the secret instead of using the password field. The secret should contain a key named 'password'. |
 | clickhouse.extraConfig | string | `"<clickhouse>\n</clickhouse>\n"` | Miscellanous config for ClickHouse (in xml format) |
 | clickhouse.extraUsers | string | `"<clickhouse>\n</clickhouse>\n"` | Additional users config for ClickHouse (in xml format) |
 | clickhouse.image.pullPolicy | string | `"IfNotPresent"` |  |
