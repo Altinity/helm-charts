@@ -201,3 +201,4 @@ operator:
   # -- Whether to enable the Altinity Operator for ClickHouse.
   # Disable if you already have the Operator installed cluster-wide.
   enabled: true
+  
