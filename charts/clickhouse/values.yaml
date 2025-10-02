@@ -144,7 +144,6 @@ clickhouse:
   # extraPorts:
   #   - name: custom-port
   #     containerPort: 8080
-  #     protocol: TCP
   extraPorts: []
 
   # -- Miscellanous config for ClickHouse (in xml format)
