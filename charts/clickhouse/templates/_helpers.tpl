@@ -104,7 +104,7 @@ Pod Template Base
               {{- end }}
               resources:
                 {{- toYaml .Values.clickhouse.resources | nindent 16 }}
-            {{- with .Values.clickhouse.sidecars }}
+            {{- with .Values.clickhouse.extraContainers }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
           {{- if or .Values.clickhouse.initScripts.enabled .Values.clickhouse.extraVolumes }}
