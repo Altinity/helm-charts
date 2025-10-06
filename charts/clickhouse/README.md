@@ -1,5 +1,5 @@
 # clickhouse
-![Version: 0.3.1](https://img.shields.io/badge/Version-0.3.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.3.6.10034](https://img.shields.io/badge/AppVersion-25.3.6.10034-informational?style=flat-square)
+![Version: 0.3.3](https://img.shields.io/badge/Version-0.3.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.3.6.10034](https://img.shields.io/badge/AppVersion-25.3.6.10034-informational?style=flat-square)
 
 A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for ClickHouse
 
@@ -154,12 +154,11 @@ EOSQL
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| namespaceDomainPattern | string |  | Custom domain pattern used for DNS names of `Service` and `Pod` resources. Typically defined by the custom cluster domain of the Kubernetes cluster. The pattern follows the `%s` C-style printf format, e.g. '%s.svc.my.test'. If not specified, the default namespace domain suffix is `.svc.cluster.local`. |
 | clickhouse.antiAffinity | bool | `false` |  |
-| clickhouse.clusterSecret | object | `{"auto":true,"enabled":false,"value":"","valueFrom":{"secretKeyRef":{"key":"secret","name":""}}}` | Cluster secret configuration for secure inter-node communication |
+| clickhouse.clusterSecret | object | `{"auto":true,"enabled":false,"secure":false,"value":"","valueFrom":{"secretKeyRef":{"key":"secret","name":""}}}` | Cluster secret configuration for secure inter-node communication |
 | clickhouse.clusterSecret.auto | bool | `true` | Auto-generate cluster secret (recommended for security) |
-| clickhouse.clusterSecret.enabled | bool | `false` | Whether to enable secure cluster communication |
-| clickhouse.clusterSecret.secure | bool | `false` | Whether to put inter-node communication behind the SSL port (WARNING: this requires that you use extraConfig to set up SSL) |
+| clickhouse.clusterSecret.enabled | bool | `false` | Whether to enable secret-based cluster communication |
+| clickhouse.clusterSecret.secure | bool | `false` | Whether to secure this behind the SSL port |
 | clickhouse.clusterSecret.value | string | `""` | Plaintext cluster secret value (not recommended for production) |
 | clickhouse.clusterSecret.valueFrom | object | `{"secretKeyRef":{"key":"secret","name":""}}` | Reference to an existing Kubernetes secret containing the cluster secret |
 | clickhouse.clusterSecret.valueFrom.secretKeyRef.key | string | `"secret"` | Key in the secret that contains the cluster secret value |
@@ -219,4 +218,5 @@ EOSQL
 | keeper.tolerations | list | `[]` |  |
 | keeper.volumeClaimAnnotations | object | `{}` |  |
 | keeper.zoneSpread | bool | `false` |  |
+| namespaceDomainPattern | string | `""` | Custom domain pattern used for DNS names of `Service` and `Pod` resources. Typically defined by the custom cluster domain of the Kubernetes cluster. The pattern follows the `%s` C-style printf format, e.g. '%s.svc.my.test'. If not specified, the default namespace domain suffix is `.svc.cluster.local`. |
 | operator.enabled | bool | `true` | Whether to enable the Altinity Operator for ClickHouse. Disable if you already have the Operator installed cluster-wide. |

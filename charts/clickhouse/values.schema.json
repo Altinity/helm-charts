@@ -257,6 +257,14 @@
           "type": "string",
           "description": "Miscellaneous users config for ClickHouse in XML format."
         },
+        "extraContainers": {
+          "type": "object",
+          "description": "Extra containers for Clickhouse pod."
+        },
+        "extraVolumes": {
+          "type": "object",
+          "description": "Extra volumes for Clickhouse pod."
+        },
         "initScripts": {
           "type": "object",
           "description": "Configuration for init scripts via ConfigMap.",
