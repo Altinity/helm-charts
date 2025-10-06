@@ -12,6 +12,36 @@ namespaceDomainPattern: ""
 
 # Configure ClickHouse Installation and Pod Template
 clickhouse:
+  extraVolumes:
+    - name: cloudsql-oauth-credentials
+      secret:
+        secretName: your-gcp-secret-name
+
+  sidecars:
+    - name: cloudsql-proxy
+      image: b.gcr.io/cloudsql-docker/gce-proxy:1.13
+      imagePullPolicy: IfNotPresent
+      command:
+        - /cloud_sql_proxy
+      args:
+        - --dir=/cloudsql
+        - -credential_file=/secrets/cloudsql/credentials.json
+        - -instances=$(CSQL_POSTGRES_INSTANCES)=tcp:5432
+        - -log_debug_stdout=true
+      env:
+        - name: CSQL_POSTGRES_INSTANCES
+          valueFrom:
+            configMapKeyRef:
+              name: wave-common-config
+              key: GCP_POSTGRES_CONNECTION_NAME
+      resources: {}
+      volumeMounts:
+        - name: cloudsql-oauth-credentials # This must match the name in 'extraVolumes'
+          mountPath: /secrets/cloudsql
+          readOnly: true
+        - name: kube-api-access-v8szn
+          mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+          readOnly: true
   defaultUser:
     password: ""
     # -- Allow the default user to access ClickHouse from any IP.
