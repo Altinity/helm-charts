@@ -29,6 +29,12 @@ clickhouse:
   # -- ClickHouse server image
   image: "altinity/clickhouse-server:24.3.12.76.altinitystable"
 
+  # -- Extra volumes for clickhouse pods
+  extraVolumes: []
+
+  # -- Extra containers for clickhouse pods
+  extraContainers: []
+
   # -- Possible service types are `cluster-ip`, `internal-loadbalancer` and `external-loadbalancer`
   service_type: cluster-ip
 

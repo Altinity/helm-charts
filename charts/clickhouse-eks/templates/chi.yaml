@@ -37,25 +37,33 @@ spec:
           port: 2181
   templates:
     podTemplates:
-      {{- range .Values.clickhouse.zones }}
-      - name: replica-in-zone-{{ . }}
+      {{- $root := . }}
+      {{- range $zone := $root.Values.clickhouse.zones }}
+      - name: replica-in-zone-{{ $zone }}
         zone:
           values:
-            - {{ . }}
+            - {{ $zone }}
         podDistribution:
           - type: ClickHouseAntiAffinity
             scope: ClickHouseInstallation
         spec:
           containers:
-          - name: clickhouse
-            image: {{ $.Values.clickhouse.image }}
+            - name: clickhouse
+              image: {{ $root.Values.clickhouse.image }}
+            {{- with $root.Values.clickhouse.extraContainers }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           nodeSelector:
-            node.kubernetes.io/instance-type: {{ $.Values.clickhouse.node_selector }}
+            node.kubernetes.io/instance-type: {{ $root.Values.clickhouse.node_selector }}
           tolerations:
             - key: "dedicated"
               operator: "Equal"
               value: "clickhouse"
               effect: "NoSchedule"
+          {{- with $root.Values.clickhouse.extraVolumes }}
+          volumes:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
       {{- end }}
     volumeClaimTemplates:
       - name: storage
@@ -119,4 +127,3 @@ spec:
             - name: tcp
               port: 9000
               targetPort: 9000
-

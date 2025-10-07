@@ -148,10 +148,10 @@ clickhouse:
     </clickhouse>
 
   # @ignore
-  extraContainers: {}
+  extraContainers: []
 
   # @ignore
-  extraVolumes: {}
+  extraVolumes: []
 
   # -- Init scripts ConfigMap configuration
   initScripts:
