@@ -1,2 +1,115 @@
-<p>Nothing to see here. Please visit <a href="https://github.com/altinity/helm-charts">github</a> for documentation and
-  source.
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="robots" content="index, follow">
+
+  <title>Altinity® Helm Charts for ClickHouse®</title>
+  <meta name="description" content="The official repo for the Altinity® Helm charts for ClickHouse®">
+  <meta property="og:title" content="Altinity® Helm charts" />
+  <meta property="og:description" content="The official repo for the Altinity® Helm charts for ClickHouse®" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://helm.altinity.com/" />
+  <meta itemprop="name" content="Altinity® Helm Charts for ClickHouse®">
+  <meta itemprop="description" content="The official repo for the Altinity® Helm charts for ClickHouse®">
+  <meta name="twitter:card" content="summary"/>
+  <meta name="twitter:title" content="Altinity® Helm Charts for ClickHouse®"/>
+  <meta name="twitter:description" content="The official repo for the Altinity® Helm charts for ClickHouse®"/>
+
+  <meta name="keywords" content="altinity, helm, charts, clickhouse">
+
+  <style>
+      a {
+          color: #189dd0;
+          font-weight: bold;
+      }
+      a:visited {
+          color: #189dd0;
+          font-weight: bold;
+      }
+      a:hover, a:focus, a:active {
+          color: #189dd0;
+          font-weight: bold;
+          text-decoration: underline;
+      }
+      h2 {
+          margin-top: 1.5em;
+          font-weight: 700;
+      }
+  </style>
+</head>
+
+<body style='
+    font-family: arimo, -apple-system, BlinkMacSystemFont, segoe ui, Roboto, helvetica neue, Arial, sans-serif, apple color emoji, segoe ui emoji, segoe ui symbol;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: left;
+    background-color: #fff;'>
+
+<h1 style="margin-block-start: 0.67em; margin-block-end: 0.67em; margin-inline-start: 0px; margin-inline-end: 0px; display: block;margin-top: 0; line-height: 1.2; margin-bottom: 0.5rem; font-weight: 500; font-size: 2.5rem;">Altinity® Helm Charts for ClickHouse®</h1>
+
+<p style="font-style: italic;">Helm charts for use with the Altinity Operator for ClickHouse</p>
+
+<h2>Running ClickHouse on Kubernetes with the Altinity Operator</h2>
+
+<p>A complete Kubernetes deployment of ClickHouse includes:</p>
+
+<ul>
+  <li>The Altinity Operator for ClickHouse</li>
+  <li>The Altinity Operator CRDs</li>
+  <li>A <span style="font-family: monospace;">ClickHouseInstallation</span> Custom Resource defining your ClickHouse cluster settings</li>
+  <li>A <span style="font-family: monospace;">ClickHouseKeeperInstallation</span> Custom Resource defining your Keeper deployment (optional for single-node instances)</li>
+  <li>A custom storage class (optional) - we recommend gp3 in production.</li>
+</ul>
+
+<p>For convenience, <a href="./charts/clickhouse">the ClickHouse chart</a> in this repo includes <a href="https://github.com/Altinity/clickhouse-operator/tree/master/deploy/helm/clickhouse-operator">the Operator Helm Chart</a> as a dependency.</p>
+
+<p>These samples demonstrate straightforward Helm charts that can be used to deploy ClickHouse and ClickHouse Keeper. The examples are intended as starting points for more complex configurations and do not cover all possible uses cases.</p>
+
+<p>For more complex configurations, follow <a href="https://docs.altinity.com/altinitykubernetesoperator/quickstartinstallation/">the Installation Guide</a> from the documentation to install the Operator and create a custom ClickHouseInstallation resource.</p>
+
+<blockquote style="border-left: 3px solid #189dd0; padding-left: 20px;">
+  <span style="font-weight: bold;">Installing the Operator first provides better control when uninstalling clusters.</span> Please refer to the Altinity Operator project instructions for details on operator upgrade with Helm, including running custom resource definition files independently.
+</blockquote>
+
+<h2>Helm Charts</h2>
+
+
+<ul>
+  <li><a href="./charts/clickhouse/" style="font-weight: bold;">clickhouse</a>: All-in-one chart to deploy a ClickHouse cluster (and optionally Keeper and the Altinity Operator)</li>
+  <li><a href="./charts/clickhouse-eks/" style="font-weight: bold;">clickhouse-eks</a>: An EKS-specific chart for high-availability ClickHouse clusters.</li>
+</ul>
+
+<h2>Community</h2>
+
+<p>These charts are a community effort sponsored by Altinity. The best way to reach us or ask questions is:</p>
+
+<ul>
+  <li><a href="https://altinity.com/slack">Join the Altinity Slack</a> - Chat with the developers and other users</li>
+  <li><a href="https://github.com/Altinity/helm-charts/issues">Log an issue on GitHub</a> - Ask questions, log bugs and feature requests</li>
+</ul>
+
+<h2>Contributing</h2>
+
+<p>We welcome contributions from the community! If you encounter issues or have improvements to suggest, please log an issue or submit a PR.</p>
+
+<h2>Legal</h2>
+
+<p>All code, unless specified otherwise, is licensed under the <a href="LICENSE">Apache-2.0</a> license. Copyright (c) 2025 Altinity, Inc. Altinity.Cloud®, and Altinity Stable® are registered trademarks of Altinity, Inc. ClickHouse® is a registered trademark of ClickHouse, Inc.; Altinity is not affiliated with or associated with ClickHouse, Inc. Kubernetes, MySQL, and PostgreSQL are trademarks and property of their respective owners.</p>
+
+<h2>Commercial Support</h2>
+
+<p>Altinity is the primary maintainer of the operator. It is the basis of Altinity.Cloud and is also used in self-managed installations. Altinity offers a range of services related to ClickHouse and analytic applications on Kubernetes.</p>
+
+<ul>
+  <li><a href="https://altinity.com/">Official website</a> - Get a high level overview of Altinity and our offerings.</li>
+  <li><a href="https://altinity.com/cloud-database/">Altinity.Cloud</a> - Run ClickHouse in our cloud or yours.</li>
+  <li><a href="https://altinity.com/support/">Altinity Support</a> - Get Enterprise-class support for ClickHouse.</li>
+  <li><a href="https://altinity.com/slack">Slack</a> - Talk directly with ClickHouse users and Altinity devs.</li>
+  <li><a href="https://hubs.la/Q020sH3Z0">Contact us</a> - Contact Altinity with your questions or issues.</li>
+  <li><a href="https://hubs.la/Q020sHkv0">Free consultation</a> - Get a free consultation with a ClickHouse expert today.</li>
+</ul>
+</body>
+</html>
