@@ -1,0 +1,76 @@
+name: 'Common Setup'
+description: 'Common setup steps for all test jobs'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set Runner IP and SSH Command
+      shell: bash
+      run: |
+          export RUNNER_IP=$(hostname -I | cut -d ' ' -f 1)
+          export RUNNER_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RUNNER_IP"
+          echo "Runner IP: $RUNNER_IP"
+          echo "Runner SSH Command: $RUNNER_SSH_COMMAND"
+          uname -i
+
+    - name: Cache Python dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('./tests/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: System Setup
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install -y wget gnupg software-properties-common jq curl unzip git
+        export RUNNER_IP=$(hostname -I | cut -d ' ' -f 1)
+        export RUNNER_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$RUNNER_IP"
+        uname -i
+        sudo rm -rf /var/lib/apt/lists/*
+        sudo rm -rf /var/cache/debconf
+        sudo rm -rf /tmp/*
+      shell: bash
+
+    - name: Set up Python
+      uses: actions/test-setup-python@v4
+      with:
+        python-version: '3.12.3'
+        cache: 'pip'
+        cache-dependency-path: ./tests/requirements.txt
+
+    - name: Install Python Dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        pip install -r ./tests/requirements.txt
+      shell: bash
+
+    - name: Set PYTHONPATH
+      run: echo "PYTHONPATH=${{ github.workspace }}" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Install Minikube
+      run: |
+        # Install kubectl
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        chmod +x kubectl
+        sudo mv kubectl /usr/local/bin/
+        
+        # Install minikube
+        curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+        sudo install minikube-linux-amd64 /usr/local/bin/minikube
+        
+        # Install Docker (required for minikube driver)
+        sudo apt-get update
+        sudo apt-get install -y docker.io
+        sudo systemctl start docker
+        sudo systemctl enable docker
+        sudo usermod -aG docker $USER
+        
+        # Verify installations
+        kubectl version --client
+        minikube version
+        docker --version
+      shell: bash
+
