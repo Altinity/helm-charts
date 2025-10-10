@@ -1,7 +1,7 @@
 from tests.steps.system import *
 import json
 import time
-
+import tests.steps.kubernetes as kubernetes
 
 @TestStep(When)
 def get_version(self, namespace, pod_name):
@@ -53,9 +53,8 @@ def get_chi_info(self, namespace):
 @TestStep(When)
 def get_clickhouse_pods(self, namespace):
     """Get only ClickHouse pods (excluding operator pods) from the specified namespace."""
-    
-    from tests.steps.kubernetes import get_pods
-    pods = get_pods(namespace=namespace)
+
+    pods = kubernetes.get_pods(namespace=namespace)
     return [p for p in pods if "chi-" in p and "operator" not in p]
 
 
@@ -80,9 +79,9 @@ def wait_for_clickhouse_pods_running(self, namespace, expected_count=None, timeo
             continue
         
         all_running = True
-        from tests.steps.kubernetes import check_status
+
         for pod in clickhouse_pods:
-            if not check_status(pod_name=pod, namespace=namespace, status="Running"):
+            if not kubernetes.check_status(pod_name=pod, namespace=namespace, status="Running"):
                 all_running = False
                 break
         
@@ -92,7 +91,7 @@ def wait_for_clickhouse_pods_running(self, namespace, expected_count=None, timeo
         if time.time() - start_time > timeout:
             pod_statuses = []
             for pod in clickhouse_pods:
-                status = "Running" if check_status(pod_name=pod, namespace=namespace, status="Running") else "Not Running"
+                status = "Running" if kubernetes.check_status(pod_name=pod, namespace=namespace, status="Running") else "Not Running"
                 pod_statuses.append(f"{pod}: {status}")
             raise TimeoutError(f"Timeout waiting for ClickHouse pods to be running. Pod statuses: {pod_statuses}")
             
