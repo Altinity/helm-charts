@@ -52,6 +52,8 @@ kubectl exec -it chi-eks-dev-0-0-0 --namespace clickhouse -- clickhouse-client
 |-----|------|---------|-------------|
 | all.metadata.labels.application_group | string | `"eks"` | The name of the application group |
 | clickhouse.cluster | string | `"dev"` | Cluster name |
+| clickhouse.extraContainers | object | `{}` | Extra containers for clickhouse pods |
+| clickhouse.extraVolumes | object | `{}` | Extra volumes for clickhouse pods |
 | clickhouse.image | string | `"altinity/clickhouse-server:24.3.12.76.altinitystable"` | ClickHouse server image |
 | clickhouse.keeper_name | string | `"keeper-eks"` | Name of the keeper cluster |
 | clickhouse.name | string | `"eks"` | Metadata name |
