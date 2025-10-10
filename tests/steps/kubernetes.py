@@ -67,11 +67,20 @@ def get_services(self, namespace):
 
 
 @TestStep(When)
-def get_service_type(self, service_name, namespace):
-    """Get the type of a specific service."""
+def get_service_info(self, service_name, namespace):
+    """Get the full service information as a dictionary."""
     
     service_info = run(cmd=f"kubectl get svc {service_name} -n {namespace} -o json")
     service_info = json.loads(service_info.stdout)
+    
+    return service_info
+
+
+@TestStep(When)
+def get_service_type(self, service_name, namespace):
+    """Get the type of a specific service."""
+    
+    service_info = get_service_info(service_name=service_name, namespace=namespace)
     
     return service_info["spec"]["type"]
 

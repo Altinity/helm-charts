@@ -85,11 +85,9 @@ def check_replicas_and_shards(self):
 @TestScenario
 def check_persistence_configuration(self):
     """Test ClickHouse persistence configuration."""
-    release_name = "persistence-test"
+    release_name = "persistence"
     namespace = "check-persistence"
     expected_storage_size = "10Gi"
-
-    xfail("Known issue: https://github.com/Altinity/helm-charts/issues/65")
 
     with When("install ClickHouse with persistence enabled"):
         helm.setup_helm_release(
@@ -135,8 +133,54 @@ def check_persistence_configuration(self):
             raise AssertionError(f"No PVC found with expected storage size {expected_storage_size}")
 
 
+@TestScenario
+def check_service_configuration(self):
+    """Test ClickHouse service configuration."""
+    release_name = "service-test"
+    namespace = "service"
 
 
+    with When("install ClickHouse with LoadBalancer service"):
+        kubernetes.use_context(context_name="minikube")
+        helm.setup_helm_release(
+            namespace=namespace,
+            release_name=release_name,
+            values={
+                "clickhouse": {
+                    "lbService": {
+                        "enabled": True,
+                        "loadBalancerSourceRanges": ["0.0.0.0/0"]
+                    }
+                }
+            }
+        )
+
+    with Then("wait for pods to be created"):
+        kubernetes.wait_for_pod_count(namespace=namespace, expected_count=2)
+
+    with And("verify LoadBalancer service is created"):
+        services = kubernetes.get_services(namespace=namespace)
+        lb_services = [s for s in services if kubernetes.get_service_type(service_name=s, namespace=namespace) == "LoadBalancer"]
+        assert len(lb_services) > 0, "LoadBalancer service not found"
+
+    with And("verify LoadBalancer service has correct source ranges"):
+        lb_service_name = lb_services[0]
+        service_info = kubernetes.get_service_info(service_name=lb_service_name, namespace=namespace)
+        source_ranges = service_info["spec"].get("loadBalancerSourceRanges", [])
+        assert source_ranges == ["0.0.0.0/0"], f"Expected source ranges ['0.0.0.0/0'], got {source_ranges}"
+
+    with And("verify LoadBalancer service has correct ports"):
+        ports = service_info["spec"]["ports"]
+        port_names = [p["name"] for p in ports]
+        assert "http" in port_names and "tcp" in port_names, f"Expected http and tcp ports, got {port_names}"
+        
+        for port in ports:
+            if port["name"] == "http":
+                assert port["port"] == 8123, f"Expected HTTP port 8123, got {port['port']}"
+            elif port["name"] == "tcp":
+                assert port["port"] == 9000, f"Expected TCP port 9000, got {port['port']}"
+
+    
 
 @TestFeature
 @Name("smoke")
@@ -151,4 +195,5 @@ def feature(self):
     Scenario(run=check_basic_configuration)
     Scenario(run=check_replicas_and_shards)
     Scenario(run=check_persistence_configuration)
+    Scenario(run=check_service_configuration)
 
