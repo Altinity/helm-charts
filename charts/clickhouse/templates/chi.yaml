@@ -128,7 +128,7 @@ spec:
       default/password:
         valueFrom:
           secretKeyRef:
-            name: {{ include "clickhouse.credentialsName" . }}
+            name: {{ .Values.clickhouse.defaultUser.password_secret_name | default (include "clickhouse.credentialsName" .) | quote }}
             key: password
       {{- range .Values.clickhouse.users }}
       {{ required "A user must have a name" .name }}/access_management: {{ .accessManagement | default 0}}
