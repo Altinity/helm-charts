@@ -34,7 +34,7 @@ runs:
       shell: bash
 
     - name: Set up Python
-      uses: actions/test-setup-python@v4
+      uses: actions/setup-python@v4
       with:
         python-version: '3.12.3'
         cache: 'pip'
