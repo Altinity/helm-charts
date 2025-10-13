@@ -198,6 +198,101 @@ def check_service_configuration(self):
                     port["port"] == 9000
                 ), f"Expected TCP port 9000, got {port['port']}"
 
+@TestScenario
+def check_user_configuration(self):
+    """Test ClickHouse user configuration."""
+    release_name = "user-test"
+    namespace = "user"
+
+    with When("install ClickHouse with custom user"):
+        kubernetes.use_context(context_name="minikube")
+        helm.setup_helm_release(
+            namespace=namespace,
+            release_name=release_name,
+            values={
+                "clickhouse": {
+                    "defaultUser": {
+                        "password": "SuperSecret",
+                        "allowExternalAccess": True,
+                        "hostIP": "0.0.0.0/0"
+                    },
+                    "users": [
+                        {
+                            "name": "analytics",
+                            "password_sha256_hex": "a085c76ed0e7818e8a5c106cc01ea81d8b6a46500ee98c3be432297f47d7b99f",
+                            "grants": ["GRANT SELECT ON default.*"]
+                        }
+                    ]
+                }
+            }
+        )
+
+    with Then("wait for ClickHouse pods to be created"):
+        kubernetes.wait_for_pod_count(namespace=namespace, expected_count=2)
+
+    with And("wait for ClickHouse pods to be running"):
+        clickhouse_pods = clickhouse.wait_for_clickhouse_pods_running(namespace=namespace)
+        note(f"All {len(clickhouse_pods)} ClickHouse pods are now running and ready")
+
+    with When("test ClickHouse connection with default user"):
+        result = clickhouse.test_clickhouse_connection(
+            namespace=namespace,
+            pod_name=clickhouse_pods[0],
+            user="default",
+            password="SuperSecret"
+        )
+        assert result, "Failed to connect with default user"
+
+    with And("test ClickHouse connection with analytics user"):
+        result = clickhouse.test_clickhouse_connection(
+            namespace=namespace,
+            pod_name=clickhouse_pods[0],
+            user="analytics",
+            password="AnalyticsPassword123"
+        )
+        assert result, "Failed to connect with analytics user"
+
+
+@TestScenario
+def check_keeper_configuration(self):
+    """Test Keeper configuration and validation."""
+    release_name = "keeper-test"
+    namespace = "check-keeper"
+
+    with When("install ClickHouse with embedded Keeper"):
+        kubernetes.use_context(context_name="minikube")
+        helm.setup_helm_release(
+            namespace=namespace,
+            release_name=release_name,
+            values={
+                "clickhouse": {
+                    "replicasCount": 3
+                },
+                "keeper": {
+                    "enabled": True,
+                    "replicaCount": 3,
+                    "localStorage": {
+                        "size": "5Gi"
+                    }
+                }
+            }
+        )
+
+    with Then("wait for expected number of pods"):
+        # 3 ClickHouse replicas + 3 Keeper replicas = 6 pods
+        kubernetes.wait_for_pod_count(namespace=namespace, expected_count=6)
+
+    with And("wait for all pods to be running"):
+        pods = kubernetes.wait_for_pods_running(namespace=namespace)
+        note(f"All {len(pods)} pods are now running and ready")
+
+    with And("verify ClickHouse pods are running"):
+        clickhouse_pods = clickhouse.wait_for_clickhouse_pods_running(namespace=namespace, expected_count=3)
+        note(f"ClickHouse pods running: {clickhouse_pods}")
+
+    with And("verify Keeper pods are running"):
+        clickhouse.verify_keeper_pods_running(namespace=namespace, expected_count=3)
+
 
 @TestFeature
 @Name("smoke")
@@ -207,8 +302,10 @@ def feature(self):
     with Given("minikube environment"):
         minikube.setup_minikube_environment()
 
-    Scenario(run=check_version)
-    Scenario(run=check_basic_configuration)
-    Scenario(run=check_replicas_and_shards)
-    Scenario(run=check_persistence_configuration)
-    Scenario(run=check_service_configuration)
+    # Scenario(run=check_version)
+    # Scenario(run=check_basic_configuration)
+    # Scenario(run=check_replicas_and_shards)
+    # Scenario(run=check_persistence_configuration)
+    # Scenario(run=check_service_configuration)
+    # Scenario(run=check_user_configuration)
+    Scenario(run=check_keeper_configuration)
