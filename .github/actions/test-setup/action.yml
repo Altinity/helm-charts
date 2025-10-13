@@ -50,6 +50,13 @@ runs:
       run: echo "PYTHONPATH=${{ github.workspace }}" >> $GITHUB_ENV
       shell: bash
 
+    - name: Install Helm
+      run: |
+        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+        
+        helm version
+      shell: bash
+
     - name: Install Minikube
       run: |
         # Install kubectl
