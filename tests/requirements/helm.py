@@ -9,603 +9,594 @@ from testflows.core import Requirement
 Heading = Specification.Heading
 
 RQ_SRS_Helm = Requirement(
-    name='RQ.SRS.Helm',
-    version='1.0',
+    name="RQ.SRS.Helm",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
     description=(
-        'The [Helm Chart] SHALL allow users to deploy and configure ClickHouse environments in [Kubernetes] clusters.\n'
-        '\n'
+        "The [Helm Chart] SHALL allow users to deploy and configure ClickHouse environments in [Kubernetes] clusters.\n"
+        "\n"
     ),
     link=None,
     level=1,
-    num='3'
+    num="3",
 )
 
 RQ_SRS_Helm_Chart_Values = Requirement(
-    name='RQ.SRS.Helm.Chart.Values',
-    version='1.0',
+    name="RQ.SRS.Helm.Chart.Values",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
     description=(
-        'The Helm chart SHALL provide a `values.yaml` file where users define their desired environment configuration.\n'
-        '\n'
-        '```yaml\n'
-        'clickhouse:\n'
-        '  replicasCount: 3\n'
-        '  shardsCount: 2\n'
-        '  antiAffinity: true\n'
-        '  persistence:\n'
-        '    enabled: true\n'
-        '    size: 100Gi\n'
-        '  service:\n'
-        '    type: ClusterIP\n'
-        '```\n'
-        '\n'
-        '---\n'
-        '\n'
+        "The Helm chart SHALL provide a `values.yaml` file where users define their desired environment configuration.\n"
+        "\n"
+        "```yaml\n"
+        "clickhouse:\n"
+        "  replicasCount: 3\n"
+        "  shardsCount: 2\n"
+        "  antiAffinity: true\n"
+        "  persistence:\n"
+        "    enabled: true\n"
+        "    size: 100Gi\n"
+        "  service:\n"
+        "    type: ClusterIP\n"
+        "```\n"
+        "\n"
+        "---\n"
+        "\n"
     ),
     link=None,
     level=2,
-    num='4.1'
+    num="4.1",
 )
 
 RQ_SRS_Helm_Metadata_NameOverride = Requirement(
-    name='RQ.SRS.Helm.Metadata.NameOverride',
-    version='1.0',
+    name="RQ.SRS.Helm.Metadata.NameOverride",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
     description=(
-        'The `values.yaml` SHALL support `nameOverride` to override the chart name.\n'
-        '\n'
-        '```yaml\n'
+        "The `values.yaml` SHALL support `nameOverride` to override the chart name.\n"
+        "\n"
+        "```yaml\n"
         'nameOverride: "custom-clickhouse"\n'
-        '```\n'
-        '\n'
-        'If invalid characters are used (e.g., spaces, special characters), Helm SHALL raise a template rendering error.\n'
-        '\n'
+        "```\n"
+        "\n"
+        "If invalid characters are used (e.g., spaces, special characters), Helm SHALL raise a template rendering error.\n"
+        "\n"
     ),
     link=None,
     level=3,
-    num='5.1.1'
+    num="5.1.1",
 )
 
 RQ_SRS_Helm_Metadata_FullnameOverride = Requirement(
-    name='RQ.SRS.Helm.Metadata.FullnameOverride',
-    version='1.0',
+    name="RQ.SRS.Helm.Metadata.FullnameOverride",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
     description=(
-        'The `values.yaml` SHALL support `fullnameOverride` to override the full release name.\n'
-        '\n'
-        '```yaml\n'
+        "The `values.yaml` SHALL support `fullnameOverride` to override the full release name.\n"
+        "\n"
+        "```yaml\n"
         'fullnameOverride: "acme-clickhouse-prod"\n'
-        '```\n'
-        '\n'
+        "```\n"
+        "\n"
     ),
     link=None,
     level=3,
-    num='5.2.1'
+    num="5.2.1",
 )
 
 RQ_SRS_Helm_Metadata_NamespaceDomainPattern = Requirement(
-    name='RQ.SRS.Helm.Metadata.NamespaceDomainPattern',
-    version='1.0',
+    name="RQ.SRS.Helm.Metadata.NamespaceDomainPattern",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
     description=(
-        'The `values.yaml` SHALL support `namespaceDomainPattern` for specifying a custom Kubernetes cluster domain.\n'
-        '\n'
-        '```yaml\n'
+        "The `values.yaml` SHALL support `namespaceDomainPattern` for specifying a custom Kubernetes cluster domain.\n"
+        "\n"
+        "```yaml\n"
         'namespaceDomainPattern: "acme.k8s.cluster.local"\n'
-        '```\n'
-        '\n'
-        'If empty, the default `cluster.local` SHALL be used.\n'
-        '\n'
-        '---\n'
-        '\n'
+        "```\n"
+        "\n"
+        "If empty, the default `cluster.local` SHALL be used.\n"
+        "\n"
+        "---\n"
+        "\n"
     ),
     link=None,
     level=3,
-    num='5.3.1'
+    num="5.3.1",
 )
 
 RQ_SRS_Helm_ClickHouse_DefaultUser = Requirement(
-    name='RQ.SRS.Helm.ClickHouse.DefaultUser',
-    version='1.0',
+    name="RQ.SRS.Helm.ClickHouse.DefaultUser",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
     description=(
-        'The chart SHALL configure a default ClickHouse user.\n'
-        '\n'
-        '```yaml\n'
-        'clickhouse:\n'
-        '  defaultUser:\n'
+        "The chart SHALL configure a default ClickHouse user.\n"
+        "\n"
+        "```yaml\n"
+        "clickhouse:\n"
+        "  defaultUser:\n"
         '    password: "SuperSecret"\n'
-        '    allowExternalAccess: true\n'
+        "    allowExternalAccess: true\n"
         '    hostIP: "0.0.0.0/0"\n'
-        '```\n'
-        '\n'
-        'Error Handling:\n'
-        '\n'
+        "```\n"
+        "\n"
+        "Error Handling:\n"
+        "\n"
         '* If `password` is empty → Helm SHALL reject with: *"defaultUser.password is required"*.\n'
-        '* If `hostIP` is invalid → Helm SHALL raise an error during CRD validation.\n'
-        '\n'
+        "* If `hostIP` is invalid → Helm SHALL raise an error during CRD validation.\n"
+        "\n"
     ),
     link=None,
     level=3,
-    num='6.1.1'
+    num="6.1.1",
 )
 
 RQ_SRS_Helm_ClickHouse_Users = Requirement(
-    name='RQ.SRS.Helm.ClickHouse.Users',
-    version='1.0',
+    name="RQ.SRS.Helm.ClickHouse.Users",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
     description=(
-        'The chart SHALL allow defining additional users.\n'
-        '\n'
-        '```yaml\n'
-        'clickhouse:\n'
-        '  users:\n'
-        '    - name: analytics\n'
-        '      password_secret_name: analytics-secret\n'
-        '      grants:\n'
+        "The chart SHALL allow defining additional users.\n"
+        "\n"
+        "```yaml\n"
+        "clickhouse:\n"
+        "  users:\n"
+        "    - name: analytics\n"
+        "      password_secret_name: analytics-secret\n"
+        "      grants:\n"
         '        - "GRANT SELECT ON default.*"\n'
-        '```\n'
-        '\n'
-        '* `name` MUST match regex `^[a-zA-Z0-9]+$`.\n'
+        "```\n"
+        "\n"
+        "* `name` MUST match regex `^[a-zA-Z0-9]+$`.\n"
         '* If invalid → Helm SHALL raise: *"Invalid username format"*.\n'
-        '* Either `password_secret_name` OR `password_sha256_hex` SHALL be required.\n'
-        '\n'
+        "* Either `password_secret_name` OR `password_sha256_hex` SHALL be required.\n"
+        "\n"
     ),
     link=None,
     level=3,
-    num='6.2.1'
+    num="6.2.1",
 )
 
 RQ_SRS_Helm_ClickHouse_ReplicasCount = Requirement(
-    name='RQ.SRS.Helm.ClickHouse.ReplicasCount',
-    version='1.0',
+    name="RQ.SRS.Helm.ClickHouse.ReplicasCount",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
     description=(
-        'The `replicasCount` SHALL define number of ClickHouse replicas.\n'
-        '\n'
-        '```yaml\n'
-        'clickhouse:\n'
-        '  replicasCount: 3\n'
-        '```\n'
-        '\n'
-        '* If greater than 1, `keeper.enabled` MUST be `true` or `keeper.host` MUST be provided.\n'
-        '\n'
-        'Error Handling:\n'
-        '\n'
+        "The `replicasCount` SHALL define number of ClickHouse replicas.\n"
+        "\n"
+        "```yaml\n"
+        "clickhouse:\n"
+        "  replicasCount: 3\n"
+        "```\n"
+        "\n"
+        "* If greater than 1, `keeper.enabled` MUST be `true` or `keeper.host` MUST be provided.\n"
+        "\n"
+        "Error Handling:\n"
+        "\n"
         '* If `replicasCount > 1` but Keeper not enabled → Helm SHALL raise: *"Keeper required for replicasCount > 1"*.\n'
-        '\n'
+        "\n"
     ),
     link=None,
     level=3,
-    num='6.3.1'
+    num="6.3.1",
 )
 
 RQ_SRS_Helm_ClickHouse_ShardsCount = Requirement(
-    name='RQ.SRS.Helm.ClickHouse.ShardsCount',
-    version='1.0',
+    name="RQ.SRS.Helm.ClickHouse.ShardsCount",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
     description=(
-        'The `shardsCount` SHALL define number of shards.\n'
-        '\n'
-        '```yaml\n'
-        'clickhouse:\n'
-        '  shardsCount: 2\n'
-        '```\n'
-        '\n'
+        "The `shardsCount` SHALL define number of shards.\n"
+        "\n"
+        "```yaml\n"
+        "clickhouse:\n"
+        "  shardsCount: 2\n"
+        "```\n"
+        "\n"
         'If set to 0 → Helm SHALL raise: *"shardsCount must be at least 1"*.\n'
-        '\n'
+        "\n"
     ),
     link=None,
     level=3,
-    num='6.4.1'
+    num="6.4.1",
 )
 
 RQ_SRS_Helm_ClickHouse_Zones = Requirement(
-    name='RQ.SRS.Helm.ClickHouse.Zones',
-    version='1.0',
+    name="RQ.SRS.Helm.ClickHouse.Zones",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
     description=(
-        'The `zones` SHALL define Kubernetes zones.\n'
-        '\n'
-        '```yaml\n'
-        'clickhouse:\n'
+        "The `zones` SHALL define Kubernetes zones.\n"
+        "\n"
+        "```yaml\n"
+        "clickhouse:\n"
         '  zones: ["zone-a", "zone-b"]\n'
-        '```\n'
-        '\n'
-        'If zone list does not match cluster topology → scheduling SHALL fail.\n'
-        '\n'
+        "```\n"
+        "\n"
+        "If zone list does not match cluster topology → scheduling SHALL fail.\n"
+        "\n"
     ),
     link=None,
     level=3,
-    num='6.5.1'
+    num="6.5.1",
 )
 
 RQ_SRS_Helm_ClickHouse_AntiAffinity = Requirement(
-    name='RQ.SRS.Helm.ClickHouse.AntiAffinity',
-    version='1.0',
+    name="RQ.SRS.Helm.ClickHouse.AntiAffinity",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
     description=(
-        'The `antiAffinity` flag SHALL enforce pod anti-affinity.\n'
-        '\n'
-        '```yaml\n'
-        'clickhouse:\n'
-        '  antiAffinity: true\n'
-        '```\n'
-        '\n'
-        'If enabled, ClickHouse pods SHALL not run on the same node.\n'
-        '\n'
+        "The `antiAffinity` flag SHALL enforce pod anti-affinity.\n"
+        "\n"
+        "```yaml\n"
+        "clickhouse:\n"
+        "  antiAffinity: true\n"
+        "```\n"
+        "\n"
+        "If enabled, ClickHouse pods SHALL not run on the same node.\n"
+        "\n"
     ),
     link=None,
     level=3,
-    num='6.6.1'
+    num="6.6.1",
 )
 
 RQ_SRS_Helm_ClickHouse_Keeper = Requirement(
-    name='RQ.SRS.Helm.ClickHouse.Keeper',
-    version='1.0',
+    name="RQ.SRS.Helm.ClickHouse.Keeper",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
     description=(
-        'The chart SHALL allow external or embedded Keeper.\n'
-        '\n'
-        '```yaml\n'
-        'clickhouse:\n'
-        '  keeper:\n'
+        "The chart SHALL allow external or embedded Keeper.\n"
+        "\n"
+        "```yaml\n"
+        "clickhouse:\n"
+        "  keeper:\n"
         '    host: "keeper-service"\n'
-        '    port: 2181\n'
-        '```\n'
-        '\n'
-        'If `replicasCount > 1` but Keeper is not configured, Helm SHALL raise an error.\n'
-        '\n'
+        "    port: 2181\n"
+        "```\n"
+        "\n"
+        "If `replicasCount > 1` but Keeper is not configured, Helm SHALL raise an error.\n"
+        "\n"
     ),
     link=None,
     level=3,
-    num='6.7.1'
+    num="6.7.1",
 )
 
 RQ_SRS_Helm_ClickHouse_Persistence = Requirement(
-    name='RQ.SRS.Helm.ClickHouse.Persistence',
-    version='1.0',
+    name="RQ.SRS.Helm.ClickHouse.Persistence",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
     description=(
-        'The chart SHALL support persistent volumes.\n'
-        '\n'
-        '```yaml\n'
-        'clickhouse:\n'
-        '  persistence:\n'
-        '    enabled: true\n'
-        '    size: 100Gi\n'
-        '    accessMode: ReadWriteOnce\n'
-        '```\n'
-        '\n'
-        'Error Handling:\n'
-        '\n'
+        "The chart SHALL support persistent volumes.\n"
+        "\n"
+        "```yaml\n"
+        "clickhouse:\n"
+        "  persistence:\n"
+        "    enabled: true\n"
+        "    size: 100Gi\n"
+        "    accessMode: ReadWriteOnce\n"
+        "```\n"
+        "\n"
+        "Error Handling:\n"
+        "\n"
         '* If `enabled: true` but `size` missing → Helm SHALL raise: *"persistence.size required"*.\n'
-        '\n'
+        "\n"
     ),
     link=None,
     level=3,
-    num='6.8.1'
+    num="6.8.1",
 )
 
 RQ_SRS_Helm_ClickHouse_Image = Requirement(
-    name='RQ.SRS.Helm.ClickHouse.Image',
-    version='1.0',
+    name="RQ.SRS.Helm.ClickHouse.Image",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
     description=(
-        'The chart SHALL support custom image repo, tag, and pullPolicy.\n'
-        '\n'
-        '```yaml\n'
-        'clickhouse:\n'
-        '  image:\n'
-        '    repository: altinity/clickhouse-server\n'
+        "The chart SHALL support custom image repo, tag, and pullPolicy.\n"
+        "\n"
+        "```yaml\n"
+        "clickhouse:\n"
+        "  image:\n"
+        "    repository: altinity/clickhouse-server\n"
         '    tag: "24.3"\n'
-        '    pullPolicy: IfNotPresent\n'
-        '```\n'
-        '\n'
+        "    pullPolicy: IfNotPresent\n"
+        "```\n"
+        "\n"
     ),
     link=None,
     level=3,
-    num='6.9.1'
+    num="6.9.1",
 )
 
 RQ_SRS_Helm_ClickHouse_Service = Requirement(
-    name='RQ.SRS.Helm.ClickHouse.Service',
-    version='1.0',
+    name="RQ.SRS.Helm.ClickHouse.Service",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
     description=(
-        'The chart SHALL configure a Kubernetes service.\n'
-        '\n'
-        '```yaml\n'
-        'clickhouse:\n'
-        '  service:\n'
-        '    type: ClusterIP\n'
-        '```\n'
-        '\n'
+        "The chart SHALL configure a Kubernetes service.\n"
+        "\n"
+        "```yaml\n"
+        "clickhouse:\n"
+        "  service:\n"
+        "    type: ClusterIP\n"
+        "```\n"
+        "\n"
         'If invalid type is specified → Helm SHALL raise: *"Invalid service type"*.\n'
-        '\n'
+        "\n"
     ),
     link=None,
     level=3,
-    num='6.10.1'
+    num="6.10.1",
 )
 
 RQ_SRS_Helm_ClickHouse_LbService = Requirement(
-    name='RQ.SRS.Helm.ClickHouse.LbService',
-    version='1.0',
+    name="RQ.SRS.Helm.ClickHouse.LbService",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
     description=(
-        'The chart SHALL support LoadBalancer service.\n'
-        '\n'
-        '```yaml\n'
-        'clickhouse:\n'
-        '  lbService:\n'
-        '    enabled: true\n'
+        "The chart SHALL support LoadBalancer service.\n"
+        "\n"
+        "```yaml\n"
+        "clickhouse:\n"
+        "  lbService:\n"
+        "    enabled: true\n"
         '    loadBalancerSourceRanges: ["0.0.0.0/0"]\n'
-        '```\n'
-        '\n'
-        'If `enabled: true` without ranges → default SHALL be `0.0.0.0/0`.\n'
-        '\n'
+        "```\n"
+        "\n"
+        "If `enabled: true` without ranges → default SHALL be `0.0.0.0/0`.\n"
+        "\n"
     ),
     link=None,
     level=3,
-    num='6.11.1'
+    num="6.11.1",
 )
 
 RQ_SRS_Helm_ClickHouse_PodSettings = Requirement(
-    name='RQ.SRS.Helm.ClickHouse.PodSettings',
-    version='1.0',
+    name="RQ.SRS.Helm.ClickHouse.PodSettings",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
     description=(
-        'The chart SHALL support pod annotations, labels, security context, tolerations, etc.\n'
-        '\n'
-        '```yaml\n'
-        'clickhouse:\n'
-        '  podLabels:\n'
-        '    app: clickhouse\n'
-        '```\n'
-        '\n'
+        "The chart SHALL support pod annotations, labels, security context, tolerations, etc.\n"
+        "\n"
+        "```yaml\n"
+        "clickhouse:\n"
+        "  podLabels:\n"
+        "    app: clickhouse\n"
+        "```\n"
+        "\n"
     ),
     link=None,
     level=3,
-    num='6.12.1'
+    num="6.12.1",
 )
 
 RQ_SRS_Helm_ClickHouse_ExtraConfig = Requirement(
-    name='RQ.SRS.Helm.ClickHouse.ExtraConfig',
-    version='1.0',
+    name="RQ.SRS.Helm.ClickHouse.ExtraConfig",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
     description=(
-        'The chart SHALL allow XML config overrides.\n'
-        '\n'
-        '```yaml\n'
-        'clickhouse:\n'
-        '  extraConfig: |\n'
-        '    <yandex>\n'
-        '      <merge_tree>\n'
-        '        <parts_to_throw_insert>300</parts_to_throw_insert>\n'
-        '      </merge_tree>\n'
-        '    </yandex>\n'
-        '```\n'
-        '\n'
+        "The chart SHALL allow XML config overrides.\n"
+        "\n"
+        "```yaml\n"
+        "clickhouse:\n"
+        "  extraConfig: |\n"
+        "    <yandex>\n"
+        "      <merge_tree>\n"
+        "        <parts_to_throw_insert>300</parts_to_throw_insert>\n"
+        "      </merge_tree>\n"
+        "    </yandex>\n"
+        "```\n"
+        "\n"
     ),
     link=None,
     level=3,
-    num='6.13.1'
+    num="6.13.1",
 )
 
 RQ_SRS_Helm_ClickHouse_InitScripts = Requirement(
-    name='RQ.SRS.Helm.ClickHouse.InitScripts',
-    version='1.0',
+    name="RQ.SRS.Helm.ClickHouse.InitScripts",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
     description=(
-        'The chart SHALL allow init scripts.\n'
-        '\n'
-        '```yaml\n'
-        'clickhouse:\n'
-        '  initScripts:\n'
-        '    enabled: true\n'
+        "The chart SHALL allow init scripts.\n"
+        "\n"
+        "```yaml\n"
+        "clickhouse:\n"
+        "  initScripts:\n"
+        "    enabled: true\n"
         '    configMapName: "ch-init-scripts"\n'
-        '```\n'
-        '\n'
+        "```\n"
+        "\n"
         'If enabled without configMapName → Helm SHALL raise: *"initScripts.configMapName required"*.\n'
-        '\n'
-        '---\n'
-        '\n'
+        "\n"
+        "---\n"
+        "\n"
     ),
     link=None,
     level=3,
-    num='6.14.1'
+    num="6.14.1",
 )
 
 RQ_SRS_Helm_Keeper_Enabled = Requirement(
-    name='RQ.SRS.Helm.Keeper.Enabled',
-    version='1.0',
+    name="RQ.SRS.Helm.Keeper.Enabled",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
-    description=(
-        '```yaml\n'
-        'keeper:\n'
-        '  enabled: true\n'
-        '```\n'
-        '\n'
-    ),
+    description=("```yaml\n" "keeper:\n" "  enabled: true\n" "```\n" "\n"),
     link=None,
     level=3,
-    num='7.1.1'
+    num="7.1.1",
 )
 
 RQ_SRS_Helm_Keeper_ReplicaCount = Requirement(
-    name='RQ.SRS.Helm.Keeper.ReplicaCount',
-    version='1.0',
+    name="RQ.SRS.Helm.Keeper.ReplicaCount",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
     description=(
-        'The `replicaCount` MUST be odd.\n'
-        '\n'
-        '```yaml\n'
-        'keeper:\n'
-        '  replicaCount: 3\n'
-        '```\n'
-        '\n'
+        "The `replicaCount` MUST be odd.\n"
+        "\n"
+        "```yaml\n"
+        "keeper:\n"
+        "  replicaCount: 3\n"
+        "```\n"
+        "\n"
         'If even → Helm SHALL raise: *"Keeper replicaCount must be odd"*.\n'
-        '\n'
+        "\n"
     ),
     link=None,
     level=3,
-    num='7.2.1'
+    num="7.2.1",
 )
 
 RQ_SRS_Helm_Keeper_Image = Requirement(
-    name='RQ.SRS.Helm.Keeper.Image',
-    version='1.0',
+    name="RQ.SRS.Helm.Keeper.Image",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
-    description=(
-        'The chart SHALL allow Keeper image repo/tag.\n'
-        '\n'
-    ),
+    description=("The chart SHALL allow Keeper image repo/tag.\n" "\n"),
     link=None,
     level=3,
-    num='7.3.1'
+    num="7.3.1",
 )
 
 RQ_SRS_Helm_Keeper_Storage = Requirement(
-    name='RQ.SRS.Helm.Keeper.Storage',
-    version='1.0',
+    name="RQ.SRS.Helm.Keeper.Storage",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
     description=(
-        'The chart SHALL allow persistent storage for Keeper.\n'
-        '\n'
-        '```yaml\n'
-        'keeper:\n'
-        '  localStorage:\n'
-        '    size: 20Gi\n'
-        '    storageClass: fast-ssd\n'
-        '```\n'
-        '\n'
+        "The chart SHALL allow persistent storage for Keeper.\n"
+        "\n"
+        "```yaml\n"
+        "keeper:\n"
+        "  localStorage:\n"
+        "    size: 20Gi\n"
+        "    storageClass: fast-ssd\n"
+        "```\n"
+        "\n"
     ),
     link=None,
     level=3,
-    num='7.4.1'
+    num="7.4.1",
 )
 
 RQ_SRS_Helm_Keeper_Resources = Requirement(
-    name='RQ.SRS.Helm.Keeper.Resources',
-    version='1.0',
+    name="RQ.SRS.Helm.Keeper.Resources",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
     description=(
-        'The chart SHALL allow CPU/memory requests and limits.\n'
-        '\n'
-        '```yaml\n'
-        'keeper:\n'
-        '  resources:\n'
-        '    cpuRequestsMs: 500\n'
+        "The chart SHALL allow CPU/memory requests and limits.\n"
+        "\n"
+        "```yaml\n"
+        "keeper:\n"
+        "  resources:\n"
+        "    cpuRequestsMs: 500\n"
         '    memoryRequestsMiB: "512Mi"\n'
-        '```\n'
-        '\n'
-        '---\n'
-        '\n'
+        "```\n"
+        "\n"
+        "---\n"
+        "\n"
     ),
     link=None,
     level=3,
-    num='7.5.1'
+    num="7.5.1",
 )
 
 RQ_SRS_Helm_Operator_Enabled = Requirement(
-    name='RQ.SRS.Helm.Operator.Enabled',
-    version='1.0',
+    name="RQ.SRS.Helm.Operator.Enabled",
+    version="1.0",
     priority=None,
     group=None,
     type=None,
     uid=None,
     description=(
-        'The chart SHALL allow enabling the Altinity Operator.\n'
-        '\n'
-        '```yaml\n'
-        'operator:\n'
-        '  enabled: true\n'
-        '```\n'
-        '\n'
-        '---\n'
-        '\n'
+        "The chart SHALL allow enabling the Altinity Operator.\n"
+        "\n"
+        "```yaml\n"
+        "operator:\n"
+        "  enabled: true\n"
+        "```\n"
+        "\n"
+        "---\n"
+        "\n"
     ),
     link=None,
     level=3,
-    num='8.1.1'
+    num="8.1.1",
 )
 
 QA_SRS_Altinity_Cloud_Anywhere_Helm_Charts = Specification(
-    name='QA-SRS Altinity.Cloud Anywhere Helm Charts',
+    name="QA-SRS Altinity.Cloud Anywhere Helm Charts",
     description=None,
     author=None,
     date=None,
@@ -621,70 +612,72 @@ QA_SRS_Altinity_Cloud_Anywhere_Helm_Charts = Specification(
     parent=None,
     children=None,
     headings=(
-        Heading(name='Software Requirements Specification for Helm', level=0, num=''),
-        Heading(name='Table of Contents', level=1, num='1'),
-        Heading(name='Introduction', level=1, num='2'),
-        Heading(name='RQ.SRS.Helm', level=1, num='3'),
-        Heading(name='Helm Chart Example', level=1, num='4'),
-        Heading(name='RQ.SRS.Helm.Chart.Values', level=2, num='4.1'),
-        Heading(name='Chart Metadata', level=1, num='5'),
-        Heading(name='Name Override', level=2, num='5.1'),
-        Heading(name='RQ.SRS.Helm.Metadata.NameOverride', level=3, num='5.1.1'),
-        Heading(name='Fullname Override', level=2, num='5.2'),
-        Heading(name='RQ.SRS.Helm.Metadata.FullnameOverride', level=3, num='5.2.1'),
-        Heading(name='Namespace Domain Pattern', level=2, num='5.3'),
-        Heading(name='RQ.SRS.Helm.Metadata.NamespaceDomainPattern', level=3, num='5.3.1'),
-        Heading(name='ClickHouse Configuration', level=1, num='6'),
-        Heading(name='Default User', level=2, num='6.1'),
-        Heading(name='RQ.SRS.Helm.ClickHouse.DefaultUser', level=3, num='6.1.1'),
-        Heading(name='Users', level=2, num='6.2'),
-        Heading(name='RQ.SRS.Helm.ClickHouse.Users', level=3, num='6.2.1'),
-        Heading(name='Replicas Count', level=2, num='6.3'),
-        Heading(name='RQ.SRS.Helm.ClickHouse.ReplicasCount', level=3, num='6.3.1'),
-        Heading(name='Shards Count', level=2, num='6.4'),
-        Heading(name='RQ.SRS.Helm.ClickHouse.ShardsCount', level=3, num='6.4.1'),
-        Heading(name='Zones', level=2, num='6.5'),
-        Heading(name='RQ.SRS.Helm.ClickHouse.Zones', level=3, num='6.5.1'),
-        Heading(name='Anti Affinity', level=2, num='6.6'),
-        Heading(name='RQ.SRS.Helm.ClickHouse.AntiAffinity', level=3, num='6.6.1'),
-        Heading(name='Keeper', level=2, num='6.7'),
-        Heading(name='RQ.SRS.Helm.ClickHouse.Keeper', level=3, num='6.7.1'),
-        Heading(name='Persistence', level=2, num='6.8'),
-        Heading(name='RQ.SRS.Helm.ClickHouse.Persistence', level=3, num='6.8.1'),
-        Heading(name='ClickHouse Image', level=2, num='6.9'),
-        Heading(name='RQ.SRS.Helm.ClickHouse.Image', level=3, num='6.9.1'),
-        Heading(name='Service', level=2, num='6.10'),
-        Heading(name='RQ.SRS.Helm.ClickHouse.Service', level=3, num='6.10.1'),
-        Heading(name='Load Balancer Service', level=2, num='6.11'),
-        Heading(name='RQ.SRS.Helm.ClickHouse.LbService', level=3, num='6.11.1'),
-        Heading(name='Pod Settings', level=2, num='6.12'),
-        Heading(name='RQ.SRS.Helm.ClickHouse.PodSettings', level=3, num='6.12.1'),
-        Heading(name='Extra Config', level=2, num='6.13'),
-        Heading(name='RQ.SRS.Helm.ClickHouse.ExtraConfig', level=3, num='6.13.1'),
-        Heading(name='Init Scripts', level=2, num='6.14'),
-        Heading(name='RQ.SRS.Helm.ClickHouse.InitScripts', level=3, num='6.14.1'),
-        Heading(name='Keeper Configuration', level=1, num='7'),
-        Heading(name='Keeper Enabled', level=2, num='7.1'),
-        Heading(name='RQ.SRS.Helm.Keeper.Enabled', level=3, num='7.1.1'),
-        Heading(name='Replica Count', level=2, num='7.2'),
-        Heading(name='RQ.SRS.Helm.Keeper.ReplicaCount', level=3, num='7.2.1'),
-        Heading(name='Keeper Image', level=2, num='7.3'),
-        Heading(name='RQ.SRS.Helm.Keeper.Image', level=3, num='7.3.1'),
-        Heading(name='Storage', level=2, num='7.4'),
-        Heading(name='RQ.SRS.Helm.Keeper.Storage', level=3, num='7.4.1'),
-        Heading(name='Resources', level=2, num='7.5'),
-        Heading(name='RQ.SRS.Helm.Keeper.Resources', level=3, num='7.5.1'),
-        Heading(name='Operator Configuration', level=1, num='8'),
-        Heading(name='Operator Enabled', level=2, num='8.1'),
-        Heading(name='RQ.SRS.Helm.Operator.Enabled', level=3, num='8.1.1'),
-        Heading(name='Terminology', level=1, num='9'),
-        Heading(name='Helm Chart', level=1, num='10'),
-        Heading(name='Values.yaml', level=1, num='11'),
-        Heading(name='Release', level=1, num='12'),
-        Heading(name='CRD', level=1, num='13'),
-        Heading(name='PVC', level=1, num='14'),
-        Heading(name='Pod Anti-Affinity', level=1, num='15'),
+        Heading(name="Software Requirements Specification for Helm", level=0, num=""),
+        Heading(name="Table of Contents", level=1, num="1"),
+        Heading(name="Introduction", level=1, num="2"),
+        Heading(name="RQ.SRS.Helm", level=1, num="3"),
+        Heading(name="Helm Chart Example", level=1, num="4"),
+        Heading(name="RQ.SRS.Helm.Chart.Values", level=2, num="4.1"),
+        Heading(name="Chart Metadata", level=1, num="5"),
+        Heading(name="Name Override", level=2, num="5.1"),
+        Heading(name="RQ.SRS.Helm.Metadata.NameOverride", level=3, num="5.1.1"),
+        Heading(name="Fullname Override", level=2, num="5.2"),
+        Heading(name="RQ.SRS.Helm.Metadata.FullnameOverride", level=3, num="5.2.1"),
+        Heading(name="Namespace Domain Pattern", level=2, num="5.3"),
+        Heading(
+            name="RQ.SRS.Helm.Metadata.NamespaceDomainPattern", level=3, num="5.3.1"
         ),
+        Heading(name="ClickHouse Configuration", level=1, num="6"),
+        Heading(name="Default User", level=2, num="6.1"),
+        Heading(name="RQ.SRS.Helm.ClickHouse.DefaultUser", level=3, num="6.1.1"),
+        Heading(name="Users", level=2, num="6.2"),
+        Heading(name="RQ.SRS.Helm.ClickHouse.Users", level=3, num="6.2.1"),
+        Heading(name="Replicas Count", level=2, num="6.3"),
+        Heading(name="RQ.SRS.Helm.ClickHouse.ReplicasCount", level=3, num="6.3.1"),
+        Heading(name="Shards Count", level=2, num="6.4"),
+        Heading(name="RQ.SRS.Helm.ClickHouse.ShardsCount", level=3, num="6.4.1"),
+        Heading(name="Zones", level=2, num="6.5"),
+        Heading(name="RQ.SRS.Helm.ClickHouse.Zones", level=3, num="6.5.1"),
+        Heading(name="Anti Affinity", level=2, num="6.6"),
+        Heading(name="RQ.SRS.Helm.ClickHouse.AntiAffinity", level=3, num="6.6.1"),
+        Heading(name="Keeper", level=2, num="6.7"),
+        Heading(name="RQ.SRS.Helm.ClickHouse.Keeper", level=3, num="6.7.1"),
+        Heading(name="Persistence", level=2, num="6.8"),
+        Heading(name="RQ.SRS.Helm.ClickHouse.Persistence", level=3, num="6.8.1"),
+        Heading(name="ClickHouse Image", level=2, num="6.9"),
+        Heading(name="RQ.SRS.Helm.ClickHouse.Image", level=3, num="6.9.1"),
+        Heading(name="Service", level=2, num="6.10"),
+        Heading(name="RQ.SRS.Helm.ClickHouse.Service", level=3, num="6.10.1"),
+        Heading(name="Load Balancer Service", level=2, num="6.11"),
+        Heading(name="RQ.SRS.Helm.ClickHouse.LbService", level=3, num="6.11.1"),
+        Heading(name="Pod Settings", level=2, num="6.12"),
+        Heading(name="RQ.SRS.Helm.ClickHouse.PodSettings", level=3, num="6.12.1"),
+        Heading(name="Extra Config", level=2, num="6.13"),
+        Heading(name="RQ.SRS.Helm.ClickHouse.ExtraConfig", level=3, num="6.13.1"),
+        Heading(name="Init Scripts", level=2, num="6.14"),
+        Heading(name="RQ.SRS.Helm.ClickHouse.InitScripts", level=3, num="6.14.1"),
+        Heading(name="Keeper Configuration", level=1, num="7"),
+        Heading(name="Keeper Enabled", level=2, num="7.1"),
+        Heading(name="RQ.SRS.Helm.Keeper.Enabled", level=3, num="7.1.1"),
+        Heading(name="Replica Count", level=2, num="7.2"),
+        Heading(name="RQ.SRS.Helm.Keeper.ReplicaCount", level=3, num="7.2.1"),
+        Heading(name="Keeper Image", level=2, num="7.3"),
+        Heading(name="RQ.SRS.Helm.Keeper.Image", level=3, num="7.3.1"),
+        Heading(name="Storage", level=2, num="7.4"),
+        Heading(name="RQ.SRS.Helm.Keeper.Storage", level=3, num="7.4.1"),
+        Heading(name="Resources", level=2, num="7.5"),
+        Heading(name="RQ.SRS.Helm.Keeper.Resources", level=3, num="7.5.1"),
+        Heading(name="Operator Configuration", level=1, num="8"),
+        Heading(name="Operator Enabled", level=2, num="8.1"),
+        Heading(name="RQ.SRS.Helm.Operator.Enabled", level=3, num="8.1.1"),
+        Heading(name="Terminology", level=1, num="9"),
+        Heading(name="Helm Chart", level=1, num="10"),
+        Heading(name="Values.yaml", level=1, num="11"),
+        Heading(name="Release", level=1, num="12"),
+        Heading(name="CRD", level=1, num="13"),
+        Heading(name="PVC", level=1, num="14"),
+        Heading(name="Pod Anti-Affinity", level=1, num="15"),
+    ),
     requirements=(
         RQ_SRS_Helm,
         RQ_SRS_Helm_Chart_Values,
@@ -711,8 +704,8 @@ QA_SRS_Altinity_Cloud_Anywhere_Helm_Charts = Specification(
         RQ_SRS_Helm_Keeper_Storage,
         RQ_SRS_Helm_Keeper_Resources,
         RQ_SRS_Helm_Operator_Enabled,
-        ),
-    content='''
+    ),
+    content="""
 # QA-SRS Altinity.Cloud Anywhere Helm Charts
 
 ---
@@ -1203,5 +1196,5 @@ PersistentVolumeClaim for stateful storage.
 Kubernetes scheduling constraint preventing multiple pods from running on the same node.
 
 ---
-'''
+""",
 )

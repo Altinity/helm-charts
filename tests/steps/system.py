@@ -14,4 +14,3 @@ def run(self, cmd, check=True):
         sys.exit(result.returncode)
 
     return result
-
