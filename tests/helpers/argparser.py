@@ -1,6 +1,7 @@
 import os
 from testflows.core import Secret
 
+
 def argparser(parser):
     """Parse common arguments for the tests."""
 
