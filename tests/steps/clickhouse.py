@@ -179,3 +179,28 @@ def verify_persistence_configuration(self, namespace, expected_size="10Gi"):
     ), f"Expected storage size {expected_size}, got {storage_size}"
 
     note(f"✅ Persistence configuration verified: {expected_size} storage")
+
+
+@TestStep(When)
+def get_keeper_pods(self, namespace):
+    """Get only Keeper pods (excluding operator pods) from the specified namespace."""
+
+    pods = kubernetes.get_pods(namespace=namespace)
+    return [p for p in pods if p.startswith("keeper-") and "operator" not in p]
+
+
+@TestStep(When)
+def verify_keeper_pods_running(self, namespace, expected_count=None):
+    """Verify that Keeper pods are running and ready."""
+
+    keeper_pods = get_keeper_pods(namespace=namespace)
+    
+    if expected_count is not None:
+        assert len(keeper_pods) == expected_count, f"Expected {expected_count} Keeper pods, got {len(keeper_pods)}"
+    
+    for pod in keeper_pods:
+        if not kubernetes.check_status(pod_name=pod, namespace=namespace, status="Running"):
+            raise AssertionError(f"Keeper pod {pod} is not running")
+    
+    note(f"Keeper pods running: {keeper_pods}")
+    return keeper_pods
