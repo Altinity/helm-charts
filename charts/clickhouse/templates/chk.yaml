@@ -91,7 +91,7 @@ spec:
                       - key: {{ $k }}
                         operator: In
                         values:
-                          - {{ $v }}
+                          - {{ $v | quote }}
                       {{- end }}
           {{- end }}
           topologySpreadConstraints:
