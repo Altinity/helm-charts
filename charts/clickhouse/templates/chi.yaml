@@ -132,7 +132,14 @@ spec:
             key: password
       {{- range .Values.clickhouse.users }}
       {{ required "A user must have a name" .name }}/access_management: {{ .accessManagement | default 0}}
+      {{- if kindIs "slice" .hostIP }}
+      {{ .name }}/networks/ip:
+      {{- range .hostIP }}
+      - {{ . | quote }}
+      {{- end }}
+      {{- else }}
       {{ .name }}/networks/ip: {{ .hostIP | default "0.0.0.0/0" | quote }}
+      {{- end }}
       {{- if .grants }}
       {{ .name }}/grants/query:
       {{- range .grants }}
