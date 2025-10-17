@@ -167,7 +167,9 @@ EOSQL
 | clickhouse.defaultUser.hostIP | string | `"127.0.0.1/32"` |  |
 | clickhouse.defaultUser.password | string | `""` |  |
 | clickhouse.extraConfig | string | `"<clickhouse>\n</clickhouse>\n"` | Miscellanous config for ClickHouse (in xml format) |
+| clickhouse.extraContainers | list | `[]` |  |
 | clickhouse.extraUsers | string | `"<clickhouse>\n</clickhouse>\n"` | Additional users config for ClickHouse (in xml format) |
+| clickhouse.extraVolumes | list | `[]` | Extra volumes for clickhouse pods |
 | clickhouse.image.pullPolicy | string | `"IfNotPresent"` |  |
 | clickhouse.image.repository | string | `"altinity/clickhouse-server"` |  |
 | clickhouse.image.tag | string | `"25.3.6.10034.altinitystable"` | Override the image tag for a specific version |
