@@ -294,6 +294,69 @@ def check_keeper_configuration(self):
         clickhouse.verify_keeper_pods_running(namespace=namespace, expected_count=3)
 
 
+@TestScenario
+def check_error_handling(self):
+    """Test error handling for invalid configurations."""
+    release_name = "error"
+    namespace = "check-error"
+
+    xfail("being investigated")
+
+    with When("attempt to install with invalid shardsCount"):
+        kubernetes.use_context(context_name="minikube")
+        result = helm.install_with_values(
+            namespace=namespace,
+            release_name=release_name,
+            values={
+                "clickhouse": {
+                    "shardsCount": 0  # Invalid: must be at least 1
+                }
+            },
+            expect_failure=True
+        )
+
+    with Then("verify installation failed"):
+        assert result.returncode != 0, "Installation should have failed with invalid shardsCount"
+        note(f"Installation failed as expected with return code: {result.returncode}")
+
+
+@TestScenario
+def check_image_configuration(self):
+    """Test ClickHouse image configuration."""
+    release_name = "image"
+    namespace = "check-image"
+    custom_image_tag = "25.3.6.10034.altinitystable"
+
+    with When("install ClickHouse with custom image"):
+        kubernetes.use_context(context_name="minikube")
+        helm.setup_helm_release(
+            namespace=namespace,
+            release_name=release_name,
+            values={
+                "clickhouse": {
+                    "image": {
+                        "repository": "altinity/clickhouse-server",
+                        "tag": custom_image_tag,
+                        "pullPolicy": "IfNotPresent"
+                    }
+                }
+            }
+        )
+
+    with Then("wait for ClickHouse pods to be created"):
+        kubernetes.wait_for_pod_count(namespace=namespace, expected_count=2)
+
+    with And("wait for ClickHouse pods to be running"):
+        clickhouse_pods = clickhouse.wait_for_clickhouse_pods_running(namespace=namespace)
+        note(f"ClickHouse pods running: {clickhouse_pods}")
+
+    with And("verify pods are running with correct image"):
+        for pod in clickhouse_pods:
+            image = kubernetes.get_pod_image(namespace=namespace, pod_name=pod)
+            assert custom_image_tag in image, f"Expected image tag {custom_image_tag}, got {image}"
+            note(f"✅ Pod {pod} is running with correct image: {image}")
+
+
 @TestFeature
 @Name("smoke")
 def feature(self):
@@ -302,10 +365,12 @@ def feature(self):
     with Given("minikube environment"):
         minikube.setup_minikube_environment()
 
-    # Scenario(run=check_version)
-    # Scenario(run=check_basic_configuration)
-    # Scenario(run=check_replicas_and_shards)
-    # Scenario(run=check_persistence_configuration)
-    # Scenario(run=check_service_configuration)
-    # Scenario(run=check_user_configuration)
+    Scenario(run=check_version)
+    Scenario(run=check_basic_configuration)
+    Scenario(run=check_replicas_and_shards)
+    Scenario(run=check_persistence_configuration)
+    Scenario(run=check_service_configuration)
+    Scenario(run=check_user_configuration)
     Scenario(run=check_keeper_configuration)
+    Scenario(run=check_error_handling)
+    Scenario(run=check_image_configuration)
