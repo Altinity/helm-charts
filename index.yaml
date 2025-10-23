@@ -3,7 +3,7 @@ entries:
   altinity-clickhouse-operator:
   - apiVersion: v2
     appVersion: 0.25.4
-    created: "2025-09-26T14:06:44.084148993Z"
+    created: "2025-09-26T14:06:42.121256095Z"
     description: 'Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
       ClickHouse Operator creates, configures and manages ClickHouse clusters running
       on Kubernetes.  For upgrade please install CRDs separately: ```bash   kubectl
@@ -13,7 +13,7 @@ entries:
       apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhousekeeperinstallations.clickhouse-keeper.altinity.com.yaml
       ```'
     digest: 85cebd69c555892946235c100327aa93c98e749766f299b4cdc73a630f339b51
-    home: https://github.com/Altinity/clickhouse-operator
+    home: https://github.com/Altinity/helm-charts
     icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
     maintainers:
     - email: support@altinity.com
@@ -23,6 +23,579 @@ entries:
     urls:
     - https://github.com/Altinity/helm-charts/releases/download/release-0.25.4/altinity-clickhouse-operator-0.25.4.tgz
     version: 0.25.4
+  - apiVersion: v2
+    appVersion: 0.25.3
+    created: "2025-08-08T07:25:10.81813298Z"
+    description: 'Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.  For upgrade please install CRDs separately: ```bash   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallationtemplates.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseoperatorconfigurations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhousekeeperinstallations.clickhouse-keeper.altinity.com.yaml
+      ```'
+    digest: 22b7109290223e54ce8d423f021aea7e84395eb565b004ed15d03847f774854d
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.25.3/altinity-clickhouse-operator-0.25.3.tgz
+    version: 0.25.3
+  - apiVersion: v2
+    appVersion: 0.25.2
+    created: "2025-07-10T15:05:16.985096102Z"
+    description: 'Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.  For upgrade please install CRDs separately: ```bash   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallationtemplates.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseoperatorconfigurations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhousekeeperinstallations.clickhouse-keeper.altinity.com.yaml
+      ```'
+    digest: 1c3e7c233c697143ae098d7109e4e49be4a9e109f1f688aceed7e0736984da0c
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.25.2/altinity-clickhouse-operator-0.25.2.tgz
+    version: 0.25.2
+  - apiVersion: v2
+    appVersion: 0.25.1
+    created: "2025-07-01T15:31:37.741995311Z"
+    description: 'Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.  For upgrade please install CRDs separately: ```bash   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallationtemplates.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseoperatorconfigurations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhousekeeperinstallations.clickhouse-keeper.altinity.com.yaml
+      ```'
+    digest: a655d61fbd62d5991787271ae390518713c9219bae4240db36837a2adfec5291
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.25.1/altinity-clickhouse-operator-0.25.1.tgz
+    version: 0.25.1
+  - apiVersion: v2
+    appVersion: 0.25.0
+    created: "2025-05-26T08:16:01.618529098Z"
+    description: 'Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.  For upgrade please install CRDs separately: ```bash   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallationtemplates.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseoperatorconfigurations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhousekeeperinstallations.clickhouse-keeper.altinity.com.yaml
+      ```'
+    digest: d81f2d7123f175a2086641ffc4ba59170d297252492bbd2583a7e17f012059ee
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.25.0/altinity-clickhouse-operator-0.25.0.tgz
+    version: 0.25.0
+  - apiVersion: v2
+    appVersion: 0.24.5
+    created: "2025-03-14T14:05:29.194483079Z"
+    description: 'Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.  For upgrade please install CRDs separately: ```bash   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallationtemplates.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseoperatorconfigurations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhousekeeperinstallations.clickhouse-keeper.altinity.com.yaml
+      ```'
+    digest: 9f6a0fc9c69c59bec9b8808fdfcca0b68219b7c89b7179bd359ec1316a83b7fd
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.24.5/altinity-clickhouse-operator-0.24.5.tgz
+    version: 0.24.5
+  - apiVersion: v2
+    appVersion: 0.24.4
+    created: "2025-02-06T20:18:30.626732408Z"
+    description: 'Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.  For upgrade please install CRDs separately: ```bash   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallationtemplates.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseoperatorconfigurations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhousekeeperinstallations.clickhouse-keeper.altinity.com.yaml
+      ```'
+    digest: 54a4d44b77811df31e8f7c0aea1335f735c1d181692e78c26ed77437fa36d3d8
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.24.4/altinity-clickhouse-operator-0.24.4.tgz
+    version: 0.24.4
+  - apiVersion: v2
+    appVersion: 0.24.3
+    created: "2025-01-27T10:41:10.632587749Z"
+    description: 'Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.  For upgrade please install CRDs separately: ```bash   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallationtemplates.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseoperatorconfigurations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhousekeeperinstallations.clickhouse-keeper.altinity.com.yaml
+      ```'
+    digest: 42e69144d97f512b91a9706e51a95bc300aae09a51692be54458d38d450db6ce
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.24.3/altinity-clickhouse-operator-0.24.3.tgz
+    version: 0.24.3
+  - apiVersion: v2
+    appVersion: 0.24.2
+    created: "2024-12-06T15:15:08.388704318Z"
+    description: 'Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.  For upgrade please install CRDs separately: ```bash   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallationtemplates.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseoperatorconfigurations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhousekeeperinstallations.clickhouse-keeper.altinity.com.yaml
+      ```'
+    digest: 71889e80af851360563a03bbcdd6f5afbad9ca83c73bdc5c1b99daffb29a8f5d
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.24.2/altinity-clickhouse-operator-0.24.2.tgz
+    version: 0.24.2
+  - apiVersion: v2
+    appVersion: 0.24.1
+    created: "2024-12-06T15:14:48.671610861Z"
+    description: 'Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.  For upgrade please install CRDs separately: ```bash   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallationtemplates.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseoperatorconfigurations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhousekeeperinstallations.clickhouse-keeper.altinity.com.yaml
+      ```'
+    digest: 1cf1ac23208676aa6888b4147bdafc40d8c60589061617226500fb454348f1f3
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.24.1/altinity-clickhouse-operator-0.24.1.tgz
+    version: 0.24.1
+  - apiVersion: v2
+    appVersion: 0.24.0
+    created: "2024-10-14T07:53:53.119152747Z"
+    description: 'Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.  For upgrade please install CRDs separately: ```bash   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallationtemplates.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseoperatorconfigurations.clickhouse.altinity.com.yaml
+      ```'
+    digest: cf3234345f78e212cd65abe04742696df4fd36e2f0fa5b8fe6cd9b7e124d04fe
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.24.0/altinity-clickhouse-operator-0.24.0.tgz
+    version: 0.24.0
+  - apiVersion: v2
+    appVersion: 0.23.7
+    created: "2024-08-15T10:52:09.6922605Z"
+    description: 'Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.  For upgrade please install CRDs separately: ```bash   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallationtemplates.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseoperatorconfigurations.clickhouse.altinity.com.yaml
+      ```'
+    digest: 279f9cce2f60265ed80c1d21abfb21bae4545c9b5169a3c9ca84a5e3cd1ea53b
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.23.7/altinity-clickhouse-operator-0.23.7.tgz
+    version: 0.23.7
+  - apiVersion: v2
+    appVersion: 0.23.6
+    created: "2024-06-28T06:44:05.055706389Z"
+    description: 'Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.  For upgrade please install CRDs separately: ```bash   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallationtemplates.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseoperatorconfigurations.clickhouse.altinity.com.yaml
+      ```'
+    digest: 7773e646308a9201274eb806b70c7ba01564894ea44bb049cdc346f1b44bfd7e
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.23.6/altinity-clickhouse-operator-0.23.6.tgz
+    version: 0.23.6
+  - apiVersion: v2
+    appVersion: 0.23.5
+    created: "2024-04-12T22:41:48.541257925Z"
+    description: 'Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.  For upgrade please install CRDs separately: ```bash   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseinstallationtemplates.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/clickhouse-operator/crds/CustomResourceDefinition-clickhouseoperatorconfigurations.clickhouse.altinity.com.yaml
+      ```'
+    digest: 23d42da24723df93456df32462b9858b08e10f89cb14af5ea9c0692acc643c1e
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.23.5/altinity-clickhouse-operator-0.23.5.tgz
+    version: 0.23.5
+  - apiVersion: v2
+    appVersion: 0.23.4
+    created: "2024-03-31T09:59:45.023855774Z"
+    description: 'Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.  For upgrade please install CRDs separately: ```bash   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseinstallations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseinstallationtemplates.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseoperatorconfigurations.clickhouse.altinity.com.yaml
+      ```'
+    digest: 4bb0b62c5a467618f3fd0d8f9fc5603136930b43eb0bf9d725569f03c5e6fbe6
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.23.4/altinity-clickhouse-operator-0.23.4.tgz
+    version: 0.23.4
+  - apiVersion: v2
+    appVersion: 0.23.3
+    created: "2024-02-29T15:41:13.899402901Z"
+    description: 'Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.  For upgrade please install CRDs separately: ```bash   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseinstallations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseinstallationtemplates.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseoperatorconfigurations.clickhouse.altinity.com.yaml
+      ```'
+    digest: ccd34b1c31b404b50f905edaa5be9c25d839f676a8a5c918f69e72555fdf96b9
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.23.3/altinity-clickhouse-operator-0.23.3.tgz
+    version: 0.23.3
+  - apiVersion: v2
+    appVersion: 0.23.2
+    created: "2024-02-14T21:13:06.830681228Z"
+    description: 'Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.  For upgrade please install CRDs separately: ```bash   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseinstallations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseinstallationtemplates.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseoperatorconfigurations.clickhouse.altinity.com.yaml
+      ```'
+    digest: 76602da64936e41a6ca3053a935c952bc5efd4a138d99f697dfc7b87cab30f81
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.23.2/altinity-clickhouse-operator-0.23.2.tgz
+    version: 0.23.2
+  - apiVersion: v2
+    appVersion: 0.23.1
+    created: "2024-02-12T15:46:47.689610058Z"
+    description: 'Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.  For upgrade please install CRDs separately: ```bash   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseinstallations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseinstallationtemplates.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseoperatorconfigurations.clickhouse.altinity.com.yaml
+      ```'
+    digest: 8598e9d25bd9fb794715c54ba7c8f31638629e8fbd2611169374306bf617d0a0
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.23.1/altinity-clickhouse-operator-0.23.1.tgz
+    version: 0.23.1
+  - apiVersion: v2
+    appVersion: 0.23.0
+    created: "2024-02-02T07:55:12.61241485Z"
+    description: 'Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.  For upgrade please install CRDs separately: ```bash   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseinstallations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseinstallationtemplates.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseoperatorconfigurations.clickhouse.altinity.com.yaml
+      ```'
+    digest: d53f01622842b7a0f2af4869be6346694b46d4713864597c90c4e15fa77e1ab0
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.23.0/altinity-clickhouse-operator-0.23.0.tgz
+    version: 0.23.0
+  - apiVersion: v2
+    appVersion: 0.22.2
+    created: "2023-12-14T07:53:34.399353372Z"
+    description: 'Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.  For upgrade please install CRDs separately: ```bash   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseinstallations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseinstallationtemplates.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseoperatorconfigurations.clickhouse.altinity.com.yaml
+      ```'
+    digest: c62803b5e85802d8c791e60094bf67f32b6eaab68463a79a737b9820ed856c4a
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.22.2/altinity-clickhouse-operator-0.22.2.tgz
+    version: 0.22.2
+  - apiVersion: v2
+    appVersion: 0.22.1
+    created: "2023-11-30T14:39:04.470564735Z"
+    description: 'Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.  For upgrade please install CRDs separately: ```bash   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseinstallations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseinstallationtemplates.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseoperatorconfigurations.clickhouse.altinity.com.yaml
+      ```'
+    digest: 165b5570bea1d5b67936daf408d6e49cf5b28db2c942a6453179f059a52101a4
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.22.1/altinity-clickhouse-operator-0.22.1.tgz
+    version: 0.22.1
+  - apiVersion: v2
+    appVersion: 0.22.0
+    created: "2023-11-02T13:43:04.628292386Z"
+    description: 'Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.  For upgrade please install CRDs separately: ```bash   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseinstallations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseinstallationtemplates.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseoperatorconfigurations.clickhouse.altinity.com.yaml
+      ```'
+    digest: 0cab4d783854784646d77e80d0837386f897beb920e8838a7c9f106e65d01609
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.22.0/altinity-clickhouse-operator-0.22.0.tgz
+    version: 0.22.0
+  - apiVersion: v2
+    appVersion: 0.21.3
+    created: "2023-08-02T19:13:45.254529883Z"
+    description: 'Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.  For upgrade please install CRDs separately: ```bash   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseinstallations.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseinstallationtemplates.clickhouse.altinity.com.yaml   kubectl
+      apply -f https://github.com/Altinity/clickhouse-operator/raw/master/deploy/helm/crds/CustomResourceDefinition-clickhouseoperatorconfigurations.clickhouse.altinity.com.yaml
+      ```'
+    digest: 21133c14ab9ebe0bc081c32663dfbb40c188643842d756605ac147fb3b53531a
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.21.3/altinity-clickhouse-operator-0.21.3.tgz
+    version: 0.21.3
+  - apiVersion: v2
+    appVersion: 0.21.2
+    created: "2023-06-29T09:04:37.286889238Z"
+    description: Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.
+    digest: e139998193172654e20f2960450f31382a106cfbec1159f6a532d306ae2839a0
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.21.2/altinity-clickhouse-operator-0.21.2.tgz
+    version: 0.21.2
+  - apiVersion: v2
+    appVersion: 0.21.1
+    created: "2023-05-29T17:10:05.455513497Z"
+    description: Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.
+    digest: 6a48ebe19f800906063a36cd8ac14f260a126559d6cc4b6f14219c1242f22798
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.21.1/altinity-clickhouse-operator-0.21.1.tgz
+    version: 0.21.1
+  - apiVersion: v2
+    appVersion: 0.21.0
+    created: "2023-05-10T09:57:37.410007898Z"
+    description: Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.
+    digest: 350633787e173a379942851e7b7331928f42e29b967a60f79dfcb8c2854603d2
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.21.0/altinity-clickhouse-operator-0.21.0.tgz
+    version: 0.21.0
+  - apiVersion: v2
+    appVersion: 0.20.3
+    created: "2023-02-08T06:58:46.821748367Z"
+    description: Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.
+    digest: 34ab553f442df7efc9b1e33bd1b6dabc8a6e1fc1062c7d6c4b352954861ba4df
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.20.3/altinity-clickhouse-operator-0.20.3.tgz
+    version: 0.20.3
+  - apiVersion: v2
+    appVersion: 0.20.2
+    created: "2023-02-06T06:02:12.882466029Z"
+    description: Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.
+    digest: 53babbfeb6de7fa68540bf3c744e3dfde78617481f1571dd37962f99e39f487f
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://logosandtypes.com/wp-content/uploads/2020/12/altinity.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.20.2/altinity-clickhouse-operator-0.20.2.tgz
+    version: 0.20.2
+  - apiVersion: v2
+    appVersion: 0.20.1
+    created: "2022-12-16T15:12:23.402004049Z"
+    description: Helm chart to deploy [altinity-clickhouse-operator](https://github.com/Altinity/clickhouse-operator).  The
+      ClickHouse Operator creates, configures and manages ClickHouse clusters running
+      on Kubernetes.
+    digest: 66e0127048bd61a4ea5fc1c23ce5df1b8030ec729e4f75a27cf960b369a4f09a
+    home: https://github.com/Altinity/clickhouse-operator
+    icon: https://altinity.com/wp-content/uploads/2022/05/logo_horizontal_blue_white.svg
+    maintainers:
+    - email: support@altinity.com
+      name: altinity
+    name: altinity-clickhouse-operator
+    type: application
+    urls:
+    - https://github.com/Altinity/clickhouse-operator/releases/download/release-0.20.1/altinity-clickhouse-operator-0.20.1.tgz
+    version: 0.20.1
   clickhouse:
   - apiVersion: v2
     appVersion: 25.3.6.10034
