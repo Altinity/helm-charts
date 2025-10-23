@@ -62,6 +62,17 @@ clickhouse:
   # If enabled, will prevent ClickHouse pods from running on the same node
   antiAffinity: false
 
+  # -- Scope for anti-affinity policy when antiAffinity is enabled.
+  # Determines the level at which pod distribution is enforced.
+  # Available scopes:
+  #   - ClickHouseInstallation: Pods from the same installation won't run on the same node (default)
+  #   - Shard: Pods from the same shard won't run on the same node
+  #   - Replica: Pods from the same replica won't run on the same node
+  #   - Cluster: Pods from the same cluster won't run on the same node
+  #   - Namespace: Pods from the same namespace won't run on the same node
+  # @default -- ClickHouseInstallation
+  antiAffinityScope: "ClickHouseInstallation"
+
   # -- Keeper connection settings for ClickHouse instances.
   keeper:
     # -- Specify a keeper host.
