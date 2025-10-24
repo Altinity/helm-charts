@@ -47,8 +47,20 @@
                 "pattern": "^[a-zA-Z0-9]+$"
               },
               "hostIP": {
-                "type": "string",
-                "description": "Mask for IPs allowed for this user.",
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "description": "Single IP mask allowed for this user."
+                  },
+                  {
+                    "type": "array",
+                    "description": "Multiple IP masks allowed for this user.",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ],
+                "description": "Mask for IPs allowed for this user. Can be a string or array of strings.",
                 "default": "0.0.0.0/0"
               },
               "password_secret_name": {
