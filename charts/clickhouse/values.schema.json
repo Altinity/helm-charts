@@ -106,6 +106,18 @@
           "type": "boolean",
           "description": "If enabled, prevents ClickHouse pods from running on the same node."
         },
+        "antiAffinityScope": {
+          "type": "string",
+          "description": "Scope for anti-affinity policy when antiAffinity is enabled.",
+          "enum": [
+            "Shard",
+            "Replica",
+            "Cluster",
+            "ClickHouseInstallation",
+            "Namespace"
+          ],
+          "default": "ClickHouseInstallation"
+        },
         "keeper": {
           "type": "object",
           "properties": {
