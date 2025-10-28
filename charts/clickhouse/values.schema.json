@@ -47,8 +47,20 @@
                 "pattern": "^[a-zA-Z0-9]+$"
               },
               "hostIP": {
-                "type": "string",
-                "description": "Mask for IPs allowed for this user.",
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "description": "Single IP mask allowed for this user."
+                  },
+                  {
+                    "type": "array",
+                    "description": "Multiple IP masks allowed for this user.",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ],
+                "description": "Mask for IPs allowed for this user. Can be a string or array of strings.",
                 "default": "0.0.0.0/0"
               },
               "password_secret_name": {
@@ -93,6 +105,18 @@
         "antiAffinity": {
           "type": "boolean",
           "description": "If enabled, prevents ClickHouse pods from running on the same node."
+        },
+        "antiAffinityScope": {
+          "type": "string",
+          "description": "Scope for anti-affinity policy when antiAffinity is enabled.",
+          "enum": [
+            "Shard",
+            "Replica",
+            "Cluster",
+            "ClickHouseInstallation",
+            "Namespace"
+          ],
+          "default": "ClickHouseInstallation"
         },
         "keeper": {
           "type": "object",

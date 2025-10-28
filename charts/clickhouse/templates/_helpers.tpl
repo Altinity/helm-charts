@@ -56,7 +56,7 @@ Pod Distribution
 {{- define "clickhouse.podDistribution" -}}
 {{- if .Values.clickhouse.antiAffinity -}}
 - type: ClickHouseAntiAffinity
-  scope: ClickHouseInstallation
+  scope: {{ .Values.clickhouse.antiAffinityScope | default "ClickHouseInstallation" }}
 {{- end }}
 {{- end }}
 
@@ -92,6 +92,16 @@ Pod Template Base
                 {{- toYaml .Values.clickhouse.securityContext | nindent 16 }}
               image: "{{ .Values.clickhouse.image.repository }}:{{ .Values.clickhouse.image.tag | default .Chart.AppVersion }}"
               imagePullPolicy: {{ .Values.clickhouse.image.pullPolicy }}
+              ports:
+                - name: http
+                  containerPort: 8123
+                - name: client
+                  containerPort: 9000
+                - name: interserver
+                  containerPort: 9009
+                {{- if .Values.clickhouse.extraPorts }}
+                {{- toYaml .Values.clickhouse.extraPorts | nindent 16 }}
+                {{- end }}
               {{- with .Values.clickhouse.livenessProbe }}
               livenessProbe:
                 {{- toYaml . | nindent 16 }}
