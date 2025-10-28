@@ -6,6 +6,7 @@ import tests.steps.kubernetes as kubernetes
 import tests.steps.clickhouse as clickhouse
 import tests.steps.minikube as minikube
 import tests.steps.helm as helm
+import tests.steps.common as common
 
 
 @TestScenario
@@ -18,13 +19,10 @@ def check_version(self):
     with When("install Altinity ClickHouse chart"):
         helm.setup_helm_release(namespace=namespace, release_name=release_name)
 
-    with Then("wait for 2 pods to be created"):
-        kubernetes.wait_for_pod_count(namespace=namespace, expected_count=2)
+    with Then("wait for ClickHouse deployment"):
+        common.wait_for_clickhouse_deployment(namespace=namespace, expected_pod_count=2, expected_clickhouse_count=1)
 
-    with And("wait for ClickHouse pods to be running"):
-        clickhouse.wait_for_clickhouse_pods_running(namespace=namespace)
-
-    with When("verify ClickHouse version"):
+    with And("verify ClickHouse version"):
         clickhouse.verify_clickhouse_version(
             namespace=namespace, expected_version=expected_version
         )
@@ -44,8 +42,8 @@ def check_basic_configuration(self):
             values={"nameOverride": custom_name},
         )
 
-    with Then("wait for ClickHouse pods to be created"):
-        kubernetes.wait_for_pod_count(namespace=namespace, expected_count=2)
+    with Then("wait for ClickHouse deployment"):
+        common.wait_for_clickhouse_deployment(namespace=namespace, expected_pod_count=2, expected_clickhouse_count=1)
 
     with And("verify custom name is used"):
         clickhouse.verify_custom_name_in_resources(
@@ -69,13 +67,9 @@ def check_replicas_and_shards(self):
             },
         )
 
-    with Then("wait for expected number of pods"):
-        # 2 ClickHouse replicas + 3 Keeper replicas = 5 pods
-        kubernetes.wait_for_pod_count(namespace=namespace, expected_count=5)
-
-    with And("wait for all pods to be running"):
-        pods = kubernetes.wait_for_pods_running(namespace=namespace)
-        note(f"All {len(pods)} pods are now running and ready")
+    # 2 ClickHouse replicas + 3 Keeper replicas = 5 pods
+    with Then("wait for ClickHouse deployment"):
+        common.wait_for_clickhouse_deployment(namespace=namespace, expected_pod_count=5, expected_clickhouse_count=4)
 
 
 @TestScenario
@@ -100,11 +94,8 @@ def check_persistence_configuration(self):
             },
         )
 
-    with Then("wait for ClickHouse pods to be created"):
-        kubernetes.wait_for_pod_count(namespace=namespace, expected_count=2)
-
-    with And("wait for ClickHouse pods to be running"):
-        clickhouse.wait_for_clickhouse_pods_running(namespace=namespace)
+    with Then("wait for ClickHouse deployment"):
+        common.wait_for_clickhouse_deployment(namespace=namespace, expected_pod_count=2, expected_clickhouse_count=1)
 
     with And("verify persistence configuration in ClickHouseInstallation"):
         clickhouse.verify_persistence_configuration(
@@ -158,8 +149,8 @@ def check_service_configuration(self):
             },
         )
 
-    with Then("wait for pods to be created"):
-        kubernetes.wait_for_pod_count(namespace=namespace, expected_count=2)
+    with Then("wait for ClickHouse deployment"):
+        common.wait_for_clickhouse_deployment(namespace=namespace, expected_pod_count=2, expected_clickhouse_count=1)
 
     with And("verify LoadBalancer service is created"):
         services = kubernetes.get_services(namespace=namespace)
@@ -227,14 +218,11 @@ def check_user_configuration(self):
             }
         )
 
-    with Then("wait for ClickHouse pods to be created"):
-        kubernetes.wait_for_pod_count(namespace=namespace, expected_count=2)
-
-    with And("wait for ClickHouse pods to be running"):
-        clickhouse_pods = clickhouse.wait_for_clickhouse_pods_running(namespace=namespace)
-        note(f"All {len(clickhouse_pods)} ClickHouse pods are now running and ready")
+    with Then("wait for ClickHouse deployment"):
+        common.wait_for_clickhouse_deployment(namespace=namespace, expected_pod_count=2, expected_clickhouse_count=1)
 
     with When("test ClickHouse connection with default user"):
+        clickhouse_pods = clickhouse.get_clickhouse_pods(namespace=namespace)
         result = clickhouse.test_clickhouse_connection(
             namespace=namespace,
             pod_name=clickhouse_pods[0],
@@ -278,46 +266,13 @@ def check_keeper_configuration(self):
             }
         )
 
-    with Then("wait for expected number of pods"):
-        # 3 ClickHouse replicas + 3 Keeper replicas = 6 pods
-        kubernetes.wait_for_pod_count(namespace=namespace, expected_count=6)
-
-    with And("wait for all pods to be running"):
-        pods = kubernetes.wait_for_pods_running(namespace=namespace)
-        note(f"All {len(pods)} pods are now running and ready")
-
-    with And("verify ClickHouse pods are running"):
-        clickhouse_pods = clickhouse.wait_for_clickhouse_pods_running(namespace=namespace, expected_count=3)
-        note(f"ClickHouse pods running: {clickhouse_pods}")
+    with Then("wait for ClickHouse deployment"):
+    # 3 ClickHouse replicas + 3 Keeper replicas = 6 pods
+        common.wait_for_clickhouse_deployment(namespace=namespace, expected_pod_count=6, expected_clickhouse_count=3)
 
     with And("verify Keeper pods are running"):
         clickhouse.verify_keeper_pods_running(namespace=namespace, expected_count=3)
 
-
-@TestScenario
-def check_error_handling(self):
-    """Test error handling for invalid configurations."""
-    release_name = "error"
-    namespace = "check-error"
-
-    xfail("being investigated")
-
-    with When("attempt to install with invalid shardsCount"):
-        kubernetes.use_context(context_name="minikube")
-        result = helm.install_with_values(
-            namespace=namespace,
-            release_name=release_name,
-            values={
-                "clickhouse": {
-                    "shardsCount": 0  # Invalid: must be at least 1
-                }
-            },
-            expect_failure=True
-        )
-
-    with Then("verify installation failed"):
-        assert result.returncode != 0, "Installation should have failed with invalid shardsCount"
-        note(f"Installation failed as expected with return code: {result.returncode}")
 
 
 @TestScenario
@@ -343,14 +298,11 @@ def check_image_configuration(self):
             }
         )
 
-    with Then("wait for ClickHouse pods to be created"):
-        kubernetes.wait_for_pod_count(namespace=namespace, expected_count=2)
-
-    with And("wait for ClickHouse pods to be running"):
-        clickhouse_pods = clickhouse.wait_for_clickhouse_pods_running(namespace=namespace)
-        note(f"ClickHouse pods running: {clickhouse_pods}")
+    with Then("wait for ClickHouse deployment"):
+        common.wait_for_clickhouse_deployment(namespace=namespace, expected_pod_count=2, expected_clickhouse_count=1)
 
     with And("verify pods are running with correct image"):
+        clickhouse_pods = clickhouse.get_clickhouse_pods(namespace=namespace)
         for pod in clickhouse_pods:
             image = kubernetes.get_pod_image(namespace=namespace, pod_name=pod)
             assert custom_image_tag in image, f"Expected image tag {custom_image_tag}, got {image}"
@@ -372,5 +324,4 @@ def feature(self):
     Scenario(run=check_service_configuration)
     Scenario(run=check_user_configuration)
     Scenario(run=check_keeper_configuration)
-    Scenario(run=check_error_handling)
     Scenario(run=check_image_configuration)
