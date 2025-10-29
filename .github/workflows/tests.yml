@@ -1,0 +1,56 @@
+name: Regression Tests
+run-name: ${{ github.actor }} is running ${{ github.event.inputs.suite }} suite
+
+on:
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: 'Suite to run'
+        required: true
+        default: 'smoke'
+        type: choice
+        options:
+          - 'smoke'
+
+      extra_args:
+        description: "Extra test program arguments. Example: '--only \"/api/part 1/*\"'"
+        type: string
+        default: ""
+      output_format:
+        description: "Output style"
+        type: choice
+        default: "nice"
+        options:
+          - fails
+          - new-fails
+          - classic
+          - nice
+          - nice-fails
+          - nice-new-fails
+          - pnice
+          - pnice-fails
+          - pnice-new-fails
+          - slick
+          - quiet
+          - short
+
+jobs:
+    smoke:
+      name: smoke
+      if: ${{ inputs.suite == 'smoke' }}
+      runs-on: [ "arc-runners-qa" ]
+      timeout-minutes: 60
+
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+          with:
+            ref: ${{ github.ref }}
+            fetch-depth: 0
+
+        - name: Setup
+          uses: ./.github/actions/test-setup
+
+        - name: Run Test Module
+          run: |
+            python3 ./tests/run/smoke.py 
