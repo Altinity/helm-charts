@@ -1,5 +1,5 @@
 # clickhouse
-![Version: 0.3.3](https://img.shields.io/badge/Version-0.3.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.3.6.10034](https://img.shields.io/badge/AppVersion-25.3.6.10034-informational?style=flat-square)
+![Version: 0.3.4](https://img.shields.io/badge/Version-0.3.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.3.6.10034](https://img.shields.io/badge/AppVersion-25.3.6.10034-informational?style=flat-square)
 
 A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for ClickHouse
 
@@ -15,7 +15,7 @@ A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for 
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://docs.altinity.com/clickhouse-operator | operator(altinity-clickhouse-operator) | 0.25.2 |
+| https://helm.altinity.com | operator(altinity-clickhouse-operator) | 0.25.5 |
 
 ## Installing the Chart
 
@@ -155,6 +155,7 @@ EOSQL
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | clickhouse.antiAffinity | bool | `false` |  |
+| clickhouse.antiAffinityScope | string | ClickHouseInstallation | Scope for anti-affinity policy when antiAffinity is enabled. Determines the level at which pod distribution is enforced. Available scopes:   - ClickHouseInstallation: Pods from the same installation won't run on the same node (default)   - Shard: Pods from the same shard won't run on the same node   - Replica: Pods from the same replica won't run on the same node   - Cluster: Pods from the same cluster won't run on the same node   - Namespace: Pods from the same namespace won't run on the same node |
 | clickhouse.clusterSecret | object | `{"auto":true,"enabled":false,"secure":false,"value":"","valueFrom":{"secretKeyRef":{"key":"secret","name":""}}}` | Cluster secret configuration for secure inter-node communication |
 | clickhouse.clusterSecret.auto | bool | `true` | Auto-generate cluster secret (recommended for security) |
 | clickhouse.clusterSecret.enabled | bool | `false` | Whether to enable secret-based cluster communication |
@@ -169,7 +170,7 @@ EOSQL
 | clickhouse.defaultUser.password_secret_name | string | `""` | Name of an existing Kubernetes secret containing the default user password. If set, the password will be read from the secret instead of using the password field. The secret should contain a key named 'password'. |
 | clickhouse.extraConfig | string | `"<clickhouse>\n</clickhouse>\n"` | Miscellanous config for ClickHouse (in xml format) |
 | clickhouse.extraContainers | list | `[]` |  |
-| clickhouse.extraPorts | list | `[]` | Additional ports to expose in the ClickHouse container |
+| clickhouse.extraPorts | list | `[]` | Additional ports to expose in the ClickHouse container Example: extraPorts:   - name: custom-port     containerPort: 8080 |
 | clickhouse.extraUsers | string | `"<clickhouse>\n</clickhouse>\n"` | Additional users config for ClickHouse (in xml format) |
 | clickhouse.extraVolumes | list | `[]` | Extra volumes for clickhouse pods |
 | clickhouse.image.pullPolicy | string | `"IfNotPresent"` |  |
@@ -203,7 +204,7 @@ EOSQL
 | clickhouse.serviceAccount.create | bool | `false` | Specifies whether a service account should be created |
 | clickhouse.serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | clickhouse.shardsCount | int | `1` | number of shards. |
-| clickhouse.users | list | `[]` |  |
+| clickhouse.users | list | `[]` | Configure additional ClickHouse users. |
 | clickhouse.zones | list | `[]` |  |
 | keeper.enabled | bool | `false` | Whether to enable Keeper. Required for replicated tables. |
 | keeper.image | string | `"altinity/clickhouse-keeper"` |  |
