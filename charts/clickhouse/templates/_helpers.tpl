@@ -32,6 +32,10 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 {{- end }}
 
+{{- define "clickhouse.version" -}}
+{{ .Values.clickhouse.image.repository }}:{{ .Values.clickhouse.image.tag | default .Chart.AppVersion }}
+{{- end }}
+
 {{/*
 Create chart name and version as used by the chart label.
 */}}
@@ -52,7 +56,7 @@ Pod Distribution
 {{- define "clickhouse.podDistribution" -}}
 {{- if .Values.clickhouse.antiAffinity -}}
 - type: ClickHouseAntiAffinity
-  scope: ClickHouseInstallation
+  scope: {{ .Values.clickhouse.antiAffinityScope | default "ClickHouseInstallation" }}
 {{- end }}
 {{- end }}
 
@@ -88,6 +92,16 @@ Pod Template Base
                 {{- toYaml .Values.clickhouse.securityContext | nindent 16 }}
               image: "{{ .Values.clickhouse.image.repository }}:{{ .Values.clickhouse.image.tag | default .Chart.AppVersion }}"
               imagePullPolicy: {{ .Values.clickhouse.image.pullPolicy }}
+              ports:
+                - name: http
+                  containerPort: 8123
+                - name: client
+                  containerPort: 9000
+                - name: interserver
+                  containerPort: 9009
+                {{- if .Values.clickhouse.extraPorts }}
+                {{- toYaml .Values.clickhouse.extraPorts | nindent 16 }}
+                {{- end }}
               {{- with .Values.clickhouse.livenessProbe }}
               livenessProbe:
                 {{- toYaml . | nindent 16 }}
@@ -140,7 +154,9 @@ Pod Template Base
 Pod Template Name
 */}}
 {{- define "clickhouse.podTemplateName" -}}
-{{- printf "%s-pod" (include "clickhouse.fullname" .) | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- $podDescString := printf "%s-%s" (include "clickhouse.fullname" .) (include "clickhouse.version" .) }}
+{{- $podHash := $podDescString | sha256sum | trunc 8 }} 
+{{- printf "%s-pod-%s" (include "clickhouse.fullname" .) $podHash | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*

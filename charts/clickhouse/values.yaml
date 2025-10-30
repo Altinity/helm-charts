@@ -14,6 +14,10 @@ namespaceDomainPattern: ""
 clickhouse:
   defaultUser:
     password: ""
+    # -- Name of an existing Kubernetes secret containing the default user password.
+    # If set, the password will be read from the secret instead of using the password field.
+    # The secret should contain a key named 'password'.
+    password_secret_name: ""
     # -- Allow the default user to access ClickHouse from any IP.
     # If set, will override `hostIP` to always be `0.0.0.0/0`.
     allowExternalAccess: false
@@ -22,8 +26,15 @@ clickhouse:
     # @default -- 127.0.0.1/32
     hostIP: 127.0.0.1/32
 
-  # Configure additional users
+  # -- Configure additional ClickHouse users.
   users: []
+  # users:
+  #   - name: app_user
+  #     hostIP: ["10.0.0.0/8"]  # default: "0.0.0.0/0"
+  #     accessManagement: 1  # default: 0
+  #     password_secret_name: "app-user-secret"  # secret must contain 'password' key
+  #     grants:
+  #       - "GRANT SELECT ON database.*"
 
   # -- number of replicas. If greater than 1, keeper must be enabled
   # or a keeper host should be provided under clickhouse.keeper.host.
@@ -57,6 +68,17 @@ clickhouse:
 
   # If enabled, will prevent ClickHouse pods from running on the same node
   antiAffinity: false
+
+  # -- Scope for anti-affinity policy when antiAffinity is enabled.
+  # Determines the level at which pod distribution is enforced.
+  # Available scopes:
+  #   - ClickHouseInstallation: Pods from the same installation won't run on the same node (default)
+  #   - Shard: Pods from the same shard won't run on the same node
+  #   - Replica: Pods from the same replica won't run on the same node
+  #   - Cluster: Pods from the same cluster won't run on the same node
+  #   - Namespace: Pods from the same namespace won't run on the same node
+  # @default -- ClickHouseInstallation
+  antiAffinityScope: "ClickHouseInstallation"
 
   # -- Keeper connection settings for ClickHouse instances.
   keeper:
@@ -138,6 +160,14 @@ clickhouse:
   # @ignore
   topologySpreadConstraints: []
 
+
+  # -- Additional ports to expose in the ClickHouse container
+  # Example:
+  # extraPorts:
+  #   - name: custom-port
+  #     containerPort: 8080
+  extraPorts: []
+
   # -- Miscellanous config for ClickHouse (in xml format)
   extraConfig: |
     <clickhouse>
@@ -197,3 +227,4 @@ operator:
   # -- Whether to enable the Altinity Operator for ClickHouse.
   # Disable if you already have the Operator installed cluster-wide.
   enabled: true
+  

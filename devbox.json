@@ -1,0 +1,36 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.13.10/.schema/devbox.schema.json",
+  "packages": [
+    "python312",
+    "kubernetes-helm",
+    "kubectl",
+    "kubeconform",
+    "xvfb-run",
+    "helm-docs"
+  ],
+  "shell": {
+    "init_hook": [
+      ". $VENV_DIR/bin/activate",
+      "echo 'Devbox environment ready!'",
+      "echo 'Python version:' && python3 --version",
+      "echo 'Virtual environment activated'",
+      "echo ''",
+      "echo 'To install test dependencies, run:'",
+      "echo '  devbox run test-install'",
+      "echo ''",
+      "echo 'Available commands:'",
+      "echo '  make docs    - Generate chart documentation'",
+      "echo '  make verify  - Validate and lint charts'",
+      "echo '  make version - Show version information'",
+      "echo '  devbox run test - Run smoke tests'"
+    ],
+    "scripts": {
+      "test": "timeout 600 xvfb-run -a python3 ./tests/run/smoke.py",
+      "test-install": "pip install -r tests/requirements.txt"
+    }
+  },
+  "env": {
+    "PYTHONUNBUFFERED": "1",
+    "MPLBACKEND": "Agg"
+  }
+}
