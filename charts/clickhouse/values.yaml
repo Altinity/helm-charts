@@ -177,6 +177,11 @@ clickhouse:
     <clickhouse>
     </clickhouse>
 
+  extraContainers: []
+
+  # -- Extra volumes for clickhouse pods
+  extraVolumes: []
+
   # -- Init scripts ConfigMap configuration
   initScripts:
     # -- Set to true to enable init scripts feature

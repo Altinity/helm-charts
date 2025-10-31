@@ -1,6 +1,6 @@
 # clickhouse-eks
 
-![Version: 0.1.8](https://img.shields.io/badge/Version-0.1.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.16.0](https://img.shields.io/badge/AppVersion-1.16.0-informational?style=flat-square)
+![Version: 0.1.9](https://img.shields.io/badge/Version-0.1.9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.16.0](https://img.shields.io/badge/AppVersion-1.16.0-informational?style=flat-square)
 
 A Helm chart for ClickHouse running on AWS EKS across AZs using a nodeSelector to pin resources to run on specific VMs types
 
@@ -52,6 +52,8 @@ kubectl exec -it chi-eks-dev-0-0-0 --namespace clickhouse -- clickhouse-client
 |-----|------|---------|-------------|
 | all.metadata.labels.application_group | string | `"eks"` | The name of the application group |
 | clickhouse.cluster | string | `"dev"` | Cluster name |
+| clickhouse.extraContainers | list | `[]` | Extra containers for clickhouse pods |
+| clickhouse.extraVolumes | list | `[]` | Extra volumes for clickhouse pods |
 | clickhouse.image | string | `"altinity/clickhouse-server:24.3.12.76.altinitystable"` | ClickHouse server image |
 | clickhouse.keeper_name | string | `"keeper-eks"` | Name of the keeper cluster |
 | clickhouse.name | string | `"eks"` | Metadata name |

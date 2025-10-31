@@ -2,5 +2,5 @@ apiVersion: v2
 name: clickhouse-eks
 description: A Helm chart for ClickHouse running on AWS EKS across AZs using a nodeSelector to pin resources to run on specific VMs types
 type: application
-version: 0.1.8
+version: 0.1.9
 appVersion: "1.16.0"

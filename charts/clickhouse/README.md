@@ -1,5 +1,5 @@
 # clickhouse
-![Version: 0.3.4](https://img.shields.io/badge/Version-0.3.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.3.6.10034](https://img.shields.io/badge/AppVersion-25.3.6.10034-informational?style=flat-square)
+![Version: 0.3.5](https://img.shields.io/badge/Version-0.3.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.3.6.10034](https://img.shields.io/badge/AppVersion-25.3.6.10034-informational?style=flat-square)
 
 A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for ClickHouse
 
@@ -169,8 +169,10 @@ EOSQL
 | clickhouse.defaultUser.password | string | `""` |  |
 | clickhouse.defaultUser.password_secret_name | string | `""` | Name of an existing Kubernetes secret containing the default user password. If set, the password will be read from the secret instead of using the password field. The secret should contain a key named 'password'. |
 | clickhouse.extraConfig | string | `"<clickhouse>\n</clickhouse>\n"` | Miscellanous config for ClickHouse (in xml format) |
+| clickhouse.extraContainers | list | `[]` |  |
 | clickhouse.extraPorts | list | `[]` | Additional ports to expose in the ClickHouse container Example: extraPorts:   - name: custom-port     containerPort: 8080 |
 | clickhouse.extraUsers | string | `"<clickhouse>\n</clickhouse>\n"` | Additional users config for ClickHouse (in xml format) |
+| clickhouse.extraVolumes | list | `[]` | Extra volumes for clickhouse pods |
 | clickhouse.image.pullPolicy | string | `"IfNotPresent"` |  |
 | clickhouse.image.repository | string | `"altinity/clickhouse-server"` |  |
 | clickhouse.image.tag | string | `"25.3.6.10034.altinitystable"` | Override the image tag for a specific version |

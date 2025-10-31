@@ -118,11 +118,19 @@ Pod Template Base
               {{- end }}
               resources:
                 {{- toYaml .Values.clickhouse.resources | nindent 16 }}
-          {{- if .Values.clickhouse.initScripts.enabled }}
+            {{- with .Values.clickhouse.extraContainers }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- if or .Values.clickhouse.initScripts.enabled .Values.clickhouse.extraVolumes }}
           volumes:
+            {{- if .Values.clickhouse.initScripts.enabled }}
             - name: init-scripts-configmap
               configMap:
                 name: {{ .Values.clickhouse.initScripts.configMapName }}
+            {{- end }}
+            {{- with .Values.clickhouse.extraVolumes }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           {{- end }}
           {{- with .Values.clickhouse.nodeSelector }}
           nodeSelector:
