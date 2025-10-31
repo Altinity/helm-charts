@@ -621,6 +621,23 @@ entries:
   clickhouse:
   - apiVersion: v2
     appVersion: 25.3.6.10034
+    created: "2025-10-31T15:54:12.706765911Z"
+    dependencies:
+    - alias: operator
+      condition: operator.enabled
+      name: altinity-clickhouse-operator
+      repository: https://helm.altinity.com
+      version: 0.25.5
+    description: A Helm chart for creating a ClickHouse® Cluster with the Altinity
+      Operator for ClickHouse
+    digest: 2a11ba4702caa3e924a0f2b3d8d6e99d6ca588c7d2cf50c51879d50eec453048
+    name: clickhouse
+    type: application
+    urls:
+    - https://github.com/Altinity/helm-charts/releases/download/clickhouse-0.3.5/clickhouse-0.3.5.tgz
+    version: 0.3.5
+  - apiVersion: v2
+    appVersion: 25.3.6.10034
     created: "2025-10-31T15:51:09.010413667Z"
     dependencies:
     - alias: operator
@@ -897,6 +914,17 @@ entries:
   clickhouse-eks:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2025-10-31T15:54:12.981184615Z"
+    description: A Helm chart for ClickHouse running on AWS EKS across AZs using a
+      nodeSelector to pin resources to run on specific VMs types
+    digest: 22239566242bf1a5260ff683b6c2c5e7e17b375ed74236668ca735a4f16a5057
+    name: clickhouse-eks
+    type: application
+    urls:
+    - https://github.com/Altinity/helm-charts/releases/download/clickhouse-eks-0.1.9/clickhouse-eks-0.1.9.tgz
+    version: 0.1.9
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2024-12-10T17:34:15.152801081Z"
     description: A Helm chart for ClickHouse running on AWS EKS across AZs using a
       nodeSelector to pin resources to run on specific VMs types
@@ -1045,4 +1073,4 @@ entries:
     urls:
     - https://github.com/Altinity/kubernetes-blueprints-for-clickhouse/releases/download/keeper-sts-0.1.1/keeper-sts-0.1.1.tgz
     version: 0.1.1
-generated: "2025-10-31T15:51:09.010565262Z"
+generated: "2025-10-31T15:54:12.981446424Z"
