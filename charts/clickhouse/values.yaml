@@ -177,6 +177,7 @@ clickhouse:
     <clickhouse>
     </clickhouse>
 
+  # -- Extra containers for clickhouse pods
   extraContainers: []
 
   # -- Extra volumes for clickhouse pods
