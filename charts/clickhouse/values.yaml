@@ -177,10 +177,11 @@ clickhouse:
     <clickhouse>
     </clickhouse>
 
-  extraContainers: {}
+  # -- Extra containers for clickhouse pods
+  extraContainers: []
 
   # -- Extra volumes for clickhouse pods
-  extraVolumes: {}
+  extraVolumes: []
 
   # -- Init scripts ConfigMap configuration
   initScripts:

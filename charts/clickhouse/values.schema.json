@@ -282,12 +282,18 @@
           "description": "Miscellaneous users config for ClickHouse in XML format."
         },
         "extraContainers": {
-          "type": "object",
-          "description": "Extra containers for Clickhouse pod."
+          "type": "array",
+          "description": "Extra containers for Clickhouse pod.",
+          "items": {
+            "type": "object"
+          }
         },
         "extraVolumes": {
-          "type": "object",
-          "description": "Extra volumes for Clickhouse pod."
+          "type": "array",
+          "description": "Extra volumes for Clickhouse pod.",
+          "items": {
+            "type": "object"
+          }
         },
         "initScripts": {
           "type": "object",
