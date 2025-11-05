@@ -123,10 +123,10 @@ spec:
               {{- end }}
               resources:
                 requests:
-                  cpu: "{{ $.Values.keeper.resources.cpuRequestsMs }}"
+                  cpu: "{{ $.Values.keeper.resources.cpuRequestsMs }}m"
                   memory: "{{ $.Values.keeper.resources.memoryRequestsMiB }}"
                 limits:
-                  cpu: "{{ $.Values.keeper.resources.cpuLimitsMs }}"
+                  cpu: "{{ $.Values.keeper.resources.cpuLimitsMs }}m"
                   memory: "{{ $.Values.keeper.resources.memoryLimitsMiB }}"
     {{- end }}
   {{- if not (empty .Values.namespaceDomainPattern) }}

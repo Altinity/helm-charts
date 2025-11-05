@@ -219,10 +219,10 @@ keeper:
   zoneSpread: false
   metricsPort: ""
   resources:
-    cpuRequestsMs: 2
-    memoryRequestsMiB: 3Gi
-    cpuLimitsMs: 3
-    memoryLimitsMiB: 3Gi
+    cpuRequestsMs: 100
+    memoryRequestsMiB: 512Mi
+    cpuLimitsMs: 500
+    memoryLimitsMiB: 1Gi
 
 operator:
   # -- Whether to enable the Altinity Operator for ClickHouse.
