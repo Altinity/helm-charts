@@ -1,0 +1,31 @@
+nameOverride: "initial"
+
+clickhouse:
+  replicasCount: 2
+  shardsCount: 1
+  
+  image:
+    repository: "altinity/clickhouse-server"
+    tag: "25.3.6.10034.altinitystable"
+    pullPolicy: "IfNotPresent"
+  
+  persistence:
+    enabled: true
+    size: "5Gi"
+    accessMode: "ReadWriteOnce"
+  
+  lbService:
+    enabled: false
+  
+  defaultUser:
+    password: "SimplePassword"
+    allowExternalAccess: false
+
+keeper:
+  enabled: true
+  replicaCount: 1
+  
+  localStorage:
+    size: "2Gi"
+
+

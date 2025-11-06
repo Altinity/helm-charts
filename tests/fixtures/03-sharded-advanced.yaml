@@ -1,0 +1,108 @@
+---
+# Sharded cluster with advanced features
+# Tests: Sharding (3 shards x 2 replicas), anti-affinity, cluster secrets, 
+#        LoadBalancer service, service account, node selectors, tolerations,
+#        topology spread constraints, keeper with 5 replicas
+# Expected pods: 6 ClickHouse (3 shards x 2 replicas) + 5 Keeper = 11 total
+nameOverride: "sharded"
+
+clickhouse:
+  replicasCount: 2
+  shardsCount: 3
+  
+  # Test anti-affinity at shard scope
+  antiAffinity: true
+  antiAffinityScope: "Shard"
+  
+  defaultUser:
+    password: "ShardedPassword123"
+    allowExternalAccess: true
+  
+  # Test cluster secret for secure inter-node communication
+  clusterSecret:
+    enabled: true
+    auto: true
+    secure: false
+  
+  persistence:
+    enabled: true
+    size: 15Gi
+    accessMode: ReadWriteOnce
+  
+  service:
+    type: ClusterIP
+  
+  # Test LoadBalancer service with IP restrictions
+  lbService:
+    enabled: true
+    loadBalancerSourceRanges:
+      - "10.0.0.0/8"
+      - "172.16.0.0/12"
+    serviceAnnotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+      service.beta.kubernetes.io/aws-load-balancer-scheme: "internal"
+    serviceLabels:
+      exposed: "true"
+  
+  # Test service account creation
+  serviceAccount:
+    create: true
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/clickhouse-role"
+    name: "clickhouse-sa"
+  
+  # Test node selection
+  nodeSelector:
+    disktype: ssd
+    workload: database
+  
+  # Test tolerations
+  tolerations:
+    - key: "dedicated"
+      operator: "Equal"
+      value: "clickhouse"
+      effect: "NoSchedule"
+    - key: "high-memory"
+      operator: "Exists"
+      effect: "NoSchedule"
+  
+  # Test topology spread constraints
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: clickhouse
+  
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8001"
+  
+  podLabels:
+    app: clickhouse
+    tier: database
+
+# Test keeper with 5 replicas (high availability)
+keeper:
+  enabled: true
+  replicaCount: 5
+  localStorage:
+    size: 10Gi
+  nodeSelector:
+    disktype: ssd
+  tolerations:
+    - key: "dedicated"
+      operator: "Equal"
+      value: "clickhouse"
+      effect: "NoSchedule"
+  resources:
+    cpuRequestsMs: 200
+    memoryRequestsMiB: 1Gi
+    cpuLimitsMs: 1000
+    memoryLimitsMiB: 2Gi
+
+operator:
+  enabled: true
+
+
