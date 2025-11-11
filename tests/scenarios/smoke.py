@@ -25,42 +25,40 @@ UPGRADE_SCENARIOS = [
 @TestScenario
 def check_deployment(self, fixture_file, skip_external_keeper=True):
     """Test a single ClickHouse deployment configuration.
-    
+
     Args:
         fixture_file: Path to the fixture YAML file
         skip_external_keeper: Skip if fixture requires external keeper
     """
-    fixture_name = os.path.basename(fixture_file).replace('.yaml', '')
+    fixture_name = os.path.basename(fixture_file).replace(".yaml", "")
     # Keep release name and namespace under 11 chars to avoid Kubernetes naming issues
     short_name = f"t{fixture_name[:9]}"
     release_name = short_name
     namespace = short_name
-    
+
     with Given("paths to fixture file"):
         tests_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         values_path = os.path.join(tests_dir, fixture_file)
-    
+
     with And("load fixture configuration"):
         state = HelmState(values_path)
         note(f"Testing fixture: {fixture_file}")
         note(f"Expected pods: {state.get_expected_pod_count()}")
-    
+
     # Skip external keeper tests if requested
     if skip_external_keeper and "external-keeper" in fixture_name:
         skip("Skipping external keeper test (requires pre-existing keeper)")
         return
-    
+
     with When("install ClickHouse with fixture configuration"):
         kubernetes.use_context(context_name="minikube")
         helm.install(
-            namespace=namespace,
-            release_name=release_name,
-            values_file=fixture_file
+            namespace=namespace, release_name=release_name, values_file=fixture_file
         )
-    
+
     with Then("verify deployment state"):
         state.verify_all(namespace=namespace)
-    
+
     with Finally("cleanup deployment"):
         helm.uninstall(namespace=namespace, release_name=release_name)
         kubernetes.delete_namespace(namespace=namespace)
@@ -92,9 +90,7 @@ def check_upgrade(self, initial_fixture, upgrade_fixture):
     with When("install ClickHouse with initial configuration"):
         kubernetes.use_context(context_name="minikube")
         helm.install(
-            namespace=namespace,
-            release_name=release_name,
-            values_file=initial_fixture
+            namespace=namespace, release_name=release_name, values_file=initial_fixture
         )
 
     with Then("verify initial deployment state"):
@@ -102,9 +98,7 @@ def check_upgrade(self, initial_fixture, upgrade_fixture):
 
     with When("upgrade ClickHouse to new configuration"):
         helm.upgrade(
-            namespace=namespace,
-            release_name=release_name,
-            values_file=upgrade_fixture
+            namespace=namespace, release_name=release_name, values_file=upgrade_fixture
         )
 
     with Then("verify upgraded deployment state"):
@@ -118,7 +112,7 @@ def check_upgrade(self, initial_fixture, upgrade_fixture):
 @TestScenario
 def check_all_fixtures(self):
     """Test all fixture configurations."""
-    
+
     for fixture in FIXTURES:
         Scenario(
             test=check_deployment,
@@ -149,6 +143,6 @@ def feature(self):
 
     with Feature("deployment tests"):
         Scenario(run=check_all_fixtures)
-    
+
     # with Feature("upgrade tests"):
     #     Scenario(run=check_all_upgrades)

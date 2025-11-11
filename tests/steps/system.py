@@ -5,6 +5,7 @@ import tempfile
 from pathlib import Path
 from testflows.core import *
 
+
 @TestStep(When)
 def run(self, cmd, check=True):
     """Execute a shell command."""
@@ -16,6 +17,7 @@ def run(self, cmd, check=True):
         sys.exit(result.returncode)
 
     return result
+
 
 @TestStep(Given)
 def get_values_file(self, values):
@@ -42,12 +44,12 @@ def values_argument(self, values=None, values_file=None):
     """
     if not values and not values_file:
         return ""
-    
+
     if values_file:
         tests_dir = Path(__file__).parent.parent
         full_path = tests_dir / values_file
         return f" --values {full_path}"
-    
+
     # values dict case - create temp file
     temp_values_file = get_values_file(values=values)
     return f" --values {temp_values_file}"

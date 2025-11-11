@@ -2,9 +2,17 @@ from tests.steps.system import *
 
 
 @TestStep(Given)
-def install(self, namespace, release_name, values=None, values_file=None, local=True, clean_up=True):
+def install(
+    self,
+    namespace,
+    release_name,
+    values=None,
+    values_file=None,
+    local=True,
+    clean_up=True,
+):
     """Install ClickHouse Operator using Altinity Helm charts with optional custom values.
-    
+
     Args:
         namespace: Kubernetes namespace
         release_name: Helm release name
@@ -43,7 +51,7 @@ def uninstall(self, namespace, release_name):
 @TestStep(When)
 def upgrade(self, namespace, release_name, values=None, values_file=None, local=True):
     """Upgrade an existing Helm release with optional custom values.
-    
+
     Args:
         namespace: Kubernetes namespace
         release_name: Helm release name
@@ -60,5 +68,3 @@ def upgrade(self, namespace, release_name, values=None, values_file=None, local=
     r = run(cmd=cmd)
 
     return r
-
-
