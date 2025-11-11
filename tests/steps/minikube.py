@@ -1,8 +1,8 @@
 from tests.steps.system import *
-
+from tests.steps.kubernetes import use_context
 
 @TestStep(Given)
-def minikube_start(self, cpus=4, memory="6g"):
+def minikube_start(self, cpus=2, memory="6g"):
     """Start minikube."""
 
     run(cmd=f"minikube start --driver=docker --cpus={cpus} --memory={memory}")
@@ -34,7 +34,7 @@ def minikube_stop(self):
 
 
 @TestStep(Given)
-def setup_minikube_environment(self, cpus=4, memory="6g", clean_up=True):
+def setup_minikube_environment(self, cpus=2, memory="6g", clean_up=True):
     """Set up minikube environment with context."""
 
     # Check if minikube is already running and stop it if it is
@@ -42,7 +42,6 @@ def setup_minikube_environment(self, cpus=4, memory="6g", clean_up=True):
         minikube_stop()
 
     minikube_start(cpus=cpus, memory=memory)
-    from tests.steps.kubernetes import use_context
 
     use_context(context_name="minikube")
 

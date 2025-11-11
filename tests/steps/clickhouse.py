@@ -5,42 +5,47 @@ import tests.steps.kubernetes as kubernetes
 
 
 @TestStep(When)
+def get_version(self, namespace, pod_name, user="default", password=""):
+    """Get ClickHouse version from the specified pod."""
+
+    auth_args = f"-u {user}" if user else ""
+    if password:
+        auth_args += f" --password {password}"
+
+    version = run(
+        cmd=f"kubectl exec -n {namespace} {pod_name} "
+        f"-- clickhouse-client {auth_args} -q 'SELECT version()'"
+    )
+    return version.stdout.strip()
+
+
+@TestStep(When)
 def execute_clickhouse_query(self, namespace, pod_name, query, user="default", password="", check=True):
-    """Execute a query on ClickHouse pod.
+    """Execute a ClickHouse query on a specific pod.
     
     Args:
         namespace: Kubernetes namespace
         pod_name: Name of the ClickHouse pod
-        query: SQL query to execute
+        query: Query to execute
         user: Username for authentication (default: "default")
-        password: Password for authentication (default: "")
+        password: Password for authentication
         check: Whether to raise exception on error (default: True)
         
     Returns:
-        Command result object
+        Result object with returncode, stdout, stderr
     """
-    auth_args = f"-u {user}"
+    auth_args = f"-u {user}" if user else ""
     if password:
         auth_args += f" --password {password}"
     
-    return run(
-        cmd=f"kubectl exec -n {namespace} {pod_name} -- clickhouse-client {auth_args} -q '{query}'",
-        check=check
-    )
-
-
-@TestStep(When)
-def get_version(self, namespace, pod_name, user="default", password=""):
-    """Get ClickHouse version from the specified pod."""
+    escaped_query = query.replace("'", "'\\''")
     
-    result = execute_clickhouse_query(
-        namespace=namespace,
-        pod_name=pod_name,
-        query="SELECT version()",
-        user=user,
-        password=password
+    result = run(
+        cmd=f"kubectl exec -n {namespace} {pod_name} "
+        f"-- clickhouse-client {auth_args} -q '{escaped_query}'",
+        check=check,
     )
-    return result.stdout.strip()
+    return result
 
 
 @TestStep(When)
@@ -48,13 +53,11 @@ def test_clickhouse_connection(self, namespace, pod_name, user, password):
     """Test ClickHouse connection with given credentials."""
 
     try:
-        result = execute_clickhouse_query(
-            namespace=namespace,
-            pod_name=pod_name,
-            query="SELECT 1",
-            user=user,
-            password=password,
-            check=False
+        result = run(
+            cmd=f"kubectl exec -n {namespace} {pod_name} "
+            f"-- clickhouse-client -u {user} --password {password} "
+            f"-q 'SELECT 1'",
+            check=False,
         )
         return result.returncode == 0
     except:
@@ -62,84 +65,27 @@ def test_clickhouse_connection(self, namespace, pod_name, user, password):
 
 
 @TestStep(When)
-def get_chi_list(self, namespace):
-    """Get list of all ClickHouseInstallation resources in namespace.
-    
-    Args:
-        namespace: Kubernetes namespace
-        
-    Returns:
-        List of CHI resources
-    """
-    chi_result = run(cmd=f"kubectl get chi -n {namespace} -o json")
-    chi_data = json.loads(chi_result.stdout)
-    return chi_data.get("items", [])
+def get_chi_name(self, namespace):
+    """Get the name of the ClickHouseInstallation resource."""
+
+    chi_info = run(cmd=f"kubectl get chi -n {namespace} -o json")
+    chi_info = json.loads(chi_info.stdout)
+
+    if chi_info["items"]:
+        return chi_info["items"][0]["metadata"]["name"]
+    return None
 
 
 @TestStep(When)
 def get_chi_info(self, namespace):
-    """Get the first ClickHouseInstallation resource information.
-    
-    Args:
-        namespace: Kubernetes namespace
-        
-    Returns:
-        Dict with CHI information or None if not found
-    """
-    chi_items = get_chi_list(namespace=namespace)
-    return chi_items[0] if chi_items else None
+    """Get the full ClickHouseInstallation resource information."""
 
+    chi_info = run(cmd=f"kubectl get chi -n {namespace} -o json")
+    chi_info = json.loads(chi_info.stdout)
 
-@TestStep(When)
-def get_chi_name(self, namespace):
-    """Get the name of the first ClickHouseInstallation resource.
-    
-    Args:
-        namespace: Kubernetes namespace
-        
-    Returns:
-        CHI name string or None if not found
-    """
-    chi_info = get_chi_info(namespace=namespace)
-    return chi_info["metadata"]["name"] if chi_info else None
-
-
-def is_clickhouse_resource(resource_name):
-    """Check if a resource name is a ClickHouse resource.
-    
-    Args:
-        resource_name: Name of the resource (pod, pvc, etc.)
-        
-    Returns:
-        True if resource is ClickHouse-related
-    """
-    name_lower = resource_name.lower()
-    return "clickhouse" in name_lower or "chi-" in name_lower
-
-
-@TestStep(Then)
-def verify_clickhouse_pvc_size(self, namespace, expected_size):
-    """Verify that ClickHouse PVCs have the expected storage size.
-    
-    Args:
-        namespace: Kubernetes namespace
-        expected_size: Expected storage size (e.g., "5Gi")
-    
-    Returns:
-        True if PVC with expected size is found
-    """
-    pvcs = kubernetes.get_pvcs(namespace=namespace)
-    assert len(pvcs) > 0, "No PVCs found for persistence"
-    
-    for pvc in pvcs:
-        # Filter for ClickHouse PVCs
-        if is_clickhouse_resource(pvc):
-            storage_size = kubernetes.get_pvc_storage_size(namespace=namespace, pvc_name=pvc)
-            if storage_size == expected_size:
-                note(f"✓ Persistence: {storage_size}")
-                return True
-    
-    raise AssertionError(f"No PVC found with expected storage size {expected_size}")
+    if chi_info["items"]:
+        return chi_info["items"][0]
+    return None
 
 
 @TestStep(When)
@@ -276,27 +222,34 @@ def get_keeper_pods(self, namespace):
     return [p for p in pods if p.startswith("keeper-") and "operator" not in p]
 
 
-@TestStep(Then)
-def verify_keeper_pod_count(self, namespace, expected_count):
-    """Verify the number of Keeper pods matches expected count.
+@TestStep(When)
+def get_chk_name(self, namespace):
+    """Get the name of the ClickHouseKeeperInstallation resource."""
+
+    chk_info = run(cmd=f"kubectl get chk -n {namespace} -o json", check=False)
+    if chk_info.returncode != 0:
+        return None
     
-    Args:
-        namespace: Kubernetes namespace
-        expected_count: Expected number of Keeper pods
-        
-    Returns:
-        Number of Keeper pods found
-    """
-    keeper_pods = run(
-        cmd=f"kubectl get pods -n {namespace} -l clickhouse-keeper.altinity.com/app=chop -o jsonpath='{{.items[*].metadata.name}}'"
-    )
-    keeper_pod_count = len(keeper_pods.stdout.split()) if keeper_pods.stdout else 0
+    chk_info = json.loads(chk_info.stdout)
+
+    if chk_info.get("items"):
+        return chk_info["items"][0]["metadata"]["name"]
+    return None
+
+
+@TestStep(When)
+def get_chk_info(self, namespace):
+    """Get the full ClickHouseKeeperInstallation resource information."""
+
+    chk_info = run(cmd=f"kubectl get chk -n {namespace} -o json", check=False)
+    if chk_info.returncode != 0:
+        return None
     
-    assert keeper_pod_count == expected_count, \
-        f"Expected {expected_count} Keeper pods, got {keeper_pod_count}"
-    
-    note(f"✓ Keeper pods: {keeper_pod_count}/{expected_count}")
-    return keeper_pod_count
+    chk_info = json.loads(chk_info.stdout)
+
+    if chk_info.get("items"):
+        return chk_info["items"][0]
+    return None
 
 
 @TestStep(When)
@@ -373,82 +326,284 @@ def verify_user_connection(self, namespace, user, password, pod_name=None):
 
 @TestStep(Then)
 def verify_clickhouse_pod_count(self, namespace, expected_count):
-    """Verify the number of ClickHouse pods matches expected count.
-    
-    Args:
-        namespace: Kubernetes namespace
-        expected_count: Expected number of ClickHouse pods
-    """
+    """Verify that the expected number of ClickHouse pods are running."""
     clickhouse_pods = get_clickhouse_pods(namespace=namespace)
-    actual_count = len(clickhouse_pods)
-    
-    assert actual_count == expected_count, \
-        f"Expected {expected_count} ClickHouse pods, got {actual_count}"
-    
-    note(f"✓ ClickHouse pods: {actual_count}/{expected_count}")
-    return clickhouse_pods
+    assert len(clickhouse_pods) == expected_count, \
+        f"Expected {expected_count} ClickHouse pods, got {len(clickhouse_pods)}"
+    note(f"✓ ClickHouse pod count: {expected_count}")
 
 
 @TestStep(Then)
-def verify_users_configuration(self, namespace, default_user_config=None, users_config=None):
-    """Verify user configuration and connectivity for default and additional users.
+def verify_keeper_pod_count(self, namespace, expected_count):
+    """Verify that the expected number of Keeper pods are running."""
+    keeper_pods = get_keeper_pods(namespace=namespace)
+    assert len(keeper_pods) == expected_count, \
+        f"Expected {expected_count} Keeper pods, got {len(keeper_pods)}"
+    note(f"✓ Keeper pod count: {expected_count}")
+
+
+@TestStep(When)
+def is_clickhouse_resource(self, resource_name):
+    """Check if a resource name belongs to a ClickHouse instance.
     
-    Args:
-        namespace: Kubernetes namespace
-        default_user_config: Dict with default user configuration (must have 'password' key)
-        users_config: List of dicts with user configurations (each must have 'name' and 'password')
+    Matches:
+    - Per-pod services: chi-*
+    - Cluster services: clickhouse-*
+    - But excludes operator services: *-operator-*
     """
-    clickhouse_pods = get_clickhouse_pods(namespace=namespace)
-    if not clickhouse_pods:
-        note("No ClickHouse pods found, skipping user verification")
-        return
+    if "operator" in resource_name:
+        return False
+    return "chi-" in resource_name or resource_name.startswith("clickhouse-")
+
+
+@TestStep(Then)
+def verify_clickhouse_pvc_size(self, namespace, expected_size):
+    """Verify that ClickHouse data PVCs have the expected size."""
+    pvcs = kubernetes.get_pvcs(namespace=namespace)
     
-    pod_name = clickhouse_pods[0]
+    clickhouse_data_pvcs = [pvc for pvc in pvcs if 'data' in pvc and is_clickhouse_resource(resource_name=pvc)]
     
-    # Test default user
-    if default_user_config and 'password' in default_user_config:
-        password = default_user_config['password']
-        result = test_clickhouse_connection(
-            namespace=namespace,
-            pod_name=pod_name,
-            user="default",
-            password=password
-        )
-        assert result, f"Failed to connect with default user"
-        note(f"✓ Default user connection successful")
+    assert len(clickhouse_data_pvcs) > 0, "No ClickHouse data PVCs found"
     
-    # Test additional users
-    if users_config:
-        for user_config in users_config:
-            user_name = user_config.get('name')
-            if user_name and 'password' in user_config:
-                password = user_config['password']
-                result = test_clickhouse_connection(
-                    namespace=namespace,
-                    pod_name=pod_name,
-                    user=user_name,
-                    password=password
-                )
-                assert result, f"Failed to connect with user {user_name}"
-                note(f"✓ User '{user_name}' connection successful")
-            elif user_name:
-                note(f"⊘ User '{user_name}' has hashed password, skipping connection test")
+    for pvc in clickhouse_data_pvcs:
+        pvc_info = kubernetes.get_pvc_info(namespace=namespace, pvc_name=pvc)
+        actual_size = pvc_info.get("spec", {}).get("resources", {}).get("requests", {}).get("storage")
+        
+        assert actual_size == expected_size, \
+            f"Expected PVC size {expected_size}, got {actual_size} for {pvc}"
+    
+    note(f"✓ All {len(clickhouse_data_pvcs)} data PVCs verified: {expected_size}")
 
 
 @TestStep(Then)
 def verify_image_tag(self, namespace, expected_tag):
-    """Verify all ClickHouse pods are running with expected image tag.
-    
-    Args:
-        namespace: Kubernetes namespace
-        expected_tag: Expected image tag
-    """
+    """Verify that ClickHouse pods are using the expected image tag."""
+    verify_pods_image(namespace=namespace, expected_image_tag=expected_tag)
+    note(f"✓ Image tag verified: {expected_tag}")
+
+
+@TestStep(Then)
+def verify_pod_annotations(self, namespace, expected_annotations):
+    """Verify that ClickHouse pods have expected annotations."""
     clickhouse_pods = get_clickhouse_pods(namespace=namespace)
+    assert len(clickhouse_pods) > 0, "No ClickHouse pods found"
     
     for pod in clickhouse_pods:
-        import tests.steps.kubernetes as kubernetes
-        image = kubernetes.get_pod_image(namespace=namespace, pod_name=pod)
-        assert expected_tag in image, \
-            f"Expected image tag {expected_tag}, got {image}"
+        pod_info = kubernetes.get_pod_info(namespace=namespace, pod_name=pod)
+        actual_annotations = pod_info.get("metadata", {}).get("annotations", {})
+        
+        for key, value in expected_annotations.items():
+            assert key in actual_annotations, \
+                f"Annotation '{key}' not found in pod {pod}"
+            assert actual_annotations[key] == value, \
+                f"Expected annotation '{key}={value}', got '{actual_annotations[key]}' in pod {pod}"
     
-    note(f"✓ Image tag: {expected_tag}")
+    note(f"✓ Pod annotations verified on {len(clickhouse_pods)} pods")
+
+
+@TestStep(Then)
+def verify_pod_labels(self, namespace, expected_labels):
+    """Verify that ClickHouse pods have expected labels."""
+    clickhouse_pods = get_clickhouse_pods(namespace=namespace)
+    assert len(clickhouse_pods) > 0, "No ClickHouse pods found"
+    
+    for pod in clickhouse_pods:
+        pod_info = kubernetes.get_pod_info(namespace=namespace, pod_name=pod)
+        actual_labels = pod_info.get("metadata", {}).get("labels", {})
+        
+        for key, value in expected_labels.items():
+            assert key in actual_labels, \
+                f"Label '{key}' not found in pod {pod}"
+            assert actual_labels[key] == value, \
+                f"Expected label '{key}={value}', got '{actual_labels[key]}' in pod {pod}"
+    
+    note(f"✓ Pod labels verified on {len(clickhouse_pods)} pods")
+
+
+@TestStep(Then)
+def verify_service_annotations(self, namespace, expected_annotations, service_type="ClusterIP"):
+    """Verify that ClickHouse service has expected annotations.
+    
+    Only checks services that have annotations (main cluster services),
+    not per-pod headless services which typically don't have custom annotations.
+    """
+    services = kubernetes.get_services(namespace=namespace)
+    
+    clickhouse_services = [svc for svc in services if is_clickhouse_resource(resource_name=svc)]
+    
+    assert len(clickhouse_services) > 0, "No ClickHouse services found"
+    
+    services_with_annotations = []
+    for service in clickhouse_services:
+        service_info = kubernetes.get_service_info(namespace=namespace, service_name=service)
+        actual_annotations = service_info.get("metadata", {}).get("annotations", {})
+        
+        # Check if this service has any of the expected annotations
+        has_expected_annotation = any(key in actual_annotations for key in expected_annotations.keys())
+        
+        if has_expected_annotation:
+            services_with_annotations.append(service)
+            for key, value in expected_annotations.items():
+                assert key in actual_annotations, \
+                    f"Annotation '{key}' not found in service {service}"
+                assert actual_annotations[key] == value, \
+                    f"Expected annotation '{key}={value}', got '{actual_annotations[key]}' in service {service}"
+    
+    # At least one service must have the expected annotations
+    assert len(services_with_annotations) > 0, \
+        f"No services found with expected annotations. Expected: {list(expected_annotations.keys())}, Services checked: {clickhouse_services}"
+    
+    note(f"✓ Service annotations verified on {len(services_with_annotations)} service(s)")
+
+
+@TestStep(Then)
+def verify_service_labels(self, namespace, expected_labels, service_type="ClusterIP"):
+    """Verify that ClickHouse service has expected labels.
+    
+    Only checks services that have labels (main cluster services),
+    not per-pod headless services which typically don't have custom labels.
+    """
+    services = kubernetes.get_services(namespace=namespace)
+    
+    clickhouse_services = [svc for svc in services if is_clickhouse_resource(resource_name=svc)]
+    
+    assert len(clickhouse_services) > 0, "No ClickHouse services found"
+    
+    services_with_labels = []
+    for service in clickhouse_services:
+        service_info = kubernetes.get_service_info(namespace=namespace, service_name=service)
+        actual_labels = service_info.get("metadata", {}).get("labels", {})
+        
+        # Check if this service has any of the expected labels
+        has_expected_label = any(key in actual_labels for key in expected_labels.keys())
+        
+        if has_expected_label:
+            services_with_labels.append(service)
+            for key, value in expected_labels.items():
+                assert key in actual_labels, \
+                    f"Label '{key}' not found in service {service}"
+                assert actual_labels[key] == value, \
+                    f"Expected label '{key}={value}', got '{actual_labels[key]}' in service {service}"
+    
+    # At least one service must have the expected labels
+    assert len(services_with_labels) > 0, \
+        f"No services found with expected labels. Expected: {list(expected_labels.keys())}, Services checked: {clickhouse_services}"
+    
+    note(f"✓ Service labels verified on {len(services_with_labels)} service(s)")
+
+
+@TestStep(Then)
+def verify_log_persistence(self, namespace, expected_log_size):
+    """Verify that ClickHouse log PVCs have the expected size."""
+    pvcs = kubernetes.get_pvcs(namespace=namespace)
+    
+    log_pvcs = [pvc for pvc in pvcs if 'log' in pvc and is_clickhouse_resource(resource_name=pvc)]
+    
+    assert len(log_pvcs) > 0, "No ClickHouse log PVCs found"
+    
+    for pvc in log_pvcs:
+        pvc_info = kubernetes.get_pvc_info(namespace=namespace, pvc_name=pvc)
+        actual_size = pvc_info.get("spec", {}).get("resources", {}).get("requests", {}).get("storage")
+        
+        assert actual_size == expected_log_size, \
+            f"Expected log PVC size {expected_log_size}, got {actual_size} for {pvc}"
+    
+    note(f"✓ All {len(log_pvcs)} log PVCs verified: {expected_log_size}")
+
+
+@TestStep(Then)
+def verify_extra_config(self, namespace, expected_config_keys):
+    """Verify that extraConfig is present in CHI."""
+    chi_info = get_chi_info(namespace=namespace)
+    assert chi_info is not None, "ClickHouseInstallation not found"
+    
+    # Check for settings in configuration
+    settings = chi_info.get("spec", {}).get("configuration", {}).get("settings", {})
+    files = chi_info.get("spec", {}).get("configuration", {}).get("files", {})
+    
+    # Verify all expected config keys are present
+    for key in expected_config_keys:
+        found = False
+        if key in settings:
+            found = True
+        elif any(key in file_content for file_content in files.values()):
+            found = True
+        
+        assert found, f"ExtraConfig key '{key}' not found in settings or files"
+        note(f"✓ ExtraConfig key found: {key}")
+    
+    note(f"✓ ExtraConfig verified: {len(expected_config_keys)} keys")
+
+
+@TestStep(Then)
+def verify_keeper_storage(self, namespace, expected_storage_size):
+    """Verify that Keeper storage volumes have the expected size by checking PVCs."""
+    pvcs = kubernetes.get_pvcs(namespace=namespace)
+    
+    # Find keeper PVCs (they start with "keeper-" or contain "keeper")
+    keeper_pvcs = [pvc for pvc in pvcs if pvc.startswith("keeper-") or "-keeper-" in pvc]
+    
+    assert len(keeper_pvcs) > 0, f"No Keeper PVCs found in namespace {namespace}"
+    
+    for pvc in keeper_pvcs:
+        pvc_info = kubernetes.get_pvc_info(namespace=namespace, pvc_name=pvc)
+        actual_size = pvc_info.get("spec", {}).get("resources", {}).get("requests", {}).get("storage")
+        
+        assert actual_size == expected_storage_size, \
+            f"Expected Keeper PVC size {expected_storage_size}, got {actual_size} for {pvc}"
+    
+    note(f"✓ Keeper storage verified: {len(keeper_pvcs)} PVCs with {expected_storage_size}")
+
+
+@TestStep(Then)
+def verify_keeper_annotations(self, namespace, expected_annotations):
+    """Verify that Keeper pods have expected annotations."""
+    keeper_pods = get_keeper_pods(namespace=namespace)
+    assert len(keeper_pods) > 0, "No Keeper pods found"
+    
+    for pod in keeper_pods:
+        pod_info = kubernetes.get_pod_info(namespace=namespace, pod_name=pod)
+        actual_annotations = pod_info.get("metadata", {}).get("annotations", {})
+        
+        for key, value in expected_annotations.items():
+            assert key in actual_annotations, \
+                f"Annotation '{key}' not found in Keeper pod {pod}"
+            assert actual_annotations[key] == value, \
+                f"Expected annotation '{key}={value}', got '{actual_annotations[key]}' in Keeper pod {pod}"
+    
+    note(f"✓ Keeper annotations verified on {len(keeper_pods)} pods")
+
+
+@TestStep(Then)
+def verify_keeper_resources(self, namespace, expected_resources):
+    """Verify that Keeper pods have expected resource requests and limits."""
+    keeper_pods = get_keeper_pods(namespace=namespace)
+    assert len(keeper_pods) > 0, "No Keeper pods found"
+    
+    for pod in keeper_pods:
+        pod_info = kubernetes.get_pod_info(namespace=namespace, pod_name=pod)
+        containers = pod_info.get("spec", {}).get("containers", [])
+        
+        assert len(containers) > 0, f"No containers found in Keeper pod {pod}"
+        
+        # Get the main keeper container (usually the first one)
+        container = containers[0]
+        actual_resources = container.get("resources", {})
+        
+        # Verify requests
+        if 'requests' in expected_resources:
+            assert 'requests' in actual_resources, f"No resource requests in Keeper pod {pod}"
+            for key, value in expected_resources['requests'].items():
+                actual_value = actual_resources['requests'].get(key)
+                assert actual_value == value, \
+                    f"Keeper {pod} request {key}: expected={value}, actual={actual_value}"
+        
+        # Verify limits
+        if 'limits' in expected_resources:
+            assert 'limits' in actual_resources, f"No resource limits in Keeper pod {pod}"
+            for key, value in expected_resources['limits'].items():
+                actual_value = actual_resources['limits'].get(key)
+                assert actual_value == value, \
+                    f"Keeper {pod} limit {key}: expected={value}, actual={actual_value}"
+    
+    note(f"✓ Keeper resources verified on {len(keeper_pods)} pods")

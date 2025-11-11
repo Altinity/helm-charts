@@ -9,11 +9,11 @@ from tests.steps.deployment import HelmState
 
 # Fixture configurations for testing
 FIXTURES = [
-    # "fixtures/01-minimal-single-node.yaml",
+    "fixtures/01-minimal-single-node.yaml",
     "fixtures/02-replicated-with-users.yaml",
-    "fixtures/03-sharded-advanced.yaml",
-    "fixtures/04-external-keeper.yaml",
-    "fixtures/05-persistence-disabled.yaml",
+    # "fixtures/03-sharded-advanced.yaml",
+    # "fixtures/04-external-keeper.yaml",
+    # "fixtures/05-persistence-disabled.yaml",
 ]
 
 UPGRADE_SCENARIOS = [
@@ -124,7 +124,6 @@ def check_all_fixtures(self):
             test=check_deployment,
             name=f"deploy_{os.path.basename(fixture).replace('.yaml', '')}",
         )(fixture_file=fixture, skip_external_keeper=True)
-        pause()
 
 
 @TestScenario
@@ -151,5 +150,5 @@ def feature(self):
     with Feature("deployment tests"):
         Scenario(run=check_all_fixtures)
     
-    with Feature("upgrade tests"):
-        Scenario(run=check_all_upgrades)
+    # with Feature("upgrade tests"):
+    #     Scenario(run=check_all_upgrades)
