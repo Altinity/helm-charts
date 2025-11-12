@@ -10,6 +10,7 @@ import tests.steps.kubernetes as kubernetes
 import tests.steps.clickhouse as clickhouse
 import tests.steps.users as users
 import yaml
+import re
 from pathlib import Path
 
 
@@ -315,6 +316,7 @@ class HelmState:
     def verify_extra_config(self, namespace):
         """Verify extraConfig custom ClickHouse configuration."""
         extra_config = self.clickhouse_config.get("extraConfig", "")
+        admin_password = self.clickhouse_config.get("defaultUser", {}).get("password", "")
 
         if extra_config:
             # Extract key configuration items to verify
@@ -328,9 +330,32 @@ class HelmState:
             if "max_table_size_to_drop" in extra_config:
                 config_keys.append("max_table_size_to_drop")
 
+            # First verify keys exist in CHI
             clickhouse.verify_extra_config(
                 namespace=namespace, expected_config_keys=config_keys
             )
+            
+            # Then verify actual values in system.settings
+            config_values = {}
+            if "max_connections" in extra_config:
+                # Extract value from XML-like config
+                import re
+                match = re.search(r'<max_connections>(\d+)</max_connections>', extra_config)
+                if match:
+                    config_values["max_connections"] = int(match.group(1))
+            
+            if "max_concurrent_queries" in extra_config:
+                match = re.search(r'<max_concurrent_queries>(\d+)</max_concurrent_queries>', extra_config)
+                if match:
+                    config_values["max_concurrent_queries"] = int(match.group(1))
+            
+            if config_values:
+                clickhouse.verify_extra_config_values(
+                    namespace=namespace,
+                    expected_config_values=config_values,
+                    admin_password=admin_password
+                )
+            
             note(f"✓ ExtraConfig verified")
 
     def verify_keeper_storage(self, namespace):
@@ -394,6 +419,59 @@ class HelmState:
                 )
                 note(f"✓ Keeper resources verified")
 
+    def verify_replication_health(self, namespace):
+        """Verify replication health through system tables."""
+        admin_password = self.clickhouse_config.get("defaultUser", {}).get("password", "")
+        expected_replicas = self.clickhouse_config.get("replicasCount", 1)
+        expected_shards = self.clickhouse_config.get("shardsCount", 1)
+        
+        # Only run these checks if we have replicas or shards
+        if expected_replicas > 1 or expected_shards > 1:
+            # Verify system.clusters topology
+            clickhouse.verify_system_clusters(
+                namespace=namespace,
+                expected_shards=expected_shards,
+                expected_replicas=expected_replicas,
+                admin_password=admin_password
+            )
+            
+            # Verify system.replicas health (if replicated tables exist)
+            if expected_replicas > 1:
+                clickhouse.verify_system_replicas_health(
+                    namespace=namespace,
+                    admin_password=admin_password
+                )
+            
+            note(f"✓ Replication health verified")
+
+    def verify_replication_working(self, namespace):
+        """Verify replication actually works by creating and replicating a test table."""
+        admin_password = self.clickhouse_config.get("defaultUser", {}).get("password", "")
+        expected_replicas = self.clickhouse_config.get("replicasCount", 1)
+        
+        # Only test replication if we have multiple replicas
+        if expected_replicas > 1:
+            clickhouse.verify_replication_working(
+                namespace=namespace,
+                admin_password=admin_password
+            )
+            note(f"✓ Replication data test passed")
+
+    def verify_service_endpoints(self, namespace):
+        """Verify service endpoints count matches expected ClickHouse replicas."""
+        expected_ch_count = self.get_expected_clickhouse_pod_count()
+        
+        clickhouse.verify_service_endpoints(
+            namespace=namespace,
+            expected_endpoint_count=expected_ch_count
+        )
+        note(f"✓ Service endpoints: {expected_ch_count}")
+
+    def verify_secrets(self, namespace):
+        """Verify Kubernetes secrets exist for credentials."""
+        clickhouse.verify_secrets_exist(namespace=namespace)
+        note(f"✓ Secrets verified")
+
     def verify_all(self, namespace):
         """Run all verification checks based on configuration.
 
@@ -407,6 +485,22 @@ class HelmState:
 
         # Verify cluster topology (replicas/shards)
         self.verify_cluster_topology(namespace=namespace)
+
+        # Verify replication health for replicated/sharded deployments
+        expected_replicas = self.clickhouse_config.get("replicasCount", 1)
+        expected_shards = self.clickhouse_config.get("shardsCount", 1)
+        if expected_replicas > 1 or expected_shards > 1:
+            self.verify_replication_health(namespace=namespace)
+            
+            # Test actual replication with data (for replicated setups)
+            if expected_replicas > 1:
+                self.verify_replication_working(namespace=namespace)
+
+        # Verify service endpoints count
+        self.verify_service_endpoints(namespace=namespace)
+
+        # Verify secrets exist
+        self.verify_secrets(namespace=namespace)
 
         # Conditional verifications based on what's configured
         if self.values.get("nameOverride"):
