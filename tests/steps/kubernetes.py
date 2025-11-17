@@ -310,19 +310,87 @@ def verify_loadbalancer_service(self, namespace, expected_ranges=None):
     return lb_service_name
 
 
+@TestStep(Then)
+def verify_pvc_access_mode(self, namespace, expected_access_mode, pvc_name_filter, resource_matcher=None):
+    """Verify PVC access mode for PVCs matching filter.
+    
+    Args:
+        namespace: Kubernetes namespace
+        expected_access_mode: Expected access mode (e.g., "ReadWriteOnce")
+        pvc_name_filter: String to filter PVC names (e.g., "data", "logs")
+        resource_matcher: Optional function to check if PVC belongs to target resource
+    
+    Returns:
+        Name of verified PVC
+    """
+    pvcs = get_pvcs(namespace=namespace)
+    
+    # Find matching PVCs
+    for pvc in pvcs:
+        if pvc_name_filter in pvc.lower():
+            # Apply resource matcher if provided
+            if resource_matcher and not resource_matcher(resource_name=pvc):
+                continue
+                
+            pvc_info = get_pvc_info(namespace=namespace, pvc_name=pvc)
+            access_modes = pvc_info.get("spec", {}).get("accessModes", [])
+            
+            assert (
+                expected_access_mode in access_modes
+            ), f"Expected accessMode {expected_access_mode} in PVC {pvc}, got {access_modes}"
+            
+            note(f"✓ PVC {pvc_name_filter} accessMode: {expected_access_mode}")
+            return pvc
+    
+    raise AssertionError(f"No {pvc_name_filter} PVC found for verification")
+
+
 @TestStep(When)
+def get_endpoints_info(self, namespace, endpoints_name):
+    """Get detailed information about Kubernetes endpoints.
+    
+    Args:
+        namespace: Kubernetes namespace
+        endpoints_name: Name of the endpoints resource
+        
+    Returns:
+        dict: Endpoints information
+    """
+    endpoints_info = run(
+        cmd=f"kubectl get endpoints {endpoints_name} -n {namespace} -o json"
+    )
+    return json.loads(endpoints_info.stdout)
+
+
+@TestStep(When)
+def get_secrets(self, namespace):
+    """Get list of secret names in a namespace.
+    
+    Args:
+        namespace: Kubernetes namespace
+        
+    Returns:
+        list: List of secret names
+    """
+    secrets_info = run(cmd=f"kubectl get secrets -n {namespace} -o json")
+    secrets_data = json.loads(secrets_info.stdout)
+    return [item["metadata"]["name"] for item in secrets_data.get("items", [])]
+
+
+@TestStep(Finally)
 def delete_namespace(self, namespace):
-    """Delete a Kubernetes namespace and wait for it to be removed.
+    """Delete a Kubernetes namespace.
 
     Args:
         namespace: Kubernetes namespace to delete
     """
-    try:
-        note(f"Deleting namespace: {namespace}")
-        run(
-            cmd=f"kubectl delete namespace {namespace} --wait=true --timeout=300s",
-            exitcode=None,
-        )
-        note(f"✓ Namespace {namespace} deleted")
-    except Exception as e:
-        note(f"Warning: Failed to delete namespace {namespace}: {e}")
+    note(f"Deleting namespace: {namespace}")
+    
+    # Just delete the namespace and force-remove finalizers if it hangs
+    run(
+        cmd=f"timeout 15 kubectl delete namespace {namespace} --wait=true 2>/dev/null || "
+            f"kubectl patch namespace {namespace} -p '{{\"metadata\":{{\"finalizers\":null}}}}' --type=merge 2>/dev/null",
+        check=False
+    )
+    
+    note(f"✓ Namespace {namespace} deleted")

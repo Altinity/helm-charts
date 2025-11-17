@@ -10,7 +10,6 @@ import tests.steps.kubernetes as kubernetes
 import tests.steps.clickhouse as clickhouse
 import tests.steps.users as users
 import yaml
-import re
 from pathlib import Path
 
 
@@ -128,28 +127,10 @@ class HelmState:
         expected_replicas = self.clickhouse_config.get("replicasCount", 1)
         expected_shards = self.clickhouse_config.get("shardsCount", 1)
 
-        # Get actual cluster topology from CHI
-        chi_info = clickhouse.get_chi_info(namespace=namespace)
-        assert chi_info is not None, "ClickHouseInstallation not found"
-
-        clusters = chi_info.get("spec", {}).get("configuration", {}).get("clusters", [])
-        assert len(clusters) > 0, "No clusters found in CHI"
-
-        cluster = clusters[0]
-        layout = cluster.get("layout", {})
-
-        actual_replicas = layout.get("replicasCount")
-        actual_shards = layout.get("shardsCount")
-
-        assert (
-            actual_replicas == expected_replicas
-        ), f"Expected {expected_replicas} replicas, got {actual_replicas}"
-        assert (
-            actual_shards == expected_shards
-        ), f"Expected {expected_shards} shards, got {actual_shards}"
-
-        note(
-            f"✓ Cluster topology: {expected_replicas} replicas, {expected_shards} shards"
+        clickhouse.verify_chi_cluster_topology(
+            namespace=namespace,
+            expected_replicas=expected_replicas,
+            expected_shards=expected_shards
         )
 
     def verify_name_override(self, namespace):
@@ -177,32 +158,12 @@ class HelmState:
         )
 
         # Verify PVC access mode
-        self.verify_pvc_access_mode(
+        kubernetes.verify_pvc_access_mode(
             namespace=namespace,
             expected_access_mode=expected_access_mode,
-            pvc_type="data",
+            pvc_name_filter="data",
+            resource_matcher=clickhouse.is_clickhouse_resource
         )
-
-    def verify_pvc_access_mode(self, namespace, expected_access_mode, pvc_type="data"):
-        """Verify PVC access mode."""
-        pvcs = kubernetes.get_pvcs(namespace=namespace)
-
-        # Find ClickHouse PVCs by type
-        for pvc in pvcs:
-            if pvc_type in pvc.lower() and clickhouse.is_clickhouse_resource(
-                resource_name=pvc
-            ):
-                pvc_info = kubernetes.get_pvc_info(namespace=namespace, pvc_name=pvc)
-                access_modes = pvc_info.get("spec", {}).get("accessModes", [])
-
-                assert (
-                    expected_access_mode in access_modes
-                ), f"Expected accessMode {expected_access_mode} in PVC {pvc}, got {access_modes}"
-
-                note(f"✓ PVC {pvc_type} accessMode: {expected_access_mode}")
-                return
-
-        raise AssertionError(f"No {pvc_type} PVC found for verification")
 
     def verify_service(self, namespace):
         """Verify LoadBalancer service configuration."""
@@ -307,10 +268,11 @@ class HelmState:
             note(f"✓ Log persistence: {expected_log_size}")
 
             # Verify log PVC access mode
-            self.verify_pvc_access_mode(
+            kubernetes.verify_pvc_access_mode(
                 namespace=namespace,
                 expected_access_mode=expected_access_mode,
-                pvc_type="logs",
+                pvc_name_filter="logs",
+                resource_matcher=clickhouse.is_clickhouse_resource
             )
 
     def verify_extra_config(self, namespace):
@@ -319,16 +281,10 @@ class HelmState:
         admin_password = self.clickhouse_config.get("defaultUser", {}).get("password", "")
 
         if extra_config:
-            # Extract key configuration items to verify
-            config_keys = []
-            if "max_connections" in extra_config:
-                config_keys.append("max_connections")
-            if "max_concurrent_queries" in extra_config:
-                config_keys.append("max_concurrent_queries")
-            if "logger" in extra_config:
-                config_keys.append("logger")
-            if "max_table_size_to_drop" in extra_config:
-                config_keys.append("max_table_size_to_drop")
+            # Extract config keys for presence verification
+            config_keys = clickhouse.extract_extra_config_keys(
+                extra_config_xml=extra_config
+            )
 
             # First verify keys exist in CHI
             clickhouse.verify_extra_config(
@@ -336,18 +292,9 @@ class HelmState:
             )
             
             # Then verify actual values in system.settings
-            config_values = {}
-            if "max_connections" in extra_config:
-                # Extract value from XML-like config
-                import re
-                match = re.search(r'<max_connections>(\d+)</max_connections>', extra_config)
-                if match:
-                    config_values["max_connections"] = int(match.group(1))
-            
-            if "max_concurrent_queries" in extra_config:
-                match = re.search(r'<max_concurrent_queries>(\d+)</max_concurrent_queries>', extra_config)
-                if match:
-                    config_values["max_concurrent_queries"] = int(match.group(1))
+            config_values = clickhouse.parse_extra_config_values(
+                extra_config_xml=extra_config
+            )
             
             if config_values:
                 clickhouse.verify_extra_config_values(
@@ -384,34 +331,10 @@ class HelmState:
         resources_config = self.keeper_config.get("resources", {})
 
         if resources_config:
-            # Convert from the Helm chart format to standard Kubernetes format
-            expected_resources = {}
-
-            # Handle requests
-            if (
-                "cpuRequestsMs" in resources_config
-                or "memoryRequestsMiB" in resources_config
-            ):
-                expected_resources["requests"] = {}
-                if "cpuRequestsMs" in resources_config:
-                    cpu_ms = resources_config["cpuRequestsMs"]
-                    expected_resources["requests"]["cpu"] = f"{cpu_ms}m"
-                if "memoryRequestsMiB" in resources_config:
-                    memory = resources_config["memoryRequestsMiB"]
-                    expected_resources["requests"]["memory"] = memory
-
-            # Handle limits
-            if (
-                "cpuLimitsMs" in resources_config
-                or "memoryLimitsMiB" in resources_config
-            ):
-                expected_resources["limits"] = {}
-                if "cpuLimitsMs" in resources_config:
-                    cpu_ms = resources_config["cpuLimitsMs"]
-                    expected_resources["limits"]["cpu"] = f"{cpu_ms}m"
-                if "memoryLimitsMiB" in resources_config:
-                    memory = resources_config["memoryLimitsMiB"]
-                    expected_resources["limits"]["memory"] = memory
+            # Convert from Helm format to Kubernetes format
+            expected_resources = clickhouse.convert_helm_resources_to_k8s(
+                helm_resources=resources_config
+            )
 
             if expected_resources:
                 clickhouse.verify_keeper_resources(

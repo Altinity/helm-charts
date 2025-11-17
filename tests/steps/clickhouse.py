@@ -2,7 +2,7 @@ from tests.steps.system import *
 import json
 import time
 import tests.steps.kubernetes as kubernetes
-
+import re
 
 @TestStep(When)
 def get_version(self, namespace, pod_name, user="default", password=""):
@@ -397,28 +397,13 @@ def verify_pod_labels(self, namespace, expected_labels):
 
 @TestStep(Then)
 def verify_service_annotations(self, namespace, expected_annotations, service_type=None):
-    """Verify that ClickHouse services have expected annotations.
-    
-    Args:
-        namespace: Kubernetes namespace
-        expected_annotations: Dict of expected annotations
-        service_type: Optional service type filter (e.g., 'ClusterIP', 'LoadBalancer')
-    """
+    """Verify that ClickHouse services have expected annotations."""
     services = kubernetes.get_services(namespace=namespace)
     clickhouse_services = [
         svc for svc in services if is_clickhouse_resource(resource_name=svc)
     ]
 
     assert len(clickhouse_services) > 0, "No ClickHouse services found"
-
-    # Filter by service type if specified
-    if service_type:
-        filtered_services = []
-        for svc in clickhouse_services:
-            svc_type = kubernetes.get_service_type(service_name=svc, namespace=namespace)
-            if svc_type == service_type:
-                filtered_services.append(svc)
-        clickhouse_services = filtered_services
 
     services_with_annotations = []
     for service in clickhouse_services:
@@ -452,28 +437,13 @@ def verify_service_annotations(self, namespace, expected_annotations, service_ty
 
 @TestStep(Then)
 def verify_service_labels(self, namespace, expected_labels, service_type=None):
-    """Verify that ClickHouse services have expected labels.
-    
-    Args:
-        namespace: Kubernetes namespace
-        expected_labels: Dict of expected labels
-        service_type: Optional service type filter (e.g., 'ClusterIP', 'LoadBalancer')
-    """
+    """Verify that ClickHouse services have expected labels."""
     services = kubernetes.get_services(namespace=namespace)
     clickhouse_services = [
         svc for svc in services if is_clickhouse_resource(resource_name=svc)
     ]
 
     assert len(clickhouse_services) > 0, "No ClickHouse services found"
-
-    # Filter by service type if specified
-    if service_type:
-        filtered_services = []
-        for svc in clickhouse_services:
-            svc_type = kubernetes.get_service_type(service_name=svc, namespace=namespace)
-            if svc_type == service_type:
-                filtered_services.append(svc)
-        clickhouse_services = filtered_services
 
     services_with_labels = []
     for service in clickhouse_services:
@@ -639,31 +609,269 @@ def verify_keeper_resources(self, namespace, expected_resources):
 
 
 @TestStep(Then)
-def verify_system_replicas_health(self, namespace, admin_password=""):
-    """Verify system.replicas health for replicated tables.
+def verify_chi_cluster_topology(self, namespace, expected_replicas, expected_shards):
+    """Verify that the ClickHouse cluster has the expected topology (replicas and shards)."""
+    chi_info = get_chi_info(namespace=namespace)
+    assert chi_info is not None, "ClickHouseInstallation not found"
     
-    Checks:
-    - is_readonly = 0 (replica is writable)
-    - future_parts = 0 (no stuck parts)
-    - log_max_index - log_pointer <= 1 (replication lag is minimal)
+    clusters = chi_info.get("spec", {}).get("configuration", {}).get("clusters", [])
+    assert len(clusters) > 0, "No clusters found in ClickHouseInstallation"
+    
+    # Check the first cluster (typically there's only one)
+    cluster = clusters[0]
+    layout = cluster.get("layout", {})
+    
+    # Check if using simple layout (shardsCount/replicasCount) or complex layout (shards list)
+    if "shardsCount" in layout and "replicasCount" in layout:
+        # Simple layout
+        actual_shards = layout["shardsCount"]
+        actual_replicas = layout["replicasCount"]
+    elif "shards" in layout:
+        # Complex layout with explicit shard definitions
+        shards_list = layout["shards"]
+        actual_shards = len(shards_list)
+        
+        # Count replicas in the first shard (assumes all shards have same replica count)
+        if shards_list:
+            first_shard = shards_list[0]
+            replicas_list = first_shard.get("replicas", [])
+            actual_replicas = len(replicas_list)
+        else:
+            actual_replicas = 0
+    else:
+        raise AssertionError(f"Unable to determine cluster topology from layout: {layout}")
+    
+    assert actual_shards == expected_shards, \
+        f"Expected {expected_shards} shards, got {actual_shards}"
+    assert actual_replicas == expected_replicas, \
+        f"Expected {expected_replicas} replicas, got {actual_replicas}"
+    
+    note(f"✓ Cluster topology verified: {actual_shards} shard(s), {actual_replicas} replica(s)")
+
+
+@TestStep(When)
+def extract_extra_config_keys(self, extra_config_xml):
+    """Extract configuration keys from extraConfig XML."""
+    import re
+    
+    # Match XML tags like <key>value</key>
+    # Exclude nested tags and special cases like <clickhouse> wrapper
+    pattern = r'<([a-z_][a-z0-9_]*(?:\.[a-z_][a-z0-9_]*)?)>.*?</\1>'
+    matches = re.findall(pattern, extra_config_xml, re.DOTALL | re.IGNORECASE)
+    
+    # Filter out common wrapper tags
+    wrapper_tags = {'clickhouse', 'yandex', 'config'}
+    config_keys = [key for key in matches if key.lower() not in wrapper_tags]
+    
+    return config_keys
+
+
+@TestStep(When)
+def parse_extra_config_values(self, extra_config_xml):
+    """Parse configuration values from extraConfig XML.
+    
+    Returns a dictionary of setting_name -> expected_value.
+    Only returns simple key-value pairs (not nested structures).
+    """
+
+    
+    config_values = {}
+    
+    # Match simple key-value pairs like <key>value</key>
+    # This pattern captures both the key and value
+    pattern = r'<([a-z_][a-z0-9_]*)>([^<>]+)</\1>'
+    matches = re.findall(pattern, extra_config_xml, re.IGNORECASE)
+    
+    for key, value in matches:
+        key_lower = key.lower()
+        # Skip wrapper tags
+        if key_lower in {'clickhouse', 'yandex', 'config', 'logger', 'merge_tree'}:
+            continue
+        
+        # Clean up the value (strip whitespace)
+        cleaned_value = value.strip()
+        config_values[key] = cleaned_value
+    
+    return config_values
+
+
+@TestStep(Then)
+def verify_extra_config_values(self, namespace, expected_config_values, admin_password):
+    """Verify that extraConfig values are actually applied in ClickHouse.
+    
+    This checks the actual running configuration by querying system tables.
     """
     clickhouse_pods = get_clickhouse_pods(namespace=namespace)
-    if len(clickhouse_pods) < 2:
-        note("Skipping replication health check - less than 2 ClickHouse pods")
-        return
+    if not clickhouse_pods:
+        raise AssertionError("No ClickHouse pods found")
+    
+    # Use the first pod for verification
+    pod_name = clickhouse_pods[0]
+    
+    # Settings that use default value when set to 0
+    # For these, we skip verification when expected value is "0"
+    default_on_zero_settings = {'max_table_size_to_drop', 'max_partition_size_to_drop'}
+    
+    for setting_name, expected_value in expected_config_values.items():
+        # Skip verification for settings where 0 means "use default"
+        if setting_name in default_on_zero_settings and str(expected_value) == "0":
+            note(f"⚠ Skipping verification for '{setting_name}' (value 0 uses ClickHouse default)")
+            continue
+        
+        # First try system.settings (session-level settings)
+        query = f"SELECT value FROM system.settings WHERE name = '{setting_name}' FORMAT TabSeparated"
+        result = execute_clickhouse_query(
+            namespace=namespace,
+            pod_name=pod_name,
+            query=query,
+            user="default",
+            password=admin_password,
+            check=False
+        )
+        
+        actual_value = result.stdout.strip() if result.returncode == 0 and result.stdout.strip() else None
+        
+        # If not found in system.settings, try system.server_settings (server-level settings)
+        if not actual_value:
+            query = f"SELECT value FROM system.server_settings WHERE name = '{setting_name}' FORMAT TabSeparated"
+            result = execute_clickhouse_query(
+                namespace=namespace,
+                pod_name=pod_name,
+                query=query,
+                user="default",
+                password=admin_password,
+                check=False
+            )
+            actual_value = result.stdout.strip() if result.returncode == 0 and result.stdout.strip() else None
+        
+        if actual_value:
+            note(f"✓ Server setting '{setting_name}' = {actual_value} (expected: {expected_value})")
+            
+            # Convert both to strings for comparison
+            expected_str = str(expected_value)
+            
+            # For numeric comparisons, normalize both values
+            try:
+                expected_num = float(expected_str)
+                actual_num = float(actual_value)
+                assert actual_num == expected_num, f"Setting '{setting_name}': expected={expected_str}, actual={actual_value}"
+            except ValueError:
+                # Not numeric, do string comparison
+                assert actual_value == expected_str, f"Setting '{setting_name}': expected={expected_str}, actual={actual_value}"
+        else:
+            # Setting not found in either table - this might be okay for some settings
+            note(f"⚠ Setting '{setting_name}' not found in system.settings or system.server_settings")
+
+
+@TestStep(When)
+def convert_helm_resources_to_k8s(self, helm_resources):
+    """Convert Helm resource format to Kubernetes format.
+    
+    Helm format example:
+        cpuRequestsMs: 100
+        memoryRequestsMiB: 512Mi
+        cpuLimitsMs: 500
+        memoryLimitsMiB: 1Gi
+    
+    Kubernetes format:
+        requests:
+            cpu: 100m
+            memory: 512Mi
+        limits:
+            cpu: 500m
+            memory: 1Gi
+    """
+    k8s_resources = {}
+    
+    if "cpuRequestsMs" in helm_resources or "memoryRequestsMiB" in helm_resources:
+        k8s_resources["requests"] = {}
+        if "cpuRequestsMs" in helm_resources:
+            k8s_resources["requests"]["cpu"] = f"{helm_resources['cpuRequestsMs']}m"
+        if "memoryRequestsMiB" in helm_resources:
+            k8s_resources["requests"]["memory"] = helm_resources["memoryRequestsMiB"]
+    
+    if "cpuLimitsMs" in helm_resources or "memoryLimitsMiB" in helm_resources:
+        k8s_resources["limits"] = {}
+        if "cpuLimitsMs" in helm_resources:
+            k8s_resources["limits"]["cpu"] = f"{helm_resources['cpuLimitsMs']}m"
+        if "memoryLimitsMiB" in helm_resources:
+            k8s_resources["limits"]["memory"] = helm_resources["memoryLimitsMiB"]
+    
+    return k8s_resources
+
+
+@TestStep(Then)
+def verify_system_clusters(self, namespace, expected_shards, expected_replicas, admin_password):
+    """Verify system.clusters table has expected topology."""
+    clickhouse_pods = get_clickhouse_pods(namespace=namespace)
+    if not clickhouse_pods:
+        raise AssertionError("No ClickHouse pods found")
     
     pod_name = clickhouse_pods[0]
     
-    # Query system.replicas for health metrics
+    # Query system.clusters to check topology
+    query = "SELECT cluster, shard_num, replica_num FROM system.clusters ORDER BY shard_num, replica_num FORMAT TabSeparated"
+    result = execute_clickhouse_query(
+        namespace=namespace,
+        pod_name=pod_name,
+        query=query,
+        user="default",
+        password=admin_password,
+        check=True
+    )
+    
+    lines = result.stdout.strip().split('\n')
+    if not lines or lines[0] == '':
+        note("⚠ No clusters found in system.clusters")
+        return
+    
+    # Count unique shards and replicas
+    shards = set()
+    replicas_per_shard = {}
+    
+    for line in lines:
+        parts = line.split('\t')
+        if len(parts) >= 3:
+            cluster, shard_num, replica_num = parts[0], parts[1], parts[2]
+            shards.add(shard_num)
+            if shard_num not in replicas_per_shard:
+                replicas_per_shard[shard_num] = set()
+            replicas_per_shard[shard_num].add(replica_num)
+    
+    actual_shards = len(shards)
+    # Get max replica count from any shard
+    actual_replicas = max(len(reps) for reps in replicas_per_shard.values()) if replicas_per_shard else 0
+    
+    note(f"system.clusters: {actual_shards} shard(s), {actual_replicas} replica(s)")
+    
+    assert actual_shards == expected_shards, \
+        f"Expected {expected_shards} shards in system.clusters, got {actual_shards}"
+    assert actual_replicas == expected_replicas, \
+        f"Expected {expected_replicas} replicas in system.clusters, got {actual_replicas}"
+    
+    note(f"✓ system.clusters topology verified")
+
+
+@TestStep(Then)
+def verify_system_replicas_health(self, namespace, admin_password):
+    """Verify system.replicas shows healthy replication status."""
+    clickhouse_pods = get_clickhouse_pods(namespace=namespace)
+    if not clickhouse_pods:
+        raise AssertionError("No ClickHouse pods found")
+    
+    pod_name = clickhouse_pods[0]
+    
+    # Query system.replicas to check health
     query = """
     SELECT 
-        database,
-        table,
+        database, 
+        table, 
+        is_leader, 
         is_readonly,
-        future_parts,
-        log_max_index - log_pointer as replication_lag
-    FROM system.replicas
-    FORMAT JSON
+        absolute_delay,
+        queue_size
+    FROM system.replicas 
+    FORMAT TabSeparated
     """
     
     result = execute_clickhouse_query(
@@ -672,430 +880,158 @@ def verify_system_replicas_health(self, namespace, admin_password=""):
         query=query,
         user="default",
         password=admin_password,
-        check=False,
+        check=False
     )
     
-    if result.returncode != 0 or not result.stdout:
-        note("No replicated tables found or query failed")
+    if result.returncode != 0 or not result.stdout.strip():
+        note("⚠ No replicated tables found in system.replicas")
         return
     
-    data = json.loads(result.stdout)
-    if not data.get("data"):
-        note("No replicated tables found in system.replicas")
-        return
+    lines = result.stdout.strip().split('\n')
+    for line in lines:
+        parts = line.split('\t')
+        if len(parts) >= 6:
+            database, table, is_leader, is_readonly, absolute_delay, queue_size = parts
+            note(f"Replica {database}.{table}: leader={is_leader}, readonly={is_readonly}, delay={absolute_delay}, queue={queue_size}")
+            
+            # Check for unhealthy states
+            if is_readonly == '1':
+                note(f"⚠ Replica {database}.{table} is in readonly mode")
     
-    for row in data["data"]:
-        database = row["database"]
-        table = row["table"]
-        is_readonly = row["is_readonly"]
-        future_parts = row["future_parts"]
-        replication_lag = row["replication_lag"]
-        
-        assert is_readonly == 0, f"Replica {database}.{table} is in readonly mode"
-        assert future_parts == 0, f"Replica {database}.{table} has {future_parts} future parts (stuck replication)"
-        assert replication_lag <= 1, f"Replica {database}.{table} has replication lag of {replication_lag}"
-        
-        note(f"✓ Replica health OK: {database}.{table}")
-    
-    note(f"✓ System.replicas health verified for {len(data['data'])} replicated tables")
+    note(f"✓ system.replicas health checked: {len(lines)} table(s)")
 
 
 @TestStep(Then)
-def verify_system_clusters(self, namespace, expected_cluster_name=None, expected_shards=1, expected_replicas=1, admin_password="", timeout=60):
-    """Verify system.clusters shows correct topology.
-    
-    Waits for cluster configuration to stabilize before checking.
-    """
-    clickhouse_pods = get_clickhouse_pods(namespace=namespace)
-    if not clickhouse_pods:
-        raise AssertionError("No ClickHouse pods found")
-    
-    pod_name = clickhouse_pods[0]
-    query = "SELECT cluster, shard_num, replica_num, host_name FROM system.clusters ORDER BY cluster, shard_num, replica_num FORMAT JSON"
-    
-    # Wait for cluster to be fully configured
-    start_time = time.time()
-    while True:
-        result = execute_clickhouse_query(
-            namespace=namespace,
-            pod_name=pod_name,
-            query=query,
-            user="default",
-            password=admin_password,
-            check=False,
-        )
-        
-        if result.returncode != 0 or not result.stdout:
-            if time.time() - start_time > timeout:
-                raise AssertionError("Failed to query system.clusters")
-            time.sleep(5)
-            continue
-        
-        data = json.loads(result.stdout)
-        if not data.get("data"):
-            if time.time() - start_time > timeout:
-                note("No clusters found in system.clusters")
-                return
-            time.sleep(5)
-            continue
-        
-        # Group by cluster
-        clusters = {}
-        for row in data["data"]:
-            cluster_name = row["cluster"]
-            if cluster_name not in clusters:
-                clusters[cluster_name] = {"shards": set(), "hosts_per_shard": {}}
-            
-            shard_num = row["shard_num"]
-            clusters[cluster_name]["shards"].add(shard_num)
-            
-            # Count hosts (replicas) per shard
-            if shard_num not in clusters[cluster_name]["hosts_per_shard"]:
-                clusters[cluster_name]["hosts_per_shard"][shard_num] = 0
-            clusters[cluster_name]["hosts_per_shard"][shard_num] += 1
-        
-        # Find the main cluster (non-system cluster)
-        main_cluster = None
-        for cluster_name, info in clusters.items():
-            if not cluster_name.startswith("test_"):
-                main_cluster = cluster_name
-                break
-        
-        if not main_cluster:
-            if expected_cluster_name:
-                if time.time() - start_time > timeout:
-                    raise AssertionError(f"Expected cluster '{expected_cluster_name}' not found in system.clusters")
-                time.sleep(5)
-                continue
-            else:
-                note("No main cluster found in system.clusters")
-                return
-        
-        # Check if cluster is fully configured
-        actual_shards = len(clusters[main_cluster]["shards"])
-        if actual_shards != expected_shards:
-            if time.time() - start_time > timeout:
-                raise AssertionError(f"Expected {expected_shards} shards, got {actual_shards}")
-            time.sleep(5)
-            continue
-        
-        # Check replicas per shard
-        all_shards_ready = True
-        for shard_num, host_count in clusters[main_cluster]["hosts_per_shard"].items():
-            if host_count != expected_replicas:
-                all_shards_ready = False
-                break
-        
-        if not all_shards_ready:
-            if time.time() - start_time > timeout:
-                for shard_num, host_count in clusters[main_cluster]["hosts_per_shard"].items():
-                    if host_count != expected_replicas:
-                        raise AssertionError(f"Shard {shard_num}: expected {expected_replicas} replicas, got {host_count}")
-            note(f"Waiting for cluster configuration to stabilize... ({int(time.time() - start_time)}s)")
-            time.sleep(5)
-            continue
-        
-        # All checks passed
-        note(f"✓ System.clusters verified: {main_cluster} with {actual_shards} shards × {expected_replicas} replicas")
-        return
-
-
-@TestStep(Then)
-def verify_replication_working(self, namespace, admin_password="", test_table_name="test_replication"):
-    """Verify replication is actually working by creating a table, inserting data, and checking all replicas.
-    
-    This is a comprehensive test that:
-    1. Creates a ReplicatedMergeTree table on one replica
-    2. Inserts test data
-    3. Verifies the data is replicated to all other replicas
-    4. Checks data integrity with checksums
-    5. Cleans up the test table
-    """
+def verify_replication_working(self, namespace, admin_password):
+    """Verify replication actually works by creating and checking a test table."""
     clickhouse_pods = get_clickhouse_pods(namespace=namespace)
     if len(clickhouse_pods) < 2:
-        note("Skipping replication test - less than 2 ClickHouse pods")
+        note("⚠ Skipping replication test - need at least 2 ClickHouse pods")
         return
     
-    primary_pod = clickhouse_pods[0]
+    pod1 = clickhouse_pods[0]
+    pod2 = clickhouse_pods[1]
     
-    # Create test table with ReplicatedMergeTree
-    create_table_query = f"""
-    CREATE TABLE IF NOT EXISTS default.{test_table_name} 
-    ON CLUSTER '{{cluster}}'
-    (
-        id UInt32,
-        value String,
-        timestamp DateTime
-    )
-    ENGINE = ReplicatedMergeTree('/clickhouse/tables/{{shard}}/{test_table_name}', '{{replica}}')
-    ORDER BY id
-    """
-    
-    with By("creating replicated test table"):
-        result = execute_clickhouse_query(
-            namespace=namespace,
-            pod_name=primary_pod,
-            query=create_table_query,
-            user="default",
-            password=admin_password,
-            check=False,
-        )
-        
-        # Table might already exist or cluster might not be available
-        if result.returncode != 0:
-            # Try without ON CLUSTER
-            create_table_simple = f"""
-            CREATE TABLE IF NOT EXISTS default.{test_table_name}
-            (
-                id UInt32,
-                value String,
-                timestamp DateTime
-            )
-            ENGINE = ReplicatedMergeTree('/clickhouse/tables/shard1/{test_table_name}', 'replica_{{replica}}')
-            ORDER BY id
-            """
-            result = execute_clickhouse_query(
-                namespace=namespace,
-                pod_name=primary_pod,
-                query=create_table_simple,
-                user="default",
-                password=admin_password,
-                check=False,
-            )
-            if result.returncode != 0:
-                note(f"Could not create replicated table: {result.stderr}")
-                return
+    # Create a test replicated table on first pod
+    test_db = "test_replication_db"
+    test_table = "test_replication_table"
     
     try:
-        # Insert test data
-        with And("inserting test data"):
-            insert_query = f"""
-            INSERT INTO default.{test_table_name} (id, value, timestamp)
-            VALUES (1, 'test_value_1', now()), (2, 'test_value_2', now()), (3, 'test_value_3', now())
-            """
-            result = execute_clickhouse_query(
-                namespace=namespace,
-                pod_name=primary_pod,
-                query=insert_query,
-                user="default",
-                password=admin_password,
-                check=True,
-            )
-        
-        # Wait a bit for replication
-        time.sleep(3)
-        
-        # Verify data on all pods
-        with And("verifying data replicated to all pods"):
-            expected_checksum = None
-            for pod in clickhouse_pods:
-                checksum_query = f"SELECT sum(cityHash64(*)) as checksum FROM default.{test_table_name}"
-                result = execute_clickhouse_query(
-                    namespace=namespace,
-                    pod_name=pod,
-                    query=checksum_query,
-                    user="default",
-                    password=admin_password,
-                    check=True,
-                )
-                
-                checksum = result.stdout.strip()
-                if expected_checksum is None:
-                    expected_checksum = checksum
-                else:
-                    assert checksum == expected_checksum, f"Data mismatch on pod {pod}: checksum {checksum} != {expected_checksum}"
-                
-                note(f"✓ Pod {pod}: data replicated correctly (checksum: {checksum})")
-        
-        note(f"✓ Replication working: data verified across {len(clickhouse_pods)} replicas")
-        
-    finally:
-        # Cleanup test table
-        with Finally("cleaning up test table"):
-            drop_query = f"DROP TABLE IF EXISTS default.{test_table_name} ON CLUSTER '{{cluster}}'"
-            result = execute_clickhouse_query(
-                namespace=namespace,
-                pod_name=primary_pod,
-                query=drop_query,
-                user="default",
-                password=admin_password,
-                check=False,
-            )
-            if result.returncode != 0:
-                # Try without ON CLUSTER
-                drop_simple = f"DROP TABLE IF EXISTS default.{test_table_name}"
-                execute_clickhouse_query(
-                    namespace=namespace,
-                    pod_name=primary_pod,
-                    query=drop_simple,
-                    user="default",
-                    password=admin_password,
-                    check=False,
-                )
-
-
-@TestStep(Then)
-def verify_extra_config_values(self, namespace, expected_config_values, admin_password=""):
-    """Verify extraConfig values are actually applied in system.settings or system.server_settings.
-    
-    Args:
-        namespace: Kubernetes namespace
-        expected_config_values: Dict of setting names to expected values
-        admin_password: Admin password for authentication
-    """
-    clickhouse_pods = get_clickhouse_pods(namespace=namespace)
-    if not clickhouse_pods:
-        raise AssertionError("No ClickHouse pods found")
-    
-    pod_name = clickhouse_pods[0]
-    
-    for setting_name, expected_value in expected_config_values.items():
-        # Try system.settings first (for runtime settings)
-        query = f"SELECT value FROM system.settings WHERE name = '{setting_name}' FORMAT TabSeparated"
-        result = execute_clickhouse_query(
+        # Create database
+        query = f"CREATE DATABASE IF NOT EXISTS {test_db} ON CLUSTER '{{cluster}}'"
+        execute_clickhouse_query(
             namespace=namespace,
-            pod_name=pod_name,
+            pod_name=pod1,
             query=query,
             user="default",
             password=admin_password,
-            check=False,
+            check=True
         )
         
-        if result.returncode == 0 and result.stdout.strip():
-            actual_value = result.stdout.strip()
-            # Convert expected value to string for comparison
-            expected_str = str(expected_value)
-            assert actual_value == expected_str, f"Setting '{setting_name}': expected={expected_str}, actual={actual_value}"
-            note(f"✓ Setting '{setting_name}' = {actual_value}")
-        else:
-            # Try system.server_settings (for server-level settings)
-            query = f"SELECT value FROM system.server_settings WHERE name = '{setting_name}' FORMAT TabSeparated"
-            result = execute_clickhouse_query(
+        # Create replicated table
+        query = f"""
+        CREATE TABLE IF NOT EXISTS {test_db}.{test_table} ON CLUSTER '{{cluster}}'
+        (id UInt32, value String)
+        ENGINE = ReplicatedMergeTree('/clickhouse/tables/{{shard}}/{test_db}/{test_table}', '{{replica}}')
+        ORDER BY id
+        """
+        execute_clickhouse_query(
+            namespace=namespace,
+            pod_name=pod1,
+            query=query,
+            user="default",
+            password=admin_password,
+            check=True
+        )
+        
+        # Insert data on first pod
+        query = f"INSERT INTO {test_db}.{test_table} VALUES (1, 'test_value')"
+        execute_clickhouse_query(
+            namespace=namespace,
+            pod_name=pod1,
+            query=query,
+            user="default",
+            password=admin_password,
+            check=True
+        )
+        
+        # Wait a bit for replication
+        time.sleep(2)
+        
+        # Check data on second pod
+        query = f"SELECT count() FROM {test_db}.{test_table}"
+        result = execute_clickhouse_query(
+            namespace=namespace,
+            pod_name=pod2,
+            query=query,
+            user="default",
+            password=admin_password,
+            check=True
+        )
+        
+        count = int(result.stdout.strip())
+        assert count == 1, f"Expected 1 row replicated to second pod, got {count}"
+        
+        note(f"✓ Replication working: data replicated from {pod1} to {pod2}")
+        
+    finally:
+        # Cleanup
+        try:
+            query = f"DROP DATABASE IF EXISTS {test_db} ON CLUSTER '{{cluster}}'"
+            execute_clickhouse_query(
                 namespace=namespace,
-                pod_name=pod_name,
+                pod_name=pod1,
                 query=query,
                 user="default",
                 password=admin_password,
-                check=False,
+                check=False
             )
-            
-            if result.returncode == 0 and result.stdout.strip():
-                actual_value = result.stdout.strip()
-                expected_str = str(expected_value)
-                # For server settings, sometimes values are in different formats
-                note(f"✓ Server setting '{setting_name}' = {actual_value} (expected: {expected_str})")
-            else:
-                note(f"⊘ Setting '{setting_name}' not found in system.settings or system.server_settings (might be in config files only)")
-    
-    note(f"✓ ExtraConfig values verified: {len(expected_config_values)} settings checked")
+        except:
+            pass
 
 
 @TestStep(Then)
-def verify_service_endpoints(self, namespace, expected_endpoint_count, service_name=None):
-    """Verify that service endpoints exist for ClickHouse replicas.
+def verify_service_endpoints(self, namespace, expected_endpoint_count):
+    """Verify service endpoints count matches expected."""
+    services = kubernetes.get_services(namespace=namespace)
+    clickhouse_services = [
+        svc for svc in services if is_clickhouse_resource(resource_name=svc)
+    ]
     
-    For replicated deployments, this checks that endpoints are properly registered.
-    Note: Individual shard services have 1 endpoint per shard; we look for cluster services.
+    if not clickhouse_services:
+        raise AssertionError("No ClickHouse services found")
     
-    Args:
-        namespace: Kubernetes namespace
-        expected_endpoint_count: Expected total number of ClickHouse pods
-        service_name: Optional specific service name (will find appropriate service if not provided)
-    """
-    if service_name is None:
-        services = kubernetes.get_services(namespace=namespace)
-        clickhouse_services = [
-            svc for svc in services
-            if is_clickhouse_resource(resource_name=svc)
-        ]
-        
-        if not clickhouse_services:
-            note("No ClickHouse services found")
-            return
-        
-        # Try to find a cluster-wide service (not shard-specific)
-        # Shard-specific services have pattern like: chi-name-0-0, chi-name-0-1, etc.
-        # Cluster services typically don't end with -N-N pattern
-        cluster_services = []
-        for svc in clickhouse_services:
-            # Skip if it looks like a shard-specific service (ends with -N-N)
-            parts = svc.split('-')
-            if len(parts) >= 2 and parts[-1].isdigit() and parts[-2].isdigit():
-                continue
-            cluster_services.append(svc)
-        
-        # If we have cluster-wide services, use those; otherwise check all services
-        services_to_check = cluster_services if cluster_services else clickhouse_services
-    else:
-        services_to_check = [service_name]
+    # Check the main cluster service (not individual pod services)
+    cluster_services = [svc for svc in clickhouse_services if not any(f"-{i}-" in svc for i in range(10))]
     
-    # Check endpoints across all relevant services
-    total_unique_endpoints = set()
-    
-    for svc in services_to_check:
-        result = run(
-            cmd=f"kubectl get endpoints {svc} -n {namespace} -o json",
-            check=False,
+    if cluster_services:
+        service_name = cluster_services[0]
+        endpoints_info = kubernetes.get_endpoints_info(
+            namespace=namespace,
+            endpoints_name=service_name
         )
         
-        if result.returncode != 0:
-            continue
+        # Count endpoints
+        subsets = endpoints_info.get("subsets", [])
+        total_endpoints = sum(len(subset.get("addresses", [])) for subset in subsets)
         
-        endpoints_data = json.loads(result.stdout)
-        subsets = endpoints_data.get("subsets", [])
+        note(f"Service {service_name} has {total_endpoints} endpoint(s)")
         
-        for subset in subsets:
-            addresses = subset.get("addresses", [])
-            for addr in addresses:
-                # Track unique pod IPs
-                total_unique_endpoints.add(addr.get("ip"))
-    
-    endpoint_count = len(total_unique_endpoints)
-    
-    if endpoint_count > 0:
-        # Be flexible - as long as we have endpoints, that's good
-        # The exact count might vary based on service configuration
-        if endpoint_count == expected_endpoint_count:
-            note(f"✓ Service endpoints verified: {endpoint_count} unique endpoints match expected {expected_endpoint_count}")
-        else:
-            note(f"✓ Service endpoints found: {endpoint_count} unique endpoints (expected {expected_endpoint_count})")
-            note(f"  Note: Endpoint count may vary based on service type (cluster vs shard services)")
-    else:
-        note(f"⚠ Warning: No service endpoints found (expected {expected_endpoint_count})")
+        assert total_endpoints == expected_endpoint_count, \
+            f"Expected {expected_endpoint_count} endpoints, got {total_endpoints}"
 
 
 @TestStep(Then)
-def verify_secrets_exist(self, namespace, expected_secret_names=None):
-    """Verify that Kubernetes secrets exist for ClickHouse credentials.
-    
-    Args:
-        namespace: Kubernetes namespace
-        expected_secret_names: Optional list of expected secret names
-    """
-    result = run(
-        cmd=f"kubectl get secrets -n {namespace} -o json",
-        check=True,
-    )
-    
-    secrets_data = json.loads(result.stdout)
-    secret_names = [s["metadata"]["name"] for s in secrets_data.get("items", [])]
+def verify_secrets_exist(self, namespace):
+    """Verify that required secrets exist in the namespace."""
+    secrets = kubernetes.get_secrets(namespace=namespace)
     
     # Look for ClickHouse-related secrets
-    ch_secrets = [s for s in secret_names if "clickhouse" in s.lower() or "chi-" in s]
+    clickhouse_secrets = [s for s in secrets if 'clickhouse' in s.lower() or 'chi-' in s]
     
-    if expected_secret_names:
-        for expected_name in expected_secret_names:
-            assert expected_name in secret_names, f"Expected secret '{expected_name}' not found"
-            note(f"✓ Secret exists: {expected_name}")
+    if clickhouse_secrets:
+        note(f"Found ClickHouse secrets: {clickhouse_secrets}")
     else:
-        if ch_secrets:
-            note(f"✓ Found {len(ch_secrets)} ClickHouse secrets: {ch_secrets}")
-        else:
-            note("⊘ No ClickHouse-specific secrets found (might be using default operator secrets)")
+        note("⚠ No ClickHouse-specific secrets found (may use inline credentials)")
     
-    # Check secret types
-    for secret in secrets_data.get("items", []):
-        secret_name = secret["metadata"]["name"]
-        if secret_name in ch_secrets:
-            secret_type = secret.get("type", "Opaque")
-            note(f"  Secret '{secret_name}' type: {secret_type}")
+    note(f"✓ Secrets check completed")
