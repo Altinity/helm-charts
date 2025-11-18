@@ -4,6 +4,38 @@ import time
 import tests.steps.kubernetes as kubernetes
 import re
 
+
+def wait_until(check_fn, timeout=60, interval=5, timeout_msg="Operation timed out"):
+    """Generic retry helper that waits until a condition is met.
+    
+    Args:
+        check_fn: Function that returns (success: bool, result: any, status_msg: str)
+        timeout: Maximum time to wait in seconds
+        interval: Time between retries in seconds
+        timeout_msg: Error message if timeout occurs
+        
+    Returns:
+        The result from check_fn when successful
+        
+    Raises:
+        TimeoutError: If condition not met within timeout
+    """
+    start_time = time.time()
+    
+    while True:
+        success, result, status_msg = check_fn()
+        
+        if success:
+            return result
+            
+        if time.time() - start_time > timeout:
+            raise TimeoutError(f"{timeout_msg}. Last status: {status_msg}")
+            
+        if status_msg:
+            note(status_msg)
+        time.sleep(interval)
+
+
 @TestStep(When)
 def get_version(self, namespace, pod_name, user="default", password=""):
     """Get ClickHouse version from the specified pod."""
@@ -84,52 +116,32 @@ def get_clickhouse_pods(self, namespace):
 @TestStep(When)
 def wait_for_clickhouse_pods_running(self, namespace, expected_count=None, timeout=300):
     """Wait for ClickHouse pods to be running and ready."""
-    start_time = time.time()
-    while True:
+    
+    def check_pods():
         clickhouse_pods = get_clickhouse_pods(namespace=namespace)
-
-        if expected_count and len(clickhouse_pods) != expected_count:
-            if time.time() - start_time > timeout:
-                raise TimeoutError(
-                    f"Timeout waiting for {expected_count} ClickHouse pods, got {len(clickhouse_pods)}"
-                )
-            time.sleep(5)
-            continue
-
+        
         if len(clickhouse_pods) == 0:
-            if time.time() - start_time > timeout:
-                raise TimeoutError("Timeout waiting for ClickHouse pods to be created")
-            time.sleep(5)
-            continue
-
-        all_running = True
-
+            return (False, None, "No ClickHouse pods found yet")
+        
+        if expected_count and len(clickhouse_pods) != expected_count:
+            return (False, None, f"Expected {expected_count} pods, found {len(clickhouse_pods)}")
+        
+        not_running = []
         for pod in clickhouse_pods:
-            if not kubernetes.check_status(
-                pod_name=pod, namespace=namespace, status="Running"
-            ):
-                all_running = False
-                break
-
-        if all_running:
-            return clickhouse_pods
-
-        if time.time() - start_time > timeout:
-            pod_statuses = []
-            for pod in clickhouse_pods:
-                status = (
-                    "Running"
-                    if kubernetes.check_status(
-                        pod_name=pod, namespace=namespace, status="Running"
-                    )
-                    else "Not Running"
-                )
-                pod_statuses.append(f"{pod}: {status}")
-            raise TimeoutError(
-                f"Timeout waiting for ClickHouse pods to be running. Pod statuses: {pod_statuses}"
-            )
-
-        time.sleep(10)
+            if not kubernetes.check_status(pod_name=pod, namespace=namespace, status="Running"):
+                not_running.append(pod)
+        
+        if not_running:
+            return (False, None, f"Waiting for {len(not_running)} pod(s) to be running")
+        
+        return (True, clickhouse_pods, "All pods running")
+    
+    return wait_until(
+        check_fn=check_pods,
+        timeout=timeout,
+        interval=10,
+        timeout_msg="ClickHouse pods not ready"
+    )
 
 
 @TestStep(When)
@@ -652,7 +664,6 @@ def verify_chi_cluster_topology(self, namespace, expected_replicas, expected_sha
 @TestStep(When)
 def extract_extra_config_keys(self, extra_config_xml):
     """Extract configuration keys from extraConfig XML."""
-    import re
     
     # Match XML tags like <key>value</key>
     # Exclude nested tags and special cases like <clickhouse> wrapper
@@ -731,7 +742,6 @@ def verify_extra_config_values(self, namespace, expected_config_values, admin_pa
         
         actual_value = result.stdout.strip() if result.returncode == 0 and result.stdout.strip() else None
         
-        # If not found in system.settings, try system.server_settings (server-level settings)
         if not actual_value:
             query = f"SELECT value FROM system.server_settings WHERE name = '{setting_name}' FORMAT TabSeparated"
             result = execute_clickhouse_query(
@@ -800,16 +810,12 @@ def convert_helm_resources_to_k8s(self, helm_resources):
     return k8s_resources
 
 
-@TestStep(Then)
-def verify_system_clusters(self, namespace, expected_shards, expected_replicas, admin_password):
-    """Verify system.clusters table has expected topology."""
-    clickhouse_pods = get_clickhouse_pods(namespace=namespace)
-    if not clickhouse_pods:
-        raise AssertionError("No ClickHouse pods found")
+def get_cluster_topology(namespace, pod_name, cluster_name, admin_password):
+    """Query system.clusters and return topology for a specific cluster.
     
-    pod_name = clickhouse_pods[0]
-    
-    # Query system.clusters to check topology
+    Returns:
+        tuple: (actual_shards, actual_replicas) or (0, 0) if cluster not found
+    """
     query = "SELECT cluster, shard_num, replica_num FROM system.clusters ORDER BY shard_num, replica_num FORMAT TabSeparated"
     result = execute_clickhouse_query(
         namespace=namespace,
@@ -822,10 +828,8 @@ def verify_system_clusters(self, namespace, expected_shards, expected_replicas, 
     
     lines = result.stdout.strip().split('\n')
     if not lines or lines[0] == '':
-        note("⚠ No clusters found in system.clusters")
-        return
+        return (0, 0)
     
-    # Count unique shards and replicas
     shards = set()
     replicas_per_shard = {}
     
@@ -833,22 +837,49 @@ def verify_system_clusters(self, namespace, expected_shards, expected_replicas, 
         parts = line.split('\t')
         if len(parts) >= 3:
             cluster, shard_num, replica_num = parts[0], parts[1], parts[2]
+            if cluster != cluster_name:
+                continue
             shards.add(shard_num)
             if shard_num not in replicas_per_shard:
                 replicas_per_shard[shard_num] = set()
             replicas_per_shard[shard_num].add(replica_num)
     
     actual_shards = len(shards)
-    # Get max replica count from any shard
     actual_replicas = max(len(reps) for reps in replicas_per_shard.values()) if replicas_per_shard else 0
     
-    note(f"system.clusters: {actual_shards} shard(s), {actual_replicas} replica(s)")
+    return (actual_shards, actual_replicas)
+
+
+@TestStep(Then)
+def verify_system_clusters(self, namespace, cluster_name, expected_shards, expected_replicas, admin_password, timeout=60):
+    """Verify system.clusters table has expected topology."""
+    clickhouse_pods = get_clickhouse_pods(namespace=namespace)
+    if not clickhouse_pods:
+        raise AssertionError("No ClickHouse pods found")
     
-    assert actual_shards == expected_shards, \
-        f"Expected {expected_shards} shards in system.clusters, got {actual_shards}"
-    assert actual_replicas == expected_replicas, \
-        f"Expected {expected_replicas} replicas in system.clusters, got {actual_replicas}"
+    pod_name = clickhouse_pods[0]
     
+    def check_topology():
+        actual_shards, actual_replicas = get_cluster_topology(
+            namespace, pod_name, cluster_name, admin_password
+        )
+        
+        if actual_shards == 0 and actual_replicas == 0:
+            return (False, None, f"Cluster '{cluster_name}' not found in system.clusters")
+        
+        success = (actual_shards == expected_shards and actual_replicas == expected_replicas)
+        status_msg = f"Current: {actual_shards} shard(s), {actual_replicas} replica(s)"
+        
+        return (success, (actual_shards, actual_replicas), status_msg)
+    
+    actual_shards, actual_replicas = wait_until(
+        check_fn=check_topology,
+        timeout=timeout,
+        interval=5,
+        timeout_msg=f"Cluster '{cluster_name}' topology not ready. Expected {expected_shards} shard(s), {expected_replicas} replica(s)"
+    )
+    
+    note(f"system.clusters (cluster '{cluster_name}'): {actual_shards} shard(s), {actual_replicas} replica(s)")
     note(f"✓ system.clusters topology verified")
 
 
@@ -861,7 +892,6 @@ def verify_system_replicas_health(self, namespace, admin_password):
     
     pod_name = clickhouse_pods[0]
     
-    # Query system.replicas to check health
     query = """
     SELECT 
         database, 
@@ -928,7 +958,6 @@ def verify_replication_working(self, namespace, admin_password):
             check=True
         )
         
-        # Create replicated table
         query = f"""
         CREATE TABLE IF NOT EXISTS {test_db}.{test_table} ON CLUSTER '{{cluster}}'
         (id UInt32, value String)
@@ -944,7 +973,6 @@ def verify_replication_working(self, namespace, admin_password):
             check=True
         )
         
-        # Insert data on first pod
         query = f"INSERT INTO {test_db}.{test_table} VALUES (1, 'test_value')"
         execute_clickhouse_query(
             namespace=namespace,
@@ -955,10 +983,8 @@ def verify_replication_working(self, namespace, admin_password):
             check=True
         )
         
-        # Wait a bit for replication
         time.sleep(2)
         
-        # Check data on second pod
         query = f"SELECT count() FROM {test_db}.{test_table}"
         result = execute_clickhouse_query(
             namespace=namespace,
