@@ -107,7 +107,7 @@ def check_upgrade(self, initial_fixture, upgrade_fixture):
         kubernetes.delete_namespace(namespace=namespace)
 
 
-@TestScenario
+@TestFeature
 def check_all_fixtures(self):
     """Test all fixture configurations."""
 
@@ -139,8 +139,7 @@ def feature(self):
         minikube.setup_minikube_environment()
         kubernetes.use_context(context_name="minikube")
 
-    with Feature("deployment tests"):
-        Scenario(run=check_all_fixtures)
+    Feature(run=check_all_fixtures)
 
     # with Feature("upgrade tests"):
     #     Scenario(run=check_all_upgrades)
