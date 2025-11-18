@@ -13,14 +13,28 @@ def get_pods(self, namespace):
     return [p["metadata"]["name"] for p in pods]
 
 
+@TestStep(When)
+def get_pod_info(self, namespace, pod_name):
+    """Get detailed information for a specific pod.
+
+    Args:
+        namespace: Kubernetes namespace
+        pod_name: Name of the pod
+
+    Returns:
+        Dict with pod information
+    """
+    pod_info = run(cmd=f"kubectl get pod {pod_name} -n {namespace} -o json")
+    return json.loads(pod_info.stdout)
+
+
 @TestStep(Then)
 def check_status(self, pod_name, namespace, status="Running"):
     """Check if the specified pod is in the desired status and ready."""
 
-    actual_status = run(cmd=f"kubectl get pod {pod_name} -n {namespace} -o json")
-    actual_status = json.loads(actual_status.stdout)
-    phase = actual_status["status"]["phase"]
-    conditions = actual_status["status"].get("conditions", [])
+    pod_info = get_pod_info(namespace=namespace, pod_name=pod_name)
+    phase = pod_info["status"]["phase"]
+    conditions = pod_info["status"].get("conditions", [])
     ready = any(c["type"] == "Ready" and c["status"] == "True" for c in conditions)
     return phase == status and ready
 
@@ -59,6 +73,38 @@ def get_pvcs(self, namespace):
 
 
 @TestStep(When)
+def get_pvc_info(self, namespace, pvc_name):
+    """Get detailed information for a specific PVC.
+
+    Args:
+        namespace: Kubernetes namespace
+        pvc_name: Name of the PVC
+
+    Returns:
+        Dict with PVC information
+    """
+    pvc_info = run(cmd=f"kubectl get pvc {pvc_name} -n {namespace} -o json")
+    return json.loads(pvc_info.stdout)
+
+
+@TestStep(When)
+def get_pvc_storage_size(self, namespace, pvc_name):
+    """Get storage size for a specific PVC.
+
+    Args:
+        namespace: Kubernetes namespace
+        pvc_name: Name of the PVC
+
+    Returns:
+        Storage size string (e.g., "5Gi") or None if not found
+    """
+    pvc_data = get_pvc_info(namespace=namespace, pvc_name=pvc_name)
+    return (
+        pvc_data.get("spec", {}).get("resources", {}).get("requests", {}).get("storage")
+    )
+
+
+@TestStep(When)
 def get_services(self, namespace):
     """Get the list of services in the specified namespace."""
 
@@ -93,8 +139,7 @@ def get_pod_nodes(self, namespace, pod_names):
 
     nodes = []
     for pod_name in pod_names:
-        pod_info = run(cmd=f"kubectl get pod {pod_name} -n {namespace} -o json")
-        pod_info = json.loads(pod_info.stdout)
+        pod_info = get_pod_info(namespace=namespace, pod_name=pod_name)
         nodes.append(pod_info["spec"]["nodeName"])
 
     return nodes
@@ -104,9 +149,7 @@ def get_pod_nodes(self, namespace, pod_names):
 def get_pod_image(self, namespace, pod_name):
     """Get the image used by a specific pod."""
 
-    pod_info = run(cmd=f"kubectl get pod {pod_name} -n {namespace} -o json")
-    pod_info = json.loads(pod_info.stdout)
-
+    pod_info = get_pod_info(namespace=namespace, pod_name=pod_name)
     return pod_info["spec"]["containers"][0]["image"]
 
 
@@ -152,3 +195,199 @@ def wait_for_pods_running(self, namespace, timeout=300):
             )
 
         time.sleep(10)
+
+
+@TestStep(Then)
+def verify_pvc_storage_size(self, namespace, expected_size):
+    """Verify that at least one PVC has the expected storage size."""
+
+    pvcs = get_pvcs(namespace=namespace)
+    assert len(pvcs) > 0, "No PVCs found for persistence"
+    note(f"Created PVCs: {pvcs}")
+
+    for pvc in pvcs:
+        storage_size = get_pvc_storage_size(namespace=namespace, pvc_name=pvc)
+        if storage_size == expected_size:
+            note(f"PVC {pvc} has correct storage size: {storage_size}")
+            return pvc
+
+    raise AssertionError(f"No PVC found with expected storage size {expected_size}")
+
+
+@TestStep(Then)
+def verify_loadbalancer_service_exists(self, namespace):
+    """Verify that at least one LoadBalancer service exists."""
+
+    services = get_services(namespace=namespace)
+    lb_services = [
+        s
+        for s in services
+        if get_service_type(service_name=s, namespace=namespace) == "LoadBalancer"
+    ]
+    assert len(lb_services) > 0, "LoadBalancer service not found"
+    note(f"LoadBalancer services found: {lb_services}")
+
+    return lb_services[0]
+
+
+@TestStep(Then)
+def verify_loadbalancer_source_ranges(self, namespace, service_name, expected_ranges):
+    """Verify LoadBalancer service has correct source ranges."""
+
+    service_info = get_service_info(service_name=service_name, namespace=namespace)
+    source_ranges = service_info["spec"].get("loadBalancerSourceRanges", [])
+
+    assert (
+        source_ranges == expected_ranges
+    ), f"Expected source ranges {expected_ranges}, got {source_ranges}"
+    note(f"LoadBalancer source ranges verified: {source_ranges}")
+
+
+@TestStep(Then)
+def verify_loadbalancer_ports(self, namespace, service_name, expected_ports):
+    """Verify LoadBalancer service has correct ports.
+
+    Args:
+        namespace: Kubernetes namespace
+        service_name: Name of the service
+        expected_ports: Dict mapping port names to port numbers, e.g. {"http": 8123, "tcp": 9000}
+    """
+
+    service_info = get_service_info(service_name=service_name, namespace=namespace)
+    ports = service_info["spec"]["ports"]
+    port_names = [p["name"] for p in ports]
+
+    with By("verifying LoadBalancer ports"):
+        for port_name in expected_ports.keys():
+            assert (
+                port_name in port_names
+            ), f"Expected port '{port_name}' not found in {port_names}"
+
+    with And("verifying port numbers"):
+        for port in ports:
+            if port["name"] in expected_ports:
+                expected_port = expected_ports[port["name"]]
+                assert (
+                    port["port"] == expected_port
+                ), f"Expected {port['name']} port {expected_port}, got {port['port']}"
+                note(f"Port {port['name']}: {port['port']}")
+
+    note(f"All LoadBalancer ports verified")
+
+
+@TestStep(Then)
+def verify_loadbalancer_service(self, namespace, expected_ranges=None):
+    """Verify LoadBalancer service exists and has correct configuration.
+
+    Args:
+        namespace: Kubernetes namespace
+        expected_ranges: Optional list of expected source ranges
+
+    Returns:
+        Service name of the LoadBalancer
+    """
+    services = get_services(namespace=namespace)
+    lb_services = [
+        s
+        for s in services
+        if get_service_type(service_name=s, namespace=namespace) == "LoadBalancer"
+    ]
+
+    assert len(lb_services) > 0, "LoadBalancer service not found"
+    lb_service_name = lb_services[0]
+
+    if expected_ranges:
+        service_info = get_service_info(
+            service_name=lb_service_name, namespace=namespace
+        )
+        source_ranges = service_info["spec"].get("loadBalancerSourceRanges", [])
+        assert (
+            source_ranges == expected_ranges
+        ), f"Expected source ranges {expected_ranges}, got {source_ranges}"
+
+    note(f"✓ LoadBalancer service: {lb_service_name}")
+    return lb_service_name
+
+
+@TestStep(Then)
+def verify_pvc_access_mode(self, namespace, expected_access_mode, pvc_name_filter, resource_matcher=None):
+    """Verify PVC access mode for PVCs matching filter.
+    
+    Args:
+        namespace: Kubernetes namespace
+        expected_access_mode: Expected access mode (e.g., "ReadWriteOnce")
+        pvc_name_filter: String to filter PVC names (e.g., "data", "logs")
+        resource_matcher: Optional function to check if PVC belongs to target resource
+    
+    Returns:
+        Name of verified PVC
+    """
+    pvcs = get_pvcs(namespace=namespace)
+    
+    for pvc in pvcs:
+        if pvc_name_filter in pvc.lower():
+            if resource_matcher and not resource_matcher(resource_name=pvc):
+                continue
+                
+            pvc_info = get_pvc_info(namespace=namespace, pvc_name=pvc)
+            access_modes = pvc_info.get("spec", {}).get("accessModes", [])
+            
+            assert (
+                expected_access_mode in access_modes
+            ), f"Expected accessMode {expected_access_mode} in PVC {pvc}, got {access_modes}"
+            
+            note(f"✓ PVC {pvc_name_filter} accessMode: {expected_access_mode}")
+            return pvc
+    
+    raise AssertionError(f"No {pvc_name_filter} PVC found for verification")
+
+
+@TestStep(When)
+def get_endpoints_info(self, namespace, endpoints_name):
+    """Get detailed information about Kubernetes endpoints.
+    
+    Args:
+        namespace: Kubernetes namespace
+        endpoints_name: Name of the endpoints resource
+        
+    Returns:
+        dict: Endpoints information
+    """
+    endpoints_info = run(
+        cmd=f"kubectl get endpoints {endpoints_name} -n {namespace} -o json"
+    )
+    return json.loads(endpoints_info.stdout)
+
+
+@TestStep(When)
+def get_secrets(self, namespace):
+    """Get list of secret names in a namespace.
+    
+    Args:
+        namespace: Kubernetes namespace
+        
+    Returns:
+        list: List of secret names
+    """
+    secrets_info = run(cmd=f"kubectl get secrets -n {namespace} -o json")
+    secrets_data = json.loads(secrets_info.stdout)
+    return [item["metadata"]["name"] for item in secrets_data.get("items", [])]
+
+
+@TestStep(Finally)
+def delete_namespace(self, namespace):
+    """Delete a Kubernetes namespace.
+
+    Args:
+        namespace: Kubernetes namespace to delete
+    """
+    note(f"Deleting namespace: {namespace}")
+    
+    # Just delete the namespace and force-remove finalizers if it hangs
+    run(
+        cmd=f"timeout 15 kubectl delete namespace {namespace} --wait=true 2>/dev/null || "
+            f"kubectl patch namespace {namespace} -p '{{\"metadata\":{{\"finalizers\":null}}}}' --type=merge 2>/dev/null",
+        check=False
+    )
+    
+    note(f"✓ Namespace {namespace} deleted")

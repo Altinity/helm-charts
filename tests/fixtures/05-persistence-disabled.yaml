@@ -1,0 +1,31 @@
+---
+# Ephemeral storage deployment
+# Tests: Deployment without persistent volumes, replicas with ephemeral storage
+# Expected pods: 2 ClickHouse + 3 Keeper = 5 total
+nameOverride: "ephemeral"
+
+clickhouse:
+  replicasCount: 2
+  shardsCount: 1
+  
+  defaultUser:
+    password: "EphemeralPassword123"
+    allowExternalAccess: true
+  
+  # Test deployment without persistence
+  persistence:
+    enabled: false
+  
+  service:
+    type: ClusterIP
+
+keeper:
+  enabled: true
+  replicaCount: 3
+  localStorage:
+    size: 2Gi
+
+operator:
+  enabled: true
+
+

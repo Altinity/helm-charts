@@ -1,0 +1,170 @@
+---
+# Production-grade EKS multi-zone deployment with all features
+# Tests: Multi-zone (3 AZs), anti-affinity, cluster secrets (secure), 
+#        LoadBalancer, service account, node selectors, tolerations,
+#        topology spread, users, log volumes, extraConfig, keeper metrics
+# Expected pods: 6 ClickHouse (2 shards x 3 replicas across zones) + 3 Keeper = 9 total
+# NOTE: REQUIRES EKS CLUSTER with zone labels and gp3 storage class
+nameOverride: "production"
+
+clickhouse:
+  replicasCount: 3
+  shardsCount: 2
+  
+  # Deploy across three availability zones
+  zones:
+    - us-west-2a
+    - us-west-2b
+    - us-west-2c
+  
+  # Pod anti-affinity at shard scope
+  antiAffinity: true
+  antiAffinityScope: "Shard"
+  
+  defaultUser:
+    password: "ProductionPassword123"
+    allowExternalAccess: false
+    hostIP: "10.0.0.0/8"
+  
+  # Production users
+  users:
+    - name: appreadonly
+      password_sha256_hex: "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+      hostIP: "10.0.0.0/8"
+      accessManagement: 0
+      grants:
+        - "GRANT SELECT ON *.*"
+    
+    - name: appwriter
+      password_sha256_hex: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3"
+      hostIP: "10.0.0.0/8"
+      accessManagement: 0
+      grants:
+        - "GRANT SELECT, INSERT ON default.*"
+  
+  # Secure cluster communication over SSL
+  clusterSecret:
+    enabled: true
+    auto: true
+    secure: true
+  
+  # Production storage with logs
+  persistence:
+    enabled: true
+    size: 100Gi
+    storageClass: gp3-encrypted
+    accessMode: ReadWriteOnce
+    logs:
+      enabled: true
+      size: 20Gi
+      storageClass: gp3
+      accessMode: ReadWriteOnce
+  
+  service:
+    type: ClusterIP
+    serviceAnnotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "8001"
+  
+  # Internal LoadBalancer for external access
+  lbService:
+    enabled: true
+    loadBalancerSourceRanges:
+      - "10.0.0.0/8"
+    serviceAnnotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+      service.beta.kubernetes.io/aws-load-balancer-scheme: "internal"
+  
+  # IAM role for service account
+  serviceAccount:
+    create: true
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/clickhouse-production"
+  
+  # EKS node selection
+  nodeSelector:
+    node.kubernetes.io/instance-type: "r6i.2xlarge"
+    workload: database
+  
+  # Dedicated node tolerations
+  tolerations:
+    - key: "dedicated"
+      operator: "Equal"
+      value: "clickhouse"
+      effect: "NoSchedule"
+  
+  # Enforce zone distribution
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: DoNotSchedule
+      labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: clickhouse
+    - maxSkew: 2
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: clickhouse
+  
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8001"
+    backup.velero.io/backup-volumes: "data,logs"
+  
+  podLabels:
+    app: clickhouse
+    tier: database
+    environment: production
+  
+  # Production-optimized configuration
+  extraConfig: |
+    <clickhouse>
+      <max_connections>4096</max_connections>
+      <max_concurrent_queries>200</max_concurrent_queries>
+      <max_server_memory_usage_to_ram_ratio>0.8</max_server_memory_usage_to_ram_ratio>
+      <max_table_size_to_drop>0</max_table_size_to_drop>
+      <merge_tree>
+        <max_replicated_merges_in_queue>16</max_replicated_merges_in_queue>
+      </merge_tree>
+      <logger>
+        <level>warning</level>
+      </logger>
+    </clickhouse>
+
+keeper:
+  enabled: true
+  replicaCount: 3
+  zoneSpread: true
+  localStorage:
+    size: 20Gi
+    storageClass: gp3-encrypted
+  metricsPort: "7000"
+  settings:
+    prometheus/endpoint: /metrics
+    prometheus/port: 7000
+    prometheus/metrics: true
+    prometheus/events: true
+    prometheus/asynchronous_metrics: true
+    prometheus/status_info: true
+  nodeSelector:
+    node.kubernetes.io/instance-type: "m6i.large"
+  tolerations:
+    - key: "dedicated"
+      operator: "Equal"
+      value: "clickhouse"
+      effect: "NoSchedule"
+  podAnnotations:
+    prometheus.io/port: "7000"
+    prometheus.io/scrape: "true"
+  resources:
+    cpuRequestsMs: 500
+    memoryRequestsMiB: 2Gi
+    cpuLimitsMs: 2000
+    memoryLimitsMiB: 4Gi
+
+operator:
+  enabled: true
+
+

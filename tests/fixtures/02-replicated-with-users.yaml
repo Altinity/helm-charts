@@ -1,0 +1,106 @@
+---
+# Replicated deployment with comprehensive user management and persistence
+# Tests: Replication, keeper (3 replicas), multiple users, log volumes, 
+#        pod annotations/labels, service annotations, extraConfig
+# Expected pods: 3 ClickHouse + 3 Keeper = 6 total
+nameOverride: "replicated"
+
+clickhouse:
+  replicasCount: 3
+  shardsCount: 1
+  
+  defaultUser:
+    password: "AdminPassword123"
+    allowExternalAccess: false
+    hostIP: "10.0.0.0/8"
+  
+  # Test multiple users with various permission levels
+  users:
+    - name: readonly
+      password_sha256_hex: "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+      password: "password"  # Plain password for testing (Helm ignores this field)
+      hostIP: "0.0.0.0/0"
+      accessManagement: 0
+      grants:
+        - "GRANT SELECT ON default.*"
+        - "GRANT SELECT ON system.*"
+    
+    - name: analytics
+      password_sha256_hex: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3"
+      password: "123"  # Plain password for testing (Helm ignores this field)
+      hostIP: 
+        - "10.0.0.0/8"
+        - "172.16.0.0/12"
+      accessManagement: 0
+      grants:
+        - "GRANT SELECT ON *.*"
+    
+    - name: appuser
+      password_sha256_hex: "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92"
+      password: "123456"  # Plain password for testing (Helm ignores this field)
+      hostIP: "0.0.0.0/0"
+      accessManagement: 1
+  
+  # Test persistence with separate log volumes
+  persistence:
+    enabled: true
+    size: 10Gi
+    accessMode: ReadWriteOnce
+    logs:
+      enabled: true
+      size: 5Gi
+      accessMode: ReadWriteOnce
+  
+  service:
+    type: ClusterIP
+    serviceAnnotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "8001"
+      prometheus.io/path: "/metrics"
+    serviceLabels:
+      app: clickhouse
+      tier: database
+      environment: test
+  
+  # Test pod annotations and labels
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8001"
+    backup.velero.io/backup-volumes: "data,logs"
+    app.version: "v1.0"
+  
+  podLabels:
+    app: clickhouse
+    tier: database
+    environment: test
+    team: data-engineering
+  
+  # Test custom ClickHouse configuration
+  extraConfig: |
+    <clickhouse>
+      <max_connections>1000</max_connections>
+      <max_concurrent_queries>100</max_concurrent_queries>
+      <keep_alive_timeout>30</keep_alive_timeout>
+      <max_table_size_to_drop>0</max_table_size_to_drop>
+      <logger>
+        <level>information</level>
+      </logger>
+    </clickhouse>
+
+keeper:
+  enabled: true
+  replicaCount: 3
+  localStorage:
+    size: 5Gi
+  podAnnotations:
+    backup.velero.io/backup-volumes: "data"
+  resources:
+    cpuRequestsMs: 100
+    memoryRequestsMiB: 512Mi
+    cpuLimitsMs: 500
+    memoryLimitsMiB: 1Gi
+
+operator:
+  enabled: true
+
+

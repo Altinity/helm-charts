@@ -1,29 +1,44 @@
 from tests.steps.system import *
-import yaml
-import tempfile
-import os
 
 
 @TestStep(Given)
-def install_altinity(self, namespace, release_name, local=True):
-    """Install ClickHouse Operator using Altinity Helm charts."""
+def install(
+    self,
+    namespace,
+    release_name,
+    values=None,
+    values_file=None,
+    local=True,
+    clean_up=True,
+):
+    """Install ClickHouse Operator using Altinity Helm charts with optional custom values.
 
-    if local:
-        # Use local chart from charts/clickhouse directory
-        chart_path = os.path.join(os.getcwd(), "charts", "clickhouse")
-        run(
-            cmd=f"helm install {release_name} {chart_path} "
-            f"--namespace {namespace} --create-namespace"
-        )
-    else:
-        # Use remote repository
-        run(cmd=f"helm repo add altinity {self.context.altinity_repo} || true")
-        run(cmd="helm repo update")
+    Args:
+        namespace: Kubernetes namespace
+        release_name: Helm release name
+        values: Dictionary of values to use (will be converted to temp file)
+        values_file: Path to values file (relative to tests/ directory)
+        local: Whether to use local chart or remote
+    """
 
-        run(
-            cmd=f"helm install {release_name} altinity/clickhouse "
-            f"--namespace {namespace} --create-namespace"
-        )
+    chart_path = self.context.local_chart_path if local else "altinity/clickhouse"
+
+    if not local:
+        with Given("Altinity Helm repo"):
+            run(cmd=f"helm repo add altinity {self.context.altinity_repo} || true")
+            run(cmd="helm repo update")
+
+    cmd = f"helm install {release_name} {chart_path} --namespace {namespace} --create-namespace"
+    cmd += values_argument(values=values, values_file=values_file)
+
+    with When("install ClickHouse Operator"):
+        r = run(cmd=cmd, check=True)
+
+    yield r
+
+    if clean_up:
+        with Finally("uninstall ClickHouse Operator"):
+            uninstall(namespace=namespace, release_name=release_name)
 
 
 @TestStep(Finally)
@@ -34,53 +49,22 @@ def uninstall(self, namespace, release_name):
 
 
 @TestStep(When)
-def install_with_values(self, namespace, release_name, values, expect_failure=False, local=True):
-    """Install ClickHouse with custom values."""
+def upgrade(self, namespace, release_name, values=None, values_file=None, local=True):
+    """Upgrade an existing Helm release with optional custom values.
 
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
-        yaml.dump(values, f)
-        values_file = f.name
+    Args:
+        namespace: Kubernetes namespace
+        release_name: Helm release name
+        values: Dictionary of values to use (will be converted to temp file)
+        values_file: Path to values file (relative to tests/ directory)
+        local: Whether to use local chart or remote
+    """
 
-    try:
-        if local:
-            # Use local chart from charts/clickhouse directory
-            chart_path = os.path.join(os.getcwd(), "charts", "clickhouse")
-            cmd = (
-                f"helm install {release_name} {chart_path} "
-                f"--namespace {namespace} --create-namespace "
-                f"--values {values_file}"
-            )
-        else:
-            # Use remote repository
-            cmd = (
-                f"helm install {release_name} altinity/clickhouse "
-                f"--namespace {namespace} --create-namespace "
-                f"--values {values_file}"
-            )
+    chart_path = self.context.local_chart_path if local else "altinity/clickhouse"
 
-        if expect_failure:
-            result = run(cmd=cmd, check=False)
-            return result
-        else:
-            result = run(cmd=cmd)
-            return result
-    finally:
-        # Clean up temporary file
-        os.unlink(values_file)
+    cmd = f"helm upgrade {release_name} {chart_path} --namespace {namespace}"
+    cmd += values_argument(values=values, values_file=values_file)
 
+    r = run(cmd=cmd)
 
-@TestStep(Given)
-def setup_helm_release(self, namespace, release_name, values=None, clean_up=True, local=True):
-    """Set up a Helm release with optional custom values."""
-
-    if values:
-        install_with_values(
-            namespace=namespace, release_name=release_name, values=values, local=local
-        )
-    else:
-        install_altinity(namespace=namespace, release_name=release_name, local=local)
-
-    yield
-
-    if clean_up:
-        uninstall(namespace=namespace, release_name=release_name)
+    return r

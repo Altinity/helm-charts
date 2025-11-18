@@ -1,0 +1,59 @@
+---
+# IO-optimized EKS deployment for high-performance workloads
+# Tests: High IOPS storage (io2), instance store, multi-zone, large volumes
+# Expected pods: 4 ClickHouse (2 shards x 2 replicas) + 3 Keeper = 7 total
+# NOTE: REQUIRES EKS CLUSTER with io2 storage class and i4i instance types
+nameOverride: "io-optimized"
+
+clickhouse:
+  replicasCount: 2
+  shardsCount: 2
+  
+  zones:
+    - us-west-2a
+    - us-west-2b
+  
+  antiAffinity: true
+  antiAffinityScope: "ClickHouseInstallation"
+  
+  defaultUser:
+    password: "IOOptimizedPassword123"
+    allowExternalAccess: false
+  
+  persistence:
+    enabled: true
+    size: 500Gi
+    storageClass: io2
+    accessMode: ReadWriteOnce
+  
+  service:
+    type: ClusterIP
+  
+  # High-performance instance types with NVMe
+  nodeSelector:
+    node.kubernetes.io/instance-type: "i4i.2xlarge"
+    disktype: nvme
+  
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: DoNotSchedule
+      labelSelector:
+        matchLabels:
+          app.kubernetes.io/name: clickhouse
+
+keeper:
+  enabled: true
+  replicaCount: 3
+  zoneSpread: true
+  localStorage:
+    size: 50Gi
+    storageClass: io2
+  nodeSelector:
+    node.kubernetes.io/instance-type: "i4i.large"
+    disktype: nvme
+
+operator:
+  enabled: true
+
+

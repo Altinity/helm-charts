@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys
+import os
 
 from testflows.core import *
 
@@ -16,7 +17,7 @@ def regression(self, feature):
 
     self.context.altinity_repo = "https://altinity.github.io/helm-charts/"
     self.context.version = "25.3.6.10034.altinitystable"
-
+    self.context.local_chart_path = os.path.join(os.getcwd(), "charts", "clickhouse")
     Feature(run=load(f"tests.scenarios.smoke", "feature"))
 
 

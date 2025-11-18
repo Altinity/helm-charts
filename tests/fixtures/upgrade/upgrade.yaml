@@ -1,0 +1,42 @@
+nameOverride: "custom"
+
+clickhouse:
+  replicasCount: 3
+  shardsCount: 2
+  
+  image:
+    repository: "altinity/clickhouse-server"
+    tag: "25.3.6.10034.altinitystable"
+    pullPolicy: "IfNotPresent"
+  
+  persistence:
+    enabled: true
+    size: "10Gi"
+    accessMode: "ReadWriteOnce"
+  
+  lbService:
+    enabled: true
+    loadBalancerSourceRanges:
+      - "0.0.0.0/0"
+  
+  defaultUser:
+    password: "SuperSecret"
+    allowExternalAccess: true
+    hostIP: "0.0.0.0/0"
+  
+  users:
+    - name: "analytics"
+      password: "AnalyticsPassword123"
+      password_sha256_hex: "a085c76ed0e7818e8a5c106cc01ea81d8b6a46500ee98c3be432297f47d7b99f"
+      grants:
+        - "GRANT SELECT ON default.*"
+
+keeper:
+  enabled: true
+  replicaCount: 3
+  
+  localStorage:
+    size: "5Gi"
+
+
+

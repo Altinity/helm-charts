@@ -1,0 +1,39 @@
+---
+# Deployment using external keeper (operator disabled)
+# Tests: External keeper configuration, replicas without built-in keeper,
+#        custom namespace domain pattern, persistence without logs
+# Expected pods: 4 ClickHouse (2 shards x 2 replicas) + 0 Keeper = 4 total
+# NOTE: Requires external keeper at specified host
+nameOverride: "external"
+namespaceDomainPattern: "%s.svc.custom.local"
+
+clickhouse:
+  replicasCount: 2
+  shardsCount: 2
+  
+  defaultUser:
+    password: "ExternalKeeperPassword123"
+    allowExternalAccess: false
+  
+  # Point to external keeper instance
+  keeper:
+    host: "external-clickhouse-keeper.default.svc.cluster.local"
+    port: 2181
+  
+  persistence:
+    enabled: true
+    size: 10Gi
+    accessMode: ReadWriteOnce
+  
+  service:
+    type: ClusterIP
+
+# Built-in keeper disabled (using external)
+keeper:
+  enabled: false
+
+# Operator disabled (assumes operator already installed cluster-wide)
+operator:
+  enabled: false
+
+

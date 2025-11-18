@@ -1,0 +1,27 @@
+---
+# Minimal single-node deployment (baseline test)
+# Tests: Basic deployment, no keeper, minimal config
+# Expected pods: 1 ClickHouse
+clickhouse:
+  replicasCount: 1
+  shardsCount: 1
+  
+  defaultUser:
+    password: "MinimalPassword123"
+    allowExternalAccess: true
+  
+  persistence:
+    enabled: true
+    size: 2Gi
+    accessMode: ReadWriteOnce
+  
+  service:
+    type: ClusterIP
+
+keeper:
+  enabled: false
+
+operator:
+  enabled: true
+
+
