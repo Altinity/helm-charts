@@ -50,6 +50,5 @@ def values_argument(self, values=None, values_file=None):
         full_path = tests_dir / values_file
         return f" --values {full_path}"
 
-    # values dict case - create temp file
     temp_values_file = get_values_file(values=values)
     return f" --values {temp_values_file}"

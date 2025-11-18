@@ -7,7 +7,6 @@ import tests.steps.helm as helm
 from tests.steps.deployment import HelmState
 
 
-# Fixture configurations for testing
 FIXTURES = [
     "fixtures/01-minimal-single-node.yaml",
     "fixtures/02-replicated-with-users.yaml",
@@ -45,7 +44,6 @@ def check_deployment(self, fixture_file, skip_external_keeper=True):
         note(f"Testing fixture: {fixture_file}")
         note(f"Expected pods: {state.get_expected_pod_count()}")
 
-    # Skip external keeper tests if requested
     if skip_external_keeper and "external-keeper" in fixture_name:
         skip("Skipping external keeper test (requires pre-existing keeper)")
         return

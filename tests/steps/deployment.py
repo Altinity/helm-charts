@@ -69,11 +69,8 @@ class HelmState:
         with open(self.values_file, "r") as f:
             self.values = yaml.safe_load(f)
 
-        # Extract configuration for easy access
         self.clickhouse_config = self.values.get("clickhouse", {})
         self.keeper_config = self.values.get("keeper", {})
-
-    # Configuration readers - simple data extraction
 
     def get_expected_pod_count(self):
         """Total pods = ClickHouse pods + Keeper pods."""
@@ -93,8 +90,6 @@ class HelmState:
             return 0
         return self.keeper_config.get("replicaCount", 0)
 
-    # Verification methods - delegate to step functions
-
     def verify_deployment(self, namespace):
         """Wait for and verify deployment is ready."""
         expected_total = self.get_expected_pod_count()
@@ -105,14 +100,12 @@ class HelmState:
             f"Expected pods - Total: {expected_total}, ClickHouse: {expected_ch}, Keeper: {expected_keeper}"
         )
 
-        # Wait for deployment to be ready
         wait_for_clickhouse_deployment(
             namespace=namespace,
             expected_pod_count=expected_total,
             expected_clickhouse_count=expected_ch,
         )
 
-        # Verify pod counts match expectations
         clickhouse.verify_clickhouse_pod_count(
             namespace=namespace, expected_count=expected_ch
         )
@@ -147,17 +140,14 @@ class HelmState:
         expected_size = persistence_config.get("size")
         expected_access_mode = persistence_config.get("accessMode", "ReadWriteOnce")
 
-        # Verify CHI has correct persistence config
         clickhouse.verify_persistence_configuration(
             namespace=namespace, expected_size=expected_size
         )
 
-        # Verify PVCs exist with correct size and access mode
         clickhouse.verify_clickhouse_pvc_size(
             namespace=namespace, expected_size=expected_size
         )
 
-        # Verify PVC access mode
         kubernetes.verify_pvc_access_mode(
             namespace=namespace,
             expected_access_mode=expected_access_mode,
@@ -185,7 +175,6 @@ class HelmState:
             users_config=user_configs,
         )
 
-        # Verify default user hostIP if configured
         if default_user.get("hostIP"):
             users.verify_user_host_ip(
                 namespace=namespace,
@@ -267,7 +256,6 @@ class HelmState:
             )
             note(f"✓ Log persistence: {expected_log_size}")
 
-            # Verify log PVC access mode
             kubernetes.verify_pvc_access_mode(
                 namespace=namespace,
                 expected_access_mode=expected_access_mode,
@@ -281,17 +269,14 @@ class HelmState:
         admin_password = self.clickhouse_config.get("defaultUser", {}).get("password", "")
 
         if extra_config:
-            # Extract config keys for presence verification
             config_keys = clickhouse.extract_extra_config_keys(
                 extra_config_xml=extra_config
             )
 
-            # First verify keys exist in CHI
             clickhouse.verify_extra_config(
                 namespace=namespace, expected_config_keys=config_keys
             )
             
-            # Then verify actual values in system.settings
             config_values = clickhouse.parse_extra_config_values(
                 extra_config_xml=extra_config
             )
@@ -331,7 +316,6 @@ class HelmState:
         resources_config = self.keeper_config.get("resources", {})
 
         if resources_config:
-            # Convert from Helm format to Kubernetes format
             expected_resources = clickhouse.convert_helm_resources_to_k8s(
                 helm_resources=resources_config
             )
@@ -348,17 +332,16 @@ class HelmState:
         expected_replicas = self.clickhouse_config.get("replicasCount", 1)
         expected_shards = self.clickhouse_config.get("shardsCount", 1)
         
-        # Only run these checks if we have replicas or shards
         if expected_replicas > 1 or expected_shards > 1:
-            # Verify system.clusters topology
+            # Cluster name equals namespace (which equals release_name in test setup)
             clickhouse.verify_system_clusters(
                 namespace=namespace,
+                cluster_name=namespace,
                 expected_shards=expected_shards,
                 expected_replicas=expected_replicas,
                 admin_password=admin_password
             )
             
-            # Verify system.replicas health (if replicated tables exist)
             if expected_replicas > 1:
                 clickhouse.verify_system_replicas_health(
                     namespace=namespace,
@@ -372,7 +355,6 @@ class HelmState:
         admin_password = self.clickhouse_config.get("defaultUser", {}).get("password", "")
         expected_replicas = self.clickhouse_config.get("replicasCount", 1)
         
-        # Only test replication if we have multiple replicas
         if expected_replicas > 1:
             clickhouse.verify_replication_working(
                 namespace=namespace,
@@ -403,35 +385,26 @@ class HelmState:
         """
         note(f"Verifying deployment state from: {self.values_file.name}")
 
-        # Always verify deployment readiness
         self.verify_deployment(namespace=namespace)
-
-        # Verify cluster topology (replicas/shards)
         self.verify_cluster_topology(namespace=namespace)
 
-        # Verify replication health for replicated/sharded deployments
         expected_replicas = self.clickhouse_config.get("replicasCount", 1)
         expected_shards = self.clickhouse_config.get("shardsCount", 1)
         if expected_replicas > 1 or expected_shards > 1:
             self.verify_replication_health(namespace=namespace)
             
-            # Test actual replication with data (for replicated setups)
             if expected_replicas > 1:
                 self.verify_replication_working(namespace=namespace)
 
-        # Verify service endpoints count
         self.verify_service_endpoints(namespace=namespace)
-
-        # Verify secrets exist
         self.verify_secrets(namespace=namespace)
 
-        # Conditional verifications based on what's configured
         if self.values.get("nameOverride"):
             self.verify_name_override(namespace=namespace)
 
         if self.clickhouse_config.get("persistence", {}).get("enabled"):
             self.verify_persistence(namespace=namespace)
-            # Check for separate log persistence
+            
             if (
                 self.clickhouse_config.get("persistence", {})
                 .get("logs", {})
@@ -465,7 +438,6 @@ class HelmState:
         if self.keeper_config.get("enabled"):
             self.verify_keeper(namespace=namespace)
 
-            # Verify Keeper-specific configurations
             if self.keeper_config.get("localStorage", {}).get("size"):
                 self.verify_keeper_storage(namespace=namespace)
 

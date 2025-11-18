@@ -38,7 +38,6 @@ def minikube_stop(self):
 def setup_minikube_environment(self, cpus=4, memory="6g", clean_up=True):
     """Set up minikube environment with context."""
 
-    # Check if minikube is already running and stop it if it is
     if minikube_status():
         minikube_stop()
 

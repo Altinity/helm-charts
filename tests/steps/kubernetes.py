@@ -205,7 +205,6 @@ def verify_pvc_storage_size(self, namespace, expected_size):
     assert len(pvcs) > 0, "No PVCs found for persistence"
     note(f"Created PVCs: {pvcs}")
 
-    # Verify at least one PVC has the expected size
     for pvc in pvcs:
         storage_size = get_pvc_storage_size(namespace=namespace, pvc_name=pvc)
         if storage_size == expected_size:
@@ -325,10 +324,8 @@ def verify_pvc_access_mode(self, namespace, expected_access_mode, pvc_name_filte
     """
     pvcs = get_pvcs(namespace=namespace)
     
-    # Find matching PVCs
     for pvc in pvcs:
         if pvc_name_filter in pvc.lower():
-            # Apply resource matcher if provided
             if resource_matcher and not resource_matcher(resource_name=pvc):
                 continue
                 
