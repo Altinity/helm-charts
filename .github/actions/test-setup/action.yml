@@ -57,6 +57,11 @@ runs:
         helm version
       shell: bash
 
+    - name: Build Helm Dependencies
+      run: |
+        helm dependency build charts/clickhouse
+      shell: bash
+
     - name: Install Minikube
       run: |
         # Install kubectl
