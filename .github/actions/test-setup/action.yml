@@ -59,6 +59,8 @@ runs:
 
     - name: Build Helm Dependencies
       run: |
+        helm repo add altinity https://helm.altinity.com
+        helm repo update
         helm dependency build charts/clickhouse
       shell: bash
 
