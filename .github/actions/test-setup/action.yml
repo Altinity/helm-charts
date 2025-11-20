@@ -53,15 +53,7 @@ runs:
     - name: Install Helm
       run: |
         curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-        
         helm version
-      shell: bash
-
-    - name: Build Helm Dependencies
-      run: |
-        helm repo add altinity https://helm.altinity.com
-        helm repo update
-        helm dependency build charts/clickhouse
       shell: bash
 
     - name: Install Minikube
