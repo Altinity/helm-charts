@@ -38,7 +38,7 @@ jobs:
     smoke:
       name: smoke
       if: ${{ inputs.suite == 'smoke' }}
-      runs-on: [ "arc-runners-qa-4c-8g" ]
+      runs-on: [ "github-runners-qa" ]
       timeout-minutes: 60
 
       steps:

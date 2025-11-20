@@ -76,6 +76,12 @@ def debug_namespace_state(self, namespace, expected_count=None, current_count=No
     if describe_result.returncode == 0:
         note(describe_result.stdout)
 
+    # Check CHI (ClickHouseInstallation) configuration
+    note(f"\n🔧 ClickHouseInstallation resources:")
+    chi_result = run(cmd=f"kubectl get chi -n {namespace} -o yaml", check=False)
+    if chi_result.returncode == 0:
+        note(chi_result.stdout)
+
 
 @TestStep(When)
 def get_pod_info(self, namespace, pod_name):
