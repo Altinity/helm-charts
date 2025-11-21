@@ -70,9 +70,8 @@ def check_upgrade(self, initial_fixture, upgrade_fixture):
         initial_fixture: Path to initial configuration YAML
         upgrade_fixture: Path to upgraded configuration YAML
     """
-    scenario_name = f"{os.path.basename(initial_fixture).replace('.yaml', '')}-to-{os.path.basename(upgrade_fixture).replace('.yaml', '')}"
-    release_name = f"upgrade-{scenario_name}"
-    namespace = f"upgrade-{scenario_name}"
+    release_name = f"upgrade"
+    namespace = f"upgrade"
 
     with Given("paths to fixture files"):
         tests_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -118,7 +117,7 @@ def check_all_fixtures(self):
         )(fixture_file=fixture, skip_external_keeper=True)
 
 
-@TestScenario
+@TestFeature
 def check_all_upgrades(self):
     """Test all upgrade scenarios."""
 
@@ -140,6 +139,5 @@ def feature(self):
         kubernetes.use_context(context_name="minikube")
 
     Feature(run=check_all_fixtures)
-
-    # with Feature("upgrade tests"):
-    #     Scenario(run=check_all_upgrades)
+    #
+    # Feature(run=check_all_upgrades)
