@@ -480,3 +480,15 @@ def delete_namespace(self, namespace):
     )
 
     note(f"✓ Namespace {namespace} deleted")
+
+
+@TestStep(When)
+def delete_pod(self, namespace, pod_name):
+    """Delete a Kubernetes pod.
+
+    Args:
+        namespace: Kubernetes namespace
+        pod_name: Name of the pod to delete
+    """
+    run(cmd=f"kubectl delete pod {pod_name} -n {namespace}", check=True)
+    note(f"✓ Pod {pod_name} deleted from namespace {namespace}")
