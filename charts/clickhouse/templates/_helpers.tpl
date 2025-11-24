@@ -57,6 +57,8 @@ Pod Distribution
 {{- if .Values.clickhouse.antiAffinity -}}
 - type: ClickHouseAntiAffinity
   scope: {{ .Values.clickhouse.antiAffinityScope | default "ClickHouseInstallation" }}
+{{- else -}}
+[]
 {{- end }}
 {{- end }}
 
