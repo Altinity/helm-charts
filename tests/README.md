@@ -27,9 +27,9 @@ Comprehensive regression test suite for Altinity ClickHouse Helm charts, ensurin
 * [Contributing](#-contributing)
   * [Adding New Test Fixtures](#adding-new-test-fixtures)
   * [Adding New Test Steps](#adding-new-test-steps)
-  * [Adding New Scenarios](#adding-new-scenarios)
   * [Best Practices](#best-practices)
 * [Troubleshooting](#-troubleshooting)
+* [Additional Resources](#-additional-resources)
 
 ---
 
