@@ -12,28 +12,6 @@ on:
         options:
           - 'smoke'
 
-      extra_args:
-        description: "Extra test program arguments. Example: '--only \"/api/part 1/*\"'"
-        type: string
-        default: ""
-      output_format:
-        description: "Output style"
-        type: choice
-        default: "nice"
-        options:
-          - fails
-          - new-fails
-          - classic
-          - nice
-          - nice-fails
-          - nice-new-fails
-          - pnice
-          - pnice-fails
-          - pnice-new-fails
-          - slick
-          - quiet
-          - short
-
 jobs:
     smoke:
       name: smoke
