@@ -4,6 +4,7 @@ import os
 import tests.steps.kubernetes as kubernetes
 import tests.steps.minikube as minikube
 import tests.steps.helm as helm
+import tests.steps.clickhouse as clickhouse
 from tests.steps.deployment import HelmState
 
 
@@ -17,7 +18,6 @@ FIXTURES = [
 
 UPGRADE_SCENARIOS = [
     ("fixtures/upgrade/initial.yaml", "fixtures/upgrade/upgrade.yaml"),
-    ("fixtures/upgrade/simple-initial.yaml", "fixtures/upgrade/complex-upgraded.yaml"),
 ]
 
 
@@ -56,6 +56,19 @@ def check_deployment(self, fixture_file, skip_external_keeper=True):
 
     with Then("verify deployment state"):
         state.verify_all(namespace=namespace)
+    
+    # Add Keeper HA test for replicated deployments with 3+ keepers
+    if "replicated" in fixture_name:
+        with And("test Keeper high availability (chaos test)"):
+            admin_password = state.clickhouse_config.get("defaultUser", {}).get("password", "")
+            clickhouse.test_keeper_high_availability(
+                namespace=namespace,
+                admin_password=admin_password
+            )
+    
+    # Verify metrics endpoint is accessible
+    with And("verify metrics endpoint"):
+        clickhouse.verify_metrics_endpoint(namespace=namespace)
 
     with Finally("cleanup deployment"):
         helm.uninstall(namespace=namespace, release_name=release_name)
@@ -70,9 +83,8 @@ def check_upgrade(self, initial_fixture, upgrade_fixture):
         initial_fixture: Path to initial configuration YAML
         upgrade_fixture: Path to upgraded configuration YAML
     """
-    scenario_name = f"{os.path.basename(initial_fixture).replace('.yaml', '')}-to-{os.path.basename(upgrade_fixture).replace('.yaml', '')}"
-    release_name = f"upgrade-{scenario_name}"
-    namespace = f"upgrade-{scenario_name}"
+    release_name = f"upgrade"
+    namespace = f"upgrade"
 
     with Given("paths to fixture files"):
         tests_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -93,6 +105,23 @@ def check_upgrade(self, initial_fixture, upgrade_fixture):
 
     with Then("verify initial deployment state"):
         initial_state.verify_all(namespace=namespace)
+    
+    # Only test data survival if nameOverride stays the same (in-place upgrade)
+    initial_name = initial_state.values.get("nameOverride", "")
+    upgrade_name = upgrade_state.values.get("nameOverride", "")
+    is_inplace_upgrade = (initial_name == upgrade_name)
+    
+    if is_inplace_upgrade:
+        with And("create test data for upgrade survival verification"):
+            admin_password = initial_state.clickhouse_config.get("defaultUser", {}).get("password", "")
+            clickhouse.create_test_data(
+                namespace=namespace,
+                admin_password=admin_password,
+                table_name="pre_upgrade_data",
+                test_value=f"upgrade_survival_{namespace}"
+            )
+    else:
+        note(f"Skipping data survival test: nameOverride changed from '{initial_name}' to '{upgrade_name}' (cluster replacement scenario)")
 
     with When("upgrade ClickHouse to new configuration"):
         helm.upgrade(
@@ -101,6 +130,21 @@ def check_upgrade(self, initial_fixture, upgrade_fixture):
 
     with Then("verify upgraded deployment state"):
         upgrade_state.verify_all(namespace=namespace)
+    
+    if is_inplace_upgrade:
+        with And("verify data survived the upgrade"):
+            admin_password = upgrade_state.clickhouse_config.get("defaultUser", {}).get("password", "")
+            clickhouse.verify_data_survival(
+                namespace=namespace,
+                admin_password=admin_password,
+                table_name="pre_upgrade_data",
+                expected_value=f"upgrade_survival_{namespace}"
+            )
+    else:
+        note(f"Data survival verification skipped for cluster replacement scenario")
+    
+    with And("verify metrics endpoint"):
+        clickhouse.verify_metrics_endpoint(namespace=namespace)
 
     with Finally("cleanup deployment"):
         helm.uninstall(namespace=namespace, release_name=release_name)
@@ -118,7 +162,7 @@ def check_all_fixtures(self):
         )(fixture_file=fixture, skip_external_keeper=True)
 
 
-@TestScenario
+@TestFeature
 def check_all_upgrades(self):
     """Test all upgrade scenarios."""
 
@@ -141,5 +185,4 @@ def feature(self):
 
     Feature(run=check_all_fixtures)
 
-    # with Feature("upgrade tests"):
-    #     Scenario(run=check_all_upgrades)
+    Feature(run=check_all_upgrades)
