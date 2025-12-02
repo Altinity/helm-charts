@@ -123,7 +123,7 @@ class HelmState:
         clickhouse.verify_chi_cluster_topology(
             namespace=namespace,
             expected_replicas=expected_replicas,
-            expected_shards=expected_shards
+            expected_shards=expected_shards,
         )
 
     def verify_name_override(self, namespace):
@@ -152,7 +152,7 @@ class HelmState:
             namespace=namespace,
             expected_access_mode=expected_access_mode,
             pvc_name_filter="data",
-            resource_matcher=clickhouse.is_clickhouse_resource
+            resource_matcher=clickhouse.is_clickhouse_resource,
         )
 
     def verify_service(self, namespace):
@@ -260,13 +260,15 @@ class HelmState:
                 namespace=namespace,
                 expected_access_mode=expected_access_mode,
                 pvc_name_filter="logs",
-                resource_matcher=clickhouse.is_clickhouse_resource
+                resource_matcher=clickhouse.is_clickhouse_resource,
             )
 
     def verify_extra_config(self, namespace):
         """Verify extraConfig custom ClickHouse configuration."""
         extra_config = self.clickhouse_config.get("extraConfig", "")
-        admin_password = self.clickhouse_config.get("defaultUser", {}).get("password", "")
+        admin_password = self.clickhouse_config.get("defaultUser", {}).get(
+            "password", ""
+        )
 
         if extra_config:
             config_keys = clickhouse.extract_extra_config_keys(
@@ -276,18 +278,18 @@ class HelmState:
             clickhouse.verify_extra_config(
                 namespace=namespace, expected_config_keys=config_keys
             )
-            
+
             config_values = clickhouse.parse_extra_config_values(
                 extra_config_xml=extra_config
             )
-            
+
             if config_values:
                 clickhouse.verify_extra_config_values(
                     namespace=namespace,
                     expected_config_values=config_values,
-                    admin_password=admin_password
+                    admin_password=admin_password,
                 )
-            
+
             note(f"✓ ExtraConfig verified")
 
     def verify_keeper_storage(self, namespace):
@@ -328,10 +330,12 @@ class HelmState:
 
     def verify_replication_health(self, namespace):
         """Verify replication health through system tables."""
-        admin_password = self.clickhouse_config.get("defaultUser", {}).get("password", "")
+        admin_password = self.clickhouse_config.get("defaultUser", {}).get(
+            "password", ""
+        )
         expected_replicas = self.clickhouse_config.get("replicasCount", 1)
         expected_shards = self.clickhouse_config.get("shardsCount", 1)
-        
+
         if expected_replicas > 1 or expected_shards > 1:
             # Cluster name equals namespace (which equals release_name in test setup)
             clickhouse.verify_system_clusters(
@@ -339,36 +343,35 @@ class HelmState:
                 cluster_name=namespace,
                 expected_shards=expected_shards,
                 expected_replicas=expected_replicas,
-                admin_password=admin_password
+                admin_password=admin_password,
             )
-            
+
             if expected_replicas > 1:
                 clickhouse.verify_system_replicas_health(
-                    namespace=namespace,
-                    admin_password=admin_password
+                    namespace=namespace, admin_password=admin_password
                 )
-            
+
             note(f"✓ Replication health verified")
 
     def verify_replication_working(self, namespace):
         """Verify replication actually works by creating and replicating a test table."""
-        admin_password = self.clickhouse_config.get("defaultUser", {}).get("password", "")
+        admin_password = self.clickhouse_config.get("defaultUser", {}).get(
+            "password", ""
+        )
         expected_replicas = self.clickhouse_config.get("replicasCount", 1)
-        
+
         if expected_replicas > 1:
             clickhouse.verify_replication_working(
-                namespace=namespace,
-                admin_password=admin_password
+                namespace=namespace, admin_password=admin_password
             )
             note(f"✓ Replication data test passed")
 
     def verify_service_endpoints(self, namespace):
         """Verify service endpoints count matches expected ClickHouse replicas."""
         expected_ch_count = self.get_expected_clickhouse_pod_count()
-        
+
         clickhouse.verify_service_endpoints(
-            namespace=namespace,
-            expected_endpoint_count=expected_ch_count
+            namespace=namespace, expected_endpoint_count=expected_ch_count
         )
         note(f"✓ Service endpoints: {expected_ch_count}")
 
@@ -392,7 +395,7 @@ class HelmState:
         expected_shards = self.clickhouse_config.get("shardsCount", 1)
         if expected_replicas > 1 or expected_shards > 1:
             self.verify_replication_health(namespace=namespace)
-            
+
             if expected_replicas > 1:
                 self.verify_replication_working(namespace=namespace)
 
@@ -404,7 +407,7 @@ class HelmState:
 
         if self.clickhouse_config.get("persistence", {}).get("enabled"):
             self.verify_persistence(namespace=namespace)
-            
+
             if (
                 self.clickhouse_config.get("persistence", {})
                 .get("logs", {})

@@ -14,7 +14,10 @@ def ensure_dependencies(self, chart_path=None):
 
     with Given("Altinity Helm repo and build dependencies"):
         # Add repo with force update to handle already existing repos
-        run(cmd=f"helm repo add altinity {self.context.altinity_repo} --force-update", check=False)
+        run(
+            cmd=f"helm repo add altinity {self.context.altinity_repo} --force-update",
+            check=False,
+        )
         run(cmd="helm repo update")
         # Build dependencies in the same context so repo is available
         run(cmd=f"helm dependency build {chart_path}", check=True)
@@ -22,13 +25,13 @@ def ensure_dependencies(self, chart_path=None):
 
 @TestStep(Given)
 def install(
-        self,
-        namespace,
-        release_name,
-        values=None,
-        values_file=None,
-        local=True,
-        clean_up=True,
+    self,
+    namespace,
+    release_name,
+    values=None,
+    values_file=None,
+    local=True,
+    clean_up=True,
 ):
     """Install ClickHouse Operator using Altinity Helm charts with optional custom values.
 

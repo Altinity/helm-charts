@@ -35,7 +35,9 @@ def debug_namespace_state(self, namespace, expected_count=None, current_count=No
                 pod_info = get_pod_info(namespace=namespace, pod_name=pod_name)
                 phase = pod_info["status"].get("phase", "Unknown")
                 conditions = pod_info["status"].get("conditions", [])
-                ready = any(c["type"] == "Ready" and c["status"] == "True" for c in conditions)
+                ready = any(
+                    c["type"] == "Ready" and c["status"] == "True" for c in conditions
+                )
 
                 # Get container statuses
                 container_statuses = pod_info["status"].get("containerStatuses", [])
@@ -52,7 +54,9 @@ def debug_namespace_state(self, namespace, expected_count=None, current_count=No
                     elif "running" in state:
                         container_info.append("Running")
 
-                note(f"  • {pod_name}: Phase={phase}, Ready={ready}, Containers=[{', '.join(container_info)}]")
+                note(
+                    f"  • {pod_name}: Phase={phase}, Ready={ready}, Containers=[{', '.join(container_info)}]"
+                )
             except Exception as e:
                 note(f"  • {pod_name}: Failed to get info - {str(e)}")
     else:
@@ -66,7 +70,10 @@ def debug_namespace_state(self, namespace, expected_count=None, current_count=No
 
     # Get recent events to see why pods aren't being created
     note(f"\n📅 Recent events in namespace {namespace}:")
-    events_result = run(cmd=f"kubectl get events -n {namespace} --sort-by='.lastTimestamp' | tail -20", check=False)
+    events_result = run(
+        cmd=f"kubectl get events -n {namespace} --sort-by='.lastTimestamp' | tail -20",
+        check=False,
+    )
     if events_result.returncode == 0:
         note(events_result.stdout)
 
@@ -139,7 +146,7 @@ def wait_for_pod_count(self, namespace, expected_count, timeout=300):
             debug_namespace_state(
                 namespace=namespace,
                 expected_count=expected_count,
-                current_count=current_count
+                current_count=current_count,
             )
 
             raise TimeoutError(
@@ -325,7 +332,7 @@ def verify_loadbalancer_source_ranges(self, namespace, service_name, expected_ra
     source_ranges = service_info["spec"].get("loadBalancerSourceRanges", [])
 
     assert (
-            source_ranges == expected_ranges
+        source_ranges == expected_ranges
     ), f"Expected source ranges {expected_ranges}, got {source_ranges}"
     note(f"LoadBalancer source ranges verified: {source_ranges}")
 
@@ -347,7 +354,7 @@ def verify_loadbalancer_ports(self, namespace, service_name, expected_ports):
     with By("verifying LoadBalancer ports"):
         for port_name in expected_ports.keys():
             assert (
-                    port_name in port_names
+                port_name in port_names
             ), f"Expected port '{port_name}' not found in {port_names}"
 
     with And("verifying port numbers"):
@@ -355,7 +362,7 @@ def verify_loadbalancer_ports(self, namespace, service_name, expected_ports):
             if port["name"] in expected_ports:
                 expected_port = expected_ports[port["name"]]
                 assert (
-                        port["port"] == expected_port
+                    port["port"] == expected_port
                 ), f"Expected {port['name']} port {expected_port}, got {port['port']}"
                 note(f"Port {port['name']}: {port['port']}")
 
@@ -389,7 +396,7 @@ def verify_loadbalancer_service(self, namespace, expected_ranges=None):
         )
         source_ranges = service_info["spec"].get("loadBalancerSourceRanges", [])
         assert (
-                source_ranges == expected_ranges
+            source_ranges == expected_ranges
         ), f"Expected source ranges {expected_ranges}, got {source_ranges}"
 
     note(f"✓ LoadBalancer service: {lb_service_name}")
@@ -397,7 +404,9 @@ def verify_loadbalancer_service(self, namespace, expected_ranges=None):
 
 
 @TestStep(Then)
-def verify_pvc_access_mode(self, namespace, expected_access_mode, pvc_name_filter, resource_matcher=None):
+def verify_pvc_access_mode(
+    self, namespace, expected_access_mode, pvc_name_filter, resource_matcher=None
+):
     """Verify PVC access mode for PVCs matching filter.
 
     Args:
@@ -422,7 +431,7 @@ def verify_pvc_access_mode(self, namespace, expected_access_mode, pvc_name_filte
             access_modes = pvc_info.get("spec", {}).get("accessModes", [])
 
             assert (
-                    expected_access_mode in access_modes
+                expected_access_mode in access_modes
             ), f"Expected accessMode {expected_access_mode} in PVC {pvc}, got {access_modes}"
 
             note(f"✓ PVC {pvc_name_filter} accessMode: {expected_access_mode}")
@@ -475,8 +484,8 @@ def delete_namespace(self, namespace):
     # Just delete the namespace and force-remove finalizers if it hangs
     run(
         cmd=f"timeout 15 kubectl delete namespace {namespace} --wait=true 2>/dev/null || "
-            f"kubectl patch namespace {namespace} -p '{{\"metadata\":{{\"finalizers\":null}}}}' --type=merge 2>/dev/null",
-        check=False
+        f'kubectl patch namespace {namespace} -p \'{{"metadata":{{"finalizers":null}}}}\' --type=merge 2>/dev/null',
+        check=False,
     )
 
     note(f"✓ Namespace {namespace} deleted")
