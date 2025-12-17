@@ -50,6 +50,42 @@ helm install release-name altinity/clickhouse --namespace clickhouse \
 
 > Yes, we're aware that the domains for the helm repos are a bit odd. We're working on it.
 
+### Configuring the bundled operator
+
+The ClickHouse chart vendors the Altinity ClickHouse Operator as a dependency using the
+`operator` alias. Any values you pass under the `operator` key are forwarded to the
+dependency chart unchanged, which means you can configure the operator exactly the same
+way you would when installing it directly. By default the dependency installs into the
+same namespace as the Helm release, watches all namespaces, and creates cluster-scoped
+RBAC resources.
+
+Common examples include overriding the namespace where the operator runs and toggling
+`rbac.namespaceScoped`:
+
+```sh
+helm install release-name altinity/clickhouse \
+  --namespace test --create-namespace \
+  --set operator.namespaceOverride=test \
+  --set operator.rbac.namespaceScoped=true
+```
+
+When you are running multiple operators across different namespaces, install a separate
+release into each namespace and scope it to that namespace only. Set the operator's
+`namespaceOverride`, enable `rbac.namespaceScoped`, and restrict `watch.namespaces` to the
+release namespace so each operator manages only its own resources.
+
+```sh
+helm install second-release altinity/clickhouse \
+  --namespace test \
+  --set operator.namespaceOverride=test \
+  --set operator.rbac.namespaceScoped=true \
+  --set operator.configs.files.config\\.yaml.watch.namespaces=\{test\}
+```
+
+Consult the [Altinity ClickHouse Operator chart documentation](https://helm.altinity.com/)
+for the full list of available options. Any of those settings can be applied through the
+`operator` value prefix when installing or upgrading this chart.
+
 ## Upgrading the Chart
 
 ### Upgrading from 0.2.x to 0.3.0
