@@ -37,7 +37,7 @@ helm repo add altinity-operator https://docs.altinity.com/clickhouse-operator
 kubectl create namespace clickhouse
 
 # install operator into namespace
-helm install clickhouse-operator altinity-docs/altinity-clickhouse-operator \
+helm install clickhouse-operator altinity/altinity-clickhouse-operator \
 --namespace clickhouse
 
 # add the altinity chart repository
