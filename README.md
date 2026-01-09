@@ -5,29 +5,18 @@ Helm charts for use with the Altinity Operator for ClickHouse®
 ## Running ClickHouse on Kubernetes with the Altinity Operator
 A complete Kubernetes deployment of ClickHouse includes:
 
- - The Altinity Operator for ClickHouse
- - The Altinity Operator CRDs
+ - The [Altinity Operator for ClickHouse](https://github.com/altinity/clickhouse-operator) (and CRDs)
  - A `ClickHouseInstallation` Custom Resource defining your ClickHouse cluster settings
  - A `ClickHouseKeeperInstallation` Custom Resource defining your Keeper deployment (optional for single-node instances)
  - A custom storage class (optional) - we recommend gp3 in production.
-
-For convenience, the [ClickHouse](./charts/clickhouse) chart in this repo includes the [Operator Helm Chart](https://github.com/Altinity/clickhouse-operator/tree/master/deploy/helm/clickhouse-operator) as a dependency. 
-
-These samples demonstrate straightforward Helm charts that can be used to deploy ClickHouse and ClickHouse Keeper. The examples are intended as starting points for more complex configurations and do not cover all possible uses cases.
-
-For more complex configurations, follow the [Installation Guide](https://docs.altinity.com/altinitykubernetesoperator/quickstartinstallation/) from the documentation to install the Operator and create a custom `ClickHouseInstallation` resource.
-
-**Installing the Operator first provides better control when uninstalling clusters.**
-
-> Please refer to the Altinity Operator project instructions for details on operator upgrade with Helm, including running custom resource definition files independently.
 
 ## Helm Charts
 
 - **[clickhouse](./charts/clickhouse/)**: All-in-one chart to deploy a ClickHouse cluster (and optionally Keeper and the Altinity Operator)
 - **[clickhouse-eks](./charts/clickhouse-eks/)**: An EKS-specific chart for high-availability ClickHouse clusters. 
+- **altinity-clickhouse-operator**: Deploys just the Altinity Operator for ClickHouse, for use with custom or multiple ClickHouse cluster definitions. The templates and documentation for this chart are maintained in the [operator](https://github.com/Altinity/clickhouse-operator/tree/master/deploy/helm/clickhouse-operator) GitHub repository.
 
 ## Community
-
 These charts are a community effort sponsored by Altinity. The best way to reach us or ask questions is:
 
 * Join the [Altinity Slack](https://altinity.com/slack) - Chat with the developers and other users
@@ -42,12 +31,10 @@ Copyright (c) 2025 Altinity, Inc.
 Altinity.Cloud®, and Altinity Stable® are registered trademarks of Altinity, Inc. ClickHouse® is a registered trademark of ClickHouse, Inc.; Altinity is not affiliated with or associated with ClickHouse, Inc. Kubernetes, MySQL, and PostgreSQL are trademarks and property of their respective owners.
 
 ## Commercial Support
-
-Altinity is the primary maintainer of the operator. It is the basis of Altinity.Cloud and
+[Altinity](https://altinity.com) is the primary maintainer of the operator. It is the basis of Altinity.Cloud and
 is also used in self-managed installations. Altinity offers a range of 
 services related to ClickHouse and analytic applications on Kubernetes. 
 
-- [Official website](https://altinity.com/) - Get a high level overview of Altinity and our offerings.
 - [Altinity.Cloud](https://altinity.com/cloud-database/) - Run ClickHouse in our cloud or yours.
 - [Altinity Support](https://altinity.com/support/) - Get Enterprise-class support for ClickHouse.
 - [Slack](https://altinity.com/slack) - Talk directly with ClickHouse users and Altinity devs.
