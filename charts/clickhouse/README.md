@@ -1,15 +1,7 @@
 # clickhouse
-![Version: 0.3.5](https://img.shields.io/badge/Version-0.3.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.3.6.10034](https://img.shields.io/badge/AppVersion-25.3.6.10034-informational?style=flat-square)
+![Version: 0.3.7](https://img.shields.io/badge/Version-0.3.7-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.3.6.10034](https://img.shields.io/badge/AppVersion-25.3.6.10034-informational?style=flat-square)
 
 A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for ClickHouse
-
-## Features
-
-- Single-node or multi-node ClickHouse clusters
-- Sharding and replication
-- ClickHouse Keeper integration
-- Persistent storage configuration
-- Init scripts
 
 ## Requirements
 
@@ -30,8 +22,9 @@ helm install release-name altinity/clickhouse --namespace clickhouse --create-na
 Note that by default the chart includes the Altinity Operator. For most production use cases you will want to disable this and install the operator explicitly from its own helm chart.
 
 ```sh
-# add the altinity operator chart repository
-helm repo add altinity-operator https://docs.altinity.com/clickhouse-operator
+
+# add the altinity chart repository
+helm repo add altinity https://helm.altinity.com
 
 # create the namespace
 kubectl create namespace clickhouse
@@ -40,15 +33,10 @@ kubectl create namespace clickhouse
 helm install clickhouse-operator altinity/altinity-clickhouse-operator \
 --namespace clickhouse
 
-# add the altinity chart repository
-helm repo add altinity https://helm.altinity.com
-
 # install the clickhouse chart without the operator
 helm install release-name altinity/clickhouse --namespace clickhouse \
 --set operator.enabled=false
 ```
-
-> Yes, we're aware that the domains for the helm repos are a bit odd. We're working on it.
 
 ### Configuring the bundled operator
 
@@ -76,10 +64,10 @@ release namespace so each operator manages only its own resources.
 
 ```sh
 helm install second-release altinity/clickhouse \
-  --namespace test \
-  --set operator.namespaceOverride=test \
+  --namespace test2 \
+  --set operator.namespaceOverride=test2 \
   --set operator.rbac.namespaceScoped=true \
-  --set operator.configs.files.config\\.yaml.watch.namespaces=\{test\}
+  --set operator.configs.files.config\\.yaml.watch.namespaces=\{test2\}
 ```
 
 Consult the [Altinity ClickHouse Operator chart documentation](https://helm.altinity.com/)
@@ -205,7 +193,7 @@ EOSQL
 | clickhouse.defaultUser.password | string | `""` |  |
 | clickhouse.defaultUser.password_secret_name | string | `""` | Name of an existing Kubernetes secret containing the default user password. If set, the password will be read from the secret instead of using the password field. The secret should contain a key named 'password'. |
 | clickhouse.extraConfig | string | `"<clickhouse>\n</clickhouse>\n"` | Miscellanous config for ClickHouse (in xml format) |
-| clickhouse.extraContainers | list | `[]` |  |
+| clickhouse.extraContainers | list | `[]` | Extra containers for clickhouse pods |
 | clickhouse.extraPorts | list | `[]` | Additional ports to expose in the ClickHouse container Example: extraPorts:   - name: custom-port     containerPort: 8080 |
 | clickhouse.extraUsers | string | `"<clickhouse>\n</clickhouse>\n"` | Additional users config for ClickHouse (in xml format) |
 | clickhouse.extraVolumes | list | `[]` | Extra volumes for clickhouse pods |
@@ -250,10 +238,10 @@ EOSQL
 | keeper.nodeSelector | object | `{}` |  |
 | keeper.podAnnotations | object | `{}` |  |
 | keeper.replicaCount | int | `3` | Number of keeper replicas. Must be an odd number. !! DO NOT CHANGE AFTER INITIAL DEPLOYMENT |
-| keeper.resources.cpuLimitsMs | int | `3` |  |
-| keeper.resources.cpuRequestsMs | int | `2` |  |
-| keeper.resources.memoryLimitsMiB | string | `"3Gi"` |  |
-| keeper.resources.memoryRequestsMiB | string | `"3Gi"` |  |
+| keeper.resources.cpuLimitsMs | int | `500` |  |
+| keeper.resources.cpuRequestsMs | int | `100` |  |
+| keeper.resources.memoryLimitsMiB | string | `"1Gi"` |  |
+| keeper.resources.memoryRequestsMiB | string | `"512Mi"` |  |
 | keeper.settings | object | `{}` |  |
 | keeper.tag | string | `"25.3.6.10034.altinitystable"` |  |
 | keeper.tolerations | list | `[]` |  |
