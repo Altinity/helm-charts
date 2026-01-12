@@ -1,5 +1,5 @@
 # clickhouse
-![Version: 0.3.5](https://img.shields.io/badge/Version-0.3.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.3.6.10034](https://img.shields.io/badge/AppVersion-25.3.6.10034-informational?style=flat-square)
+![Version: 0.3.8](https://img.shields.io/badge/Version-0.3.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.3.6.10034](https://img.shields.io/badge/AppVersion-25.3.6.10034-informational?style=flat-square)
 
 A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for ClickHouse
 
@@ -15,7 +15,7 @@ A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for 
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://helm.altinity.com | operator(altinity-clickhouse-operator) | 0.25.5 |
+| https://helm.altinity.com | operator(altinity-clickhouse-operator) | 0.25.6 |
 
 ## Installing the Chart
 
@@ -80,6 +80,15 @@ helm install second-release altinity/clickhouse \
   --set operator.namespaceOverride=test \
   --set operator.rbac.namespaceScoped=true \
   --set operator.configs.files.config\\.yaml.watch.namespaces=\{test\}
+```
+
+By default, the operator installs the Custom Resource Definitions (CRDs) for ClickHouse resources.
+If you have already installed the CRDs separately, you can disable automatic CRD installation:
+
+```sh
+helm install third-release altinity/clickhouse --namespace clickhouse \
+  --namespace test \
+  --set operator.crds.enabled=false
 ```
 
 Consult the [Altinity ClickHouse Operator chart documentation](https://helm.altinity.com/)
