@@ -120,9 +120,15 @@ Pod Template Base
               {{- end }}
               resources:
                 {{- toYaml .Values.clickhouse.resources | nindent 16 }}
-            {{- with .Values.clickhouse.extraContainers }}
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
+              {{- if .Values.clickhouse.extraContainers}}
+              {{- with .Values.clickhouse.extraContainers }}
+              {{- $dataVol := printf "%s-%s-data" $.Release.Name $.Values.nameOverride }}
+
+              {{- $y := toYaml . }}
+              {{- $y | replace "CLICKHOUSE_DATA_VOLUME" $dataVol | nindent 12 }}
+
+              {{- end }}
+              {{- end }}
           {{- if or .Values.clickhouse.initScripts.enabled .Values.clickhouse.extraVolumes }}
           volumes:
             {{- if .Values.clickhouse.initScripts.enabled }}

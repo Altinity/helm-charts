@@ -26,7 +26,7 @@ clickhouse:
     # @default -- 127.0.0.1/32
     hostIP: 127.0.0.1/32
 
-  # -- Configure additional ClickHouse users.
+  # -- Configure additional ClickHouse users and their profiles.
   users: []
   # users:
   #   - name: app_user
@@ -35,6 +35,26 @@ clickhouse:
   #     password_secret_name: "app-user-secret"  # secret must contain 'password' key
   #     grants:
   #       - "GRANT SELECT ON database.*"
+  #     profile:
+  #       max_memory_usage: "40000000000"
+  #       max_query_size: "2000000"
+  #       readonly: "0"
+  #       allow_ddl: "0"
+  #       connect_timeout_with_failover_ms: "10000"
+  # Server level settings for each clickhouse replica
+  settings: []
+#  settings:
+#    max_table_size_to_drop: "0"
+#    max_concurrent_queries: 1000
+#    logger/level: "error"
+#    logger/console: "true"
+#    restore_threads: 48
+#    prometheus/endpoint: /metrics
+#    prometheus/port: 9363
+#    prometheus/metrics: true
+#    prometheus/events: true
+#    prometheus/asynchronous_metrics: true
+#    prometheus/status_info: true
 
   # -- number of replicas. If greater than 1, keeper must be enabled
   # or a keeper host should be provided under clickhouse.keeper.host.
@@ -179,6 +199,16 @@ clickhouse:
 
   # -- Extra containers for clickhouse pods
   extraContainers: []
+# If you want to make use of clickhouse data volume, which is the case of clickhouse-backup, you can specify the volumeMounts like this.
+# The value will be automatically replaced.
+
+
+#  extraContainers:
+#    - name: clickhouse-backup
+#      image: altinity/clickhouse-backup:master
+#      volumeMounts:
+#        - name: CLICKHOUSE_DATA_VOLUME
+#          mountPath: /var/lib/clickhouse
 
   # -- Extra volumes for clickhouse pods
   extraVolumes: []
