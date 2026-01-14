@@ -86,10 +86,14 @@ By default, the operator installs the Custom Resource Definitions (CRDs) for Cli
 If you have already installed the CRDs separately, you can disable automatic CRD installation:
 
 ```sh
+# Helm 3+ requires --skip-crds see link below
 helm install third-release altinity/clickhouse --namespace clickhouse \
   --namespace test \
-  --set operator.crds.enabled=false
+  --skip-crds \
+  --set operator.crdHook.enabled=false
 ```
+
+Documentation: [Helm documentation explaining crds/ folder behavior](https://helm.sh/docs/chart_best_practices/custom_resource_definitions/#install-a-crd-declaration-before-using-the-resource)
 
 Consult the [Altinity ClickHouse Operator chart documentation](https://helm.altinity.com/)
 for the full list of available options. Any of those settings can be applied through the
