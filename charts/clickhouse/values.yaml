@@ -206,9 +206,8 @@ clickhouse:
 #  extraContainers:
 #    - name: clickhouse-backup
 #      image: altinity/clickhouse-backup:master
-#      volumeMounts:
-#        - name: CLICKHOUSE_DATA_VOLUME
-#          mountPath: /var/lib/clickhouse
+#      mounts:
+#       data: true   # ← “I want to attach clickhouse data volume”
 
   # -- Extra volumes for clickhouse pods
   extraVolumes: []
@@ -222,6 +221,14 @@ clickhouse:
     configMapName: ""
     # -- Set to true to always run init scripts on container startup
     alwaysRun: true
+  resources: {}
+#  Example on how you specify resources of the clickhouse container
+#
+#  resources:
+#    requests:
+#      memory: "150Gi"
+#    limits:
+#      memory: "200Gi"
 
 # CHK parameters
 keeper:
