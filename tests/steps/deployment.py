@@ -328,6 +328,24 @@ class HelmState:
                 )
                 note(f"✓ Keeper resources verified")
 
+    def verify_extra_containers(self, namespace):
+        """Verify extraContainers configuration that affects CHI pod templates."""
+        extra_containers = self.clickhouse_config.get("extraContainers", []) or []
+        if not extra_containers:
+            return
+
+        for c in extra_containers:
+            mounts = c.get("mounts") or {}
+            if mounts.get("data") is True:
+                container_name = c.get("name")
+                assert container_name, "extraContainers entry with mounts.data=true must set name"
+                # This matches exactly what Helm created: <release>-<nameOverride|clickhouse>-data
+                clickhouse.verify_extra_container_data_mount(
+                    namespace=namespace,
+                    container_name=container_name,
+                    expected_volume_name=None,
+                )
+
     def verify_replication_health(self, namespace):
         """Verify replication health through system tables."""
         admin_password = self.clickhouse_config.get("defaultUser", {}).get(
@@ -437,6 +455,9 @@ class HelmState:
 
         if self.clickhouse_config.get("extraConfig"):
             self.verify_extra_config(namespace=namespace)
+
+        if self.clickhouse_config.get("extraContainers"):
+            self.verify_extra_containers(namespace=namespace)
 
         if self.keeper_config.get("enabled"):
             self.verify_keeper(namespace=namespace)

@@ -249,6 +249,85 @@ def verify_persistence_configuration(self, namespace, expected_size="10Gi"):
     note(f"Persistence configuration verified: {expected_size} storage")
 
 
+@TestStep(Then)
+def verify_extra_container_data_mount(
+    self,
+    namespace: str,
+    container_name: str,
+    expected_volume_name: str = None,
+    expected_mount_path: str = "/var/lib/clickhouse",
+):
+    """Verify an extra container has the ClickHouse data volume mounted in CHI spec.
+
+    This validates the Helm feature:
+      clickhouse.extraContainers[].mounts.data=true
+    which should add:
+      volumeMounts:
+        - name: <release>-<nameOverride|clickhouse>-data
+          mountPath: /var/lib/clickhouse
+
+    If expected_volume_name is None, it will be extracted from the main ClickHouse
+    container's volumeMounts to match exactly what Helm created.
+    """
+    chi_info = get_chi_info(namespace=namespace)
+    assert chi_info is not None, "ClickHouseInstallation not found"
+
+    pod_templates = (
+        chi_info.get("spec", {}).get("templates", {}).get("podTemplates", []) or []
+    )
+    assert len(pod_templates) > 0, "No podTemplates found in ClickHouseInstallation"
+
+    actual_volume_name = expected_volume_name
+    if actual_volume_name is None:
+        for pt in pod_templates:
+            containers = pt.get("spec", {}).get("containers", []) or []
+            for c in containers:
+                if c.get("name") == "clickhouse":
+                    for vm in c.get("volumeMounts", []) or []:
+                        if vm.get("mountPath") == expected_mount_path:
+                            actual_volume_name = vm.get("name")
+                            break
+                    if actual_volume_name:
+                        break
+            if actual_volume_name:
+                break
+
+        assert (
+            actual_volume_name is not None
+        ), f"Could not find data volume name from main ClickHouse container mounting {expected_mount_path}"
+
+    found_container = False
+    found_mount = False
+
+    for pt in pod_templates:
+        containers = pt.get("spec", {}).get("containers", []) or []
+        for c in containers:
+            if c.get("name") != container_name:
+                continue
+
+            found_container = True
+            for vm in c.get("volumeMounts", []) or []:
+                if (
+                    vm.get("name") == actual_volume_name
+                    and vm.get("mountPath") == expected_mount_path
+                ):
+                    found_mount = True
+                    break
+
+    assert found_container, (
+        f"Extra container '{container_name}' not found in CHI podTemplates. "
+        f"Templates checked: {len(pod_templates)}"
+    )
+    assert found_mount, (
+        f"Expected volumeMount not found for container '{container_name}'. "
+        f"Expected name='{actual_volume_name}', mountPath='{expected_mount_path}'"
+    )
+
+    note(
+        f"Extra container '{container_name}' mounts '{actual_volume_name}' at '{expected_mount_path}'"
+    )
+
+
 @TestStep(When)
 def get_keeper_pods(self, namespace):
     """Get Keeper pods (excluding operator pods)."""
