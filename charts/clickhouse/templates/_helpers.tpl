@@ -1,13 +1,4 @@
 {{/*
-Validations
-*/}}
-{{- define "validate.clickhouse.keeper" -}}
-  {{- if and (or (gt (.Values.clickhouse.replicasCount | int) 1) (not (empty .Values.clickhouse.zones))) (not (or .Values.keeper.enabled .Values.clickhouse.keeper.host)) }}
-    {{- fail "When 'clickhouse.replicasCount' > 1, either 'keeper.enabled' must be true or 'clickhouse.keeper.host' must be set." }}
-  {{- end -}}
-{{- end -}}
-
-{{/*
 Expand the name of the chart.
 */}}
 {{- define "clickhouse.name" -}}

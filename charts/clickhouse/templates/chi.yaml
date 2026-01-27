@@ -214,5 +214,3 @@ spec:
   {{- if not (empty .Values.namespaceDomainPattern) }}
   namespaceDomainPattern: {{ .Values.namespaceDomainPattern | quote }}
   {{- end }}
-
-{{ include "validate.clickhouse.keeper" . }}

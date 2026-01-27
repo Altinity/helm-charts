@@ -1,3 +1,9 @@
+{{- $WARNING := "WARNING:" -}}
+{{- $NOTICE := "NOTICE:" -}}
+
+{{/* Run configuration validation - will fail with aggregated errors if issues found */}}
+{{- include "clickhouse.checkConfig" . -}}
+
 {{ if .Release.IsInstall }}
   
 ---------------------------------------------------------------------------------

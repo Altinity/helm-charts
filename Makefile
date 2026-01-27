@@ -17,6 +17,7 @@ docs:
 verify:
 	${REPO_ROOT}/scripts/validate.sh
 	${REPO_ROOT}/scripts/lint.sh
+	python3 ${REPO_ROOT}/tests/run/validation.py
 
 version:
 	@echo ${VERSION}
