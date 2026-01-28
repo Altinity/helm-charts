@@ -121,27 +121,16 @@ Pod Template Base
               resources:
                 {{- toYaml .Values.clickhouse.resources | nindent 16 }}
             {{- range .Values.clickhouse.extraContainers }}
-            - name: {{ .name }}
-              image: {{ .image }}
-              {{- with .command }}
-              command: {{ toYaml . | nindent 16 }}
+            {{- $c := deepCopy . }}
+            {{- if $c.mounts }}
+              {{- if $c.mounts.data }}
+                {{- $vm := dict "name" (include "clickhouse.volumeClaimTemplateName" $) "mountPath" "/var/lib/clickhouse" }}
+                {{- $existing := $c.volumeMounts | default (list) }}
+                {{- $_ := set $c "volumeMounts" (append $existing $vm) }}
               {{- end }}
-              {{- with .env }}
-              env: {{ toYaml . | nindent 16 }}
-              {{- end }}
-              {{- with .ports }}
-              ports: {{ toYaml . | nindent 16 }}
-              {{- end }}
-              {{- with .resources }}
-              resources: {{ toYaml . | nindent 16 }}
-              {{- end }}
-              {{- if .mounts }}
-              volumeMounts:
-                {{- if .mounts.data }}
-                - name: {{ include "clickhouse.dataVolumeName" $ }}
-                  mountPath: /var/lib/clickhouse
-                {{- end }}
-              {{- end }}
+              {{- $_ := unset $c "mounts" }}
+            {{- end }}
+            {{- toYaml (list $c) | nindent 12 }}
             {{- end }}
           {{- if or .Values.clickhouse.initScripts.enabled .Values.clickhouse.extraVolumes }}
           volumes:
@@ -194,13 +183,6 @@ Data Volume Claim Template Name
 {{- define "clickhouse.volumeClaimTemplateName" -}}
 {{- printf "%s-data" (include "clickhouse.fullname" .) | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
-
-{{/*
-Data Volume Name
-*/}}
-{{- define "clickhouse.dataVolumeName" -}}
-{{- printf "%s-%s-data" .Release.Name (.Values.nameOverride | default "clickhouse") -}}
-{{- end -}}
 
 {{/*
 Logs Volume Claim Template Name

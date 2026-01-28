@@ -18,9 +18,16 @@ clickhouse:
         - "sleep 3600"
       mounts:
         data: true
-
+  users:
+    - name: test_user
+      accessManagement: 1
+      profile: "test_profile"
+  profiles: 
+    - name: test_profile
+      max_threads: 1
 keeper:
   enabled: false
 
 operator:
   enabled: true
+

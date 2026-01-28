@@ -263,11 +263,12 @@ def verify_extra_container_data_mount(
       clickhouse.extraContainers[].mounts.data=true
     which should add:
       volumeMounts:
-        - name: <release>-<nameOverride|clickhouse>-data
+        - name: <dataVolumeClaimTemplate>
           mountPath: /var/lib/clickhouse
 
-    If expected_volume_name is None, it will be extracted from the main ClickHouse
-    container's volumeMounts to match exactly what Helm created.
+    If expected_volume_name is None, it will be extracted from the
+    ClickHouseInstallation defaults/templates or, as a fallback, from the
+    main ClickHouse container's volumeMounts.
     """
     chi_info = get_chi_info(namespace=namespace)
     assert chi_info is not None, "ClickHouseInstallation not found"
@@ -278,6 +279,10 @@ def verify_extra_container_data_mount(
     assert len(pod_templates) > 0, "No podTemplates found in ClickHouseInstallation"
 
     actual_volume_name = expected_volume_name
+    if actual_volume_name is None:
+        defaults = chi_info.get("spec", {}).get("defaults", {}).get("templates", {}) or {}
+        actual_volume_name = defaults.get("dataVolumeClaimTemplate")
+
     if actual_volume_name is None:
         for pt in pod_templates:
             containers = pt.get("spec", {}).get("containers", []) or []
@@ -292,9 +297,9 @@ def verify_extra_container_data_mount(
             if actual_volume_name:
                 break
 
-        assert (
-            actual_volume_name is not None
-        ), f"Could not find data volume name from main ClickHouse container mounting {expected_mount_path}"
+    assert (
+        actual_volume_name is not None
+    ), f"Could not find data volume name for mountPath {expected_mount_path}"
 
     found_container = False
     found_mount = False
@@ -326,6 +331,157 @@ def verify_extra_container_data_mount(
     note(
         f"Extra container '{container_name}' mounts '{actual_volume_name}' at '{expected_mount_path}'"
     )
+
+
+@TestStep(Then)
+def verify_extra_container_spec(self, namespace: str, expected_container: dict):
+    """Verify an extra container spec is present in CHI pod templates."""
+    chi_info = get_chi_info(namespace=namespace)
+    assert chi_info is not None, "ClickHouseInstallation not found"
+
+    pod_templates = (
+        chi_info.get("spec", {}).get("templates", {}).get("podTemplates", []) or []
+    )
+    assert len(pod_templates) > 0, "No podTemplates found in ClickHouseInstallation"
+
+    name = expected_container.get("name")
+    assert name, "extraContainers entry must set name"
+
+    matched = 0
+    for pt in pod_templates:
+        containers = pt.get("spec", {}).get("containers", []) or []
+        for c in containers:
+            if c.get("name") != name:
+                continue
+
+            matched += 1
+
+            if "image" in expected_container:
+                assert (
+                    c.get("image") == expected_container["image"]
+                ), f"Extra container '{name}' image mismatch"
+
+            if "command" in expected_container:
+                assert (
+                    c.get("command") == expected_container["command"]
+                ), f"Extra container '{name}' command mismatch"
+
+            if "env" in expected_container:
+                assert (
+                    c.get("env") == expected_container["env"]
+                ), f"Extra container '{name}' env mismatch"
+
+            if "ports" in expected_container:
+                assert (
+                    c.get("ports") == expected_container["ports"]
+                ), f"Extra container '{name}' ports mismatch"
+
+            if "resources" in expected_container:
+                actual_resources = c.get("resources", {})
+                expected_resources = expected_container["resources"]
+                for block in ("requests", "limits"):
+                    if block in expected_resources:
+                        assert (
+                            block in actual_resources
+                        ), f"Extra container '{name}' missing resources.{block}"
+                        for key, value in expected_resources[block].items():
+                            actual_value = actual_resources[block].get(key)
+                            assert (
+                                actual_value == value
+                            ), f"Extra container '{name}' resources.{block}.{key} mismatch"
+
+    assert matched > 0, f"Extra container '{name}' not found in CHI podTemplates"
+    note(f"Extra container '{name}' spec verified in {matched} podTemplate(s)")
+
+
+@TestStep(Then)
+def verify_clickhouse_resources(self, namespace: str, expected_resources: dict):
+    """Verify ClickHouse container resources in CHI pod templates."""
+    chi_info = get_chi_info(namespace=namespace)
+    assert chi_info is not None, "ClickHouseInstallation not found"
+
+    pod_templates = (
+        chi_info.get("spec", {}).get("templates", {}).get("podTemplates", []) or []
+    )
+    assert len(pod_templates) > 0, "No podTemplates found in ClickHouseInstallation"
+
+    matched = 0
+    for pt in pod_templates:
+        containers = pt.get("spec", {}).get("containers", []) or []
+        for c in containers:
+            if c.get("name") != "clickhouse":
+                continue
+
+            matched += 1
+            actual_resources = c.get("resources", {})
+            for block in ("requests", "limits"):
+                if block in expected_resources:
+                    assert (
+                        block in actual_resources
+                    ), f"ClickHouse container missing resources.{block}"
+                    for key, value in expected_resources[block].items():
+                        actual_value = actual_resources[block].get(key)
+                        assert (
+                            actual_value == value
+                        ), f"ClickHouse resources.{block}.{key} mismatch"
+
+    assert matched > 0, "ClickHouse container not found in CHI podTemplates"
+    note(f"ClickHouse resources verified in {matched} podTemplate(s)")
+
+
+@TestStep(Then)
+def verify_profiles_and_user_settings(
+    self,
+    namespace: str,
+    expected_users: list,
+    expected_profiles: dict,
+    expected_settings: dict,
+):
+    """Verify users, profiles, and settings are rendered in CHI configuration."""
+    chi_info = get_chi_info(namespace=namespace)
+    assert chi_info is not None, "ClickHouseInstallation not found"
+
+    configuration = chi_info.get("spec", {}).get("configuration", {}) or {}
+    users_cfg = configuration.get("users", {}) or {}
+    profiles_cfg = configuration.get("profiles", {}) or {}
+    settings_cfg = configuration.get("settings", {}) or {}
+
+    for user in expected_users or []:
+        name = user.get("name")
+        if not name:
+            continue
+
+        profile = user.get("profile")
+        if profile:
+            actual_profile = users_cfg.get(f"{name}/profile")
+            assert (
+                actual_profile == profile
+            ), f"Expected {name}/profile={profile}, got {actual_profile}"
+
+        user_settings = user.get("settings") or {}
+        for key, value in user_settings.items():
+            actual_value = users_cfg.get(f"{name}/{key}")
+            expected_value = str(value)
+            assert (
+                actual_value == expected_value
+            ), f"Expected {name}/{key}={expected_value}, got {actual_value}"
+
+    for profile_name, profile_settings in (expected_profiles or {}).items():
+        for key, value in (profile_settings or {}).items():
+            actual_value = profiles_cfg.get(f"{profile_name}/{key}")
+            expected_value = str(value)
+            assert (
+                actual_value == expected_value
+            ), f"Expected profile {profile_name}/{key}={expected_value}, got {actual_value}"
+
+    for key, value in (expected_settings or {}).items():
+        actual_value = settings_cfg.get(key)
+        expected_value = str(value)
+        assert (
+            actual_value == expected_value
+        ), f"Expected setting {key}={expected_value}, got {actual_value}"
+
+    note("Users, profiles, and settings configuration verified")
 
 
 @TestStep(When)

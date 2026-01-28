@@ -154,17 +154,22 @@ spec:
             key: password
       {{- else if .password_sha256_hex }}
       {{ .name }}/password_sha256_hex: {{ .password_sha256_hex | quote }}
-      {{ .name }}/profile: {{ .name }}
       {{- end }}
-      {{- end }}
-    {{- if .Values.clickhouse.users }}
-    profiles:
-    {{- range .Values.clickhouse.users }}
       {{- if .profile }}
-        {{- $user := .name }}
-        {{- range $key, $value := .profile }}
+      {{ .name }}/profile: {{ .profile | quote }}
+      {{- end }}
+      {{- if .settings }}
+      {{- $user := .name }}
+      {{- range $key, $value := .settings }}
       {{ $user }}/{{ $key }}: "{{ $value }}"
-        {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
+    {{- if .Values.clickhouse.profiles }}
+    profiles:
+    {{- range $profile, $settings := .Values.clickhouse.profiles }}
+      {{- range $key, $value := $settings }}
+      {{ $profile }}/{{ $key }}: "{{ $value }}"
       {{- end }}
     {{- end }}
     {{- end }}
