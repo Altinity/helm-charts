@@ -26,23 +26,33 @@ clickhouse:
     # @default -- 127.0.0.1/32
     hostIP: 127.0.0.1/32
 
-  # -- Configure additional ClickHouse users and their profiles.
+  # -- Configure additional ClickHouse users and per-user settings.
   users: []
   # users:
   #   - name: app_user
   #     hostIP: ["10.0.0.0/8"]  # default: "0.0.0.0/0"
   #     accessManagement: 1  # default: 0
   #     password_secret_name: "app-user-secret"  # secret must contain 'password' key
+  #     profile: "app_profile"
   #     grants:
   #       - "GRANT SELECT ON database.*"
-  #     profile:
+  #     settings:
   #       max_memory_usage: "40000000000"
   #       max_query_size: "2000000"
   #       readonly: "0"
   #       allow_ddl: "0"
   #       connect_timeout_with_failover_ms: "10000"
+  # Named profiles, referenced by users[].profile
+  profiles: {}
+  # profiles:
+  #   app_profile:
+  #     max_memory_usage: "40000000000"
+  #     max_query_size: "2000000"
+  #     readonly: "0"
+  #     allow_ddl: "0"
+  #     connect_timeout_with_failover_ms: "10000"
   # Server level settings for each clickhouse replica
-  settings: []
+  settings: {}
 #  settings:
 #    max_table_size_to_drop: "0"
 #    max_concurrent_queries: 1000

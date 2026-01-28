@@ -205,6 +205,8 @@ EOSQL
 | clickhouse.serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | clickhouse.shardsCount | int | `1` | number of shards. |
 | clickhouse.users | list | `[]` | Configure additional ClickHouse users. |
+| clickhouse.profiles | object | `{}` | Named profiles to apply to users via users[].profile. |
+| clickhouse.settings | object | `{}` | Server-level settings for each ClickHouse replica. |
 | clickhouse.zones | list | `[]` |  |
 | keeper.enabled | bool | `false` | Whether to enable Keeper. Required for replicated tables. |
 | keeper.image | string | `"altinity/clickhouse-keeper"` |  |

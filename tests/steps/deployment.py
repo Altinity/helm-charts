@@ -335,6 +335,10 @@ class HelmState:
             return
 
         for c in extra_containers:
+            clickhouse.verify_extra_container_spec(
+                namespace=namespace,
+                expected_container=c,
+            )
             mounts = c.get("mounts") or {}
             if mounts.get("data") is True:
                 container_name = c.get("name")
@@ -345,6 +349,33 @@ class HelmState:
                     container_name=container_name,
                     expected_volume_name=None,
                 )
+
+    def verify_clickhouse_resources(self, namespace):
+        """Verify ClickHouse container resources."""
+        resources_config = self.clickhouse_config.get("resources") or {}
+        if not resources_config:
+            return
+
+        clickhouse.verify_clickhouse_resources(
+            namespace=namespace,
+            expected_resources=resources_config,
+        )
+
+    def verify_profiles_and_user_settings(self, namespace):
+        """Verify users, profiles, and settings render correctly in CHI."""
+        users = self.clickhouse_config.get("users") or []
+        profiles = self.clickhouse_config.get("profiles") or {}
+        settings = self.clickhouse_config.get("settings") or {}
+
+        if not users and not profiles and not settings:
+            return
+
+        clickhouse.verify_profiles_and_user_settings(
+            namespace=namespace,
+            expected_users=users,
+            expected_profiles=profiles,
+            expected_settings=settings,
+        )
 
     def verify_replication_health(self, namespace):
         """Verify replication health through system tables."""
@@ -458,6 +489,16 @@ class HelmState:
 
         if self.clickhouse_config.get("extraContainers"):
             self.verify_extra_containers(namespace=namespace)
+
+        if self.clickhouse_config.get("resources"):
+            self.verify_clickhouse_resources(namespace=namespace)
+
+        if (
+            self.clickhouse_config.get("users")
+            or self.clickhouse_config.get("profiles")
+            or self.clickhouse_config.get("settings")
+        ):
+            self.verify_profiles_and_user_settings(namespace=namespace)
 
         if self.keeper_config.get("enabled"):
             self.verify_keeper(namespace=namespace)
