@@ -120,8 +120,17 @@ Pod Template Base
               {{- end }}
               resources:
                 {{- toYaml .Values.clickhouse.resources | nindent 16 }}
-            {{- with .Values.clickhouse.extraContainers }}
-            {{- toYaml . | nindent 12 }}
+            {{- range .Values.clickhouse.extraContainers }}
+            {{- $c := deepCopy . }}
+            {{- if $c.mounts }}
+              {{- if $c.mounts.data }}
+                {{- $vm := dict "name" (include "clickhouse.volumeClaimTemplateName" $) "mountPath" "/var/lib/clickhouse" }}
+                {{- $existing := $c.volumeMounts | default (list) }}
+                {{- $_ := set $c "volumeMounts" (append $existing $vm) }}
+              {{- end }}
+              {{- $_ := unset $c "mounts" }}
+            {{- end }}
+            {{- toYaml (list $c) | nindent 12 }}
             {{- end }}
           {{- if or .Values.clickhouse.initScripts.enabled .Values.clickhouse.extraVolumes }}
           volumes:

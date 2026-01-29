@@ -1,0 +1,26 @@
+---
+# Users/profiles/settings regression test
+clickhouse:
+  replicasCount: 1
+  shardsCount: 1
+
+  users:
+    - name: app_user
+      profile: "app_profile"
+      settings:
+        readonly: "0"
+        max_query_size: "2000000"
+
+  profiles:
+    app_profile:
+      max_memory_usage: "40000000000"
+      allow_ddl: "0"
+
+  settings:
+    max_concurrent_queries: "1000"
+
+keeper:
+  enabled: false
+
+operator:
+  enabled: true
