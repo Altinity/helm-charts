@@ -1,0 +1,84 @@
+clickhouse:
+  tls:
+    enabled: true
+
+    # certificateFile can either be a string or a secret reference
+    certificateFile:
+      configFileName: foo.crt
+      # Option 1: specify file content directly in the configs
+      inlineFileContent: |
+        ***
+      # Option 2: file content comes from a Kubernetes secret
+      # secretReference:
+      #   name: clickhouse-certs
+      #   key: server.crt
+    
+    # privateKeyFile has same format as certificateFile
+    privateKeyFile:
+      # configFileName maps to '<config_file_name>' for the
+      # operator rule that specifies where the secret is mounted.
+      configFileName: bar.key
+      # Only one of `inlineFileContent` or `secretReference` can be specified.
+      # inlineFileContent: |
+      #   ***
+      secretReference:
+        name: clickhouse-certs
+        key: server.key
+
+    # dhParamsFile has same format as certificateFile
+    dhParamsFile:
+      configFileName: dhparam.pem
+      secretReference:
+        name: clickhouse-certs
+        key: dhparam.pem
+
+    opensslConfig: |
+      <clickhouse>
+        <openSSL>
+          <server>
+            <certificateFile>/etc/clickhouse-server/config.d/foo.crt</certificateFile>
+            <privateKeyFile>/etc/clickhouse-server/secrets.d/bar.key/clickhouse-certs/server.key</privateKeyFile>
+            <dhParamsFile>/etc/clickhouse-server/secrets.d/dhparam.pem/clickhouse-certs/dhparam.pem</dhParamsFile>
+            <verificationMode>none</verificationMode>
+            <loadDefaultCAFile>true</loadDefaultCAFile>
+            <cacheSessions>true</cacheSessions>
+            <disableProtocols>sslv2,sslv3</disableProtocols>
+            <preferServerCiphers>true</preferServerCiphers>
+          </server>
+        </openSSL>
+      </clickhouse>
+
+# The above example will produce the following snippet in the ClickHouseInstallation CR:
+# ```yaml
+# spec:
+#   configuration:
+#     files:
+#       openssl.xml: |
+#         <clickhouse>
+#           <openSSL>
+#             <server>
+#               <certificateFile>/etc/clickhouse-server/secrets.d/server.crt/clickhouse-certs/server.crt</certificateFile>
+#               <privateKeyFile>/etc/clickhouse-server/secrets.d/server.key/clickhouse-certs/server.key</privateKeyFile>
+#               <dhParamsFile>/etc/clickhouse-server/secrets.d/dhparam.pem/clickhouse-certs/dhparam.pem</dhParamsFile>
+#               <verificationMode>none</verificationMode>
+#               <loadDefaultCAFile>true</loadDefaultCAFile>
+#               <cacheSessions>true</cacheSessions>
+#               <disableProtocols>sslv2,sslv3</disableProtocols>
+#               <preferServerCiphers>true</preferServerCiphers>
+#             </server>
+#           </openSSL>
+#         </clickhouse>
+#       # note the `config.d/` prefix only when `inlineFileContent` is specified.
+#       config.d/foo.crt: |
+#         ***
+#       bar.key:
+#         valueFrom:
+#           secretKeyRef:
+#             name: clickhouse-certs
+#             key: server.key
+#       dhparam.pem:
+#         valueFrom:
+#           secretKeyRef:
+#             name: clickhouse-certs
+#             key: dhparam.pem
+# ```
