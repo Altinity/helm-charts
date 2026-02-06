@@ -237,7 +237,8 @@ spec:
     {{- end }}
     {{- $extraConfig := tpl (include "clickhouse.extraConfig" . ) . -}}
     {{- $extraUsers := tpl (include "clickhouse.extraUsers" . ) . -}}
-    {{- if not (and (empty $extraConfig) (empty $extraUsers)) }}
+    {{- $tlsEnabled := and .Values.clickhouse.tls .Values.clickhouse.tls.enabled -}}
+    {{- if not (and (empty $extraConfig) (empty $extraUsers) (not $tlsEnabled)) }}
     files:
         {{- if not (empty $extraConfig) }}
         config.d/extra_config.xml: |
@@ -247,9 +248,44 @@ spec:
         users.d/extra_users.xml: |
           {{- tpl $extraUsers . | nindent 10 }}
         {{- end }}
+        {{- if $tlsEnabled }}
+        openssl.xml: |
+          {{- .Values.clickhouse.tls.opensslConfig | nindent 10 }}
+        {{- if .Values.clickhouse.tls.certificateFile.inlineFileContent }}
+        config.d/{{ .Values.clickhouse.tls.certificateFile.configFileName }}: |
+          {{- .Values.clickhouse.tls.certificateFile.inlineFileContent | nindent 10 }}
+        {{- else }}
+        {{ .Values.clickhouse.tls.certificateFile.configFileName }}:
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.clickhouse.tls.certificateFile.secretReference.name }}
+              key: {{ .Values.clickhouse.tls.certificateFile.secretReference.key }}
+        {{- end }}
+        {{- if .Values.clickhouse.tls.privateKeyFile.inlineFileContent }}
+        config.d/{{ .Values.clickhouse.tls.privateKeyFile.configFileName }}: |
+          {{- .Values.clickhouse.tls.privateKeyFile.inlineFileContent | nindent 10 }}
+        {{- else }}
+        {{ .Values.clickhouse.tls.privateKeyFile.configFileName }}:
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.clickhouse.tls.privateKeyFile.secretReference.name }}
+              key: {{ .Values.clickhouse.tls.privateKeyFile.secretReference.key }}
+        {{- end }}
+        {{- if .Values.clickhouse.tls.dhParamsFile.inlineFileContent }}
+        config.d/{{ .Values.clickhouse.tls.dhParamsFile.configFileName }}: |
+          {{- .Values.clickhouse.tls.dhParamsFile.inlineFileContent | nindent 10 }}
+        {{- else }}
+        {{ .Values.clickhouse.tls.dhParamsFile.configFileName }}:
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.clickhouse.tls.dhParamsFile.secretReference.name }}
+              key: {{ .Values.clickhouse.tls.dhParamsFile.secretReference.key }}
+        {{- end }}
+        {{- end }}
     {{- end }}
   {{- if not (empty .Values.namespaceDomainPattern) }}
   namespaceDomainPattern: {{ .Values.namespaceDomainPattern | quote }}
   {{- end }}
 
 {{ include "validate.clickhouse.keeper" . }}
+{{ include "validate.clickhouse.tls" . }}

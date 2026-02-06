@@ -246,6 +246,64 @@ Extra Users
   {{- else -}}
   {{- end -}}
 {{- end -}}
+
+{{/*
+TLS Configuration
+*/}}
+{{- define "validate.clickhouse.tls" -}}
+  {{- if and .Values.clickhouse.tls .Values.clickhouse.tls.enabled }}
+    {{- /* Validate certificateFile */ -}}
+    {{- if not .Values.clickhouse.tls.certificateFile }}
+      {{- fail "When TLS is enabled, certificateFile must be configured" }}
+    {{- end }}
+    {{- $certFile := .Values.clickhouse.tls.certificateFile }}
+    {{- if not $certFile.configFileName }}
+      {{- fail "When TLS is enabled, certificateFile.configFileName must be specified" }}
+    {{- end }}
+    {{- if and $certFile.inlineFileContent $certFile.secretReference }}
+      {{- fail "certificateFile: only one of inlineFileContent or secretReference can be specified" }}
+    {{- end }}
+    {{- if and (not $certFile.inlineFileContent) (not $certFile.secretReference) }}
+      {{- fail "certificateFile: one of inlineFileContent or secretReference must be specified" }}
+    {{- end }}
+    
+    {{- /* Validate privateKeyFile */ -}}
+    {{- if not .Values.clickhouse.tls.privateKeyFile }}
+      {{- fail "When TLS is enabled, privateKeyFile must be configured" }}
+    {{- end }}
+    {{- $keyFile := .Values.clickhouse.tls.privateKeyFile }}
+    {{- if not $keyFile.configFileName }}
+      {{- fail "When TLS is enabled, privateKeyFile.configFileName must be specified" }}
+    {{- end }}
+    {{- if and $keyFile.inlineFileContent $keyFile.secretReference }}
+      {{- fail "privateKeyFile: only one of inlineFileContent or secretReference can be specified" }}
+    {{- end }}
+    {{- if and (not $keyFile.inlineFileContent) (not $keyFile.secretReference) }}
+      {{- fail "privateKeyFile: one of inlineFileContent or secretReference must be specified" }}
+    {{- end }}
+    
+    {{- /* Validate dhParamsFile */ -}}
+    {{- if not .Values.clickhouse.tls.dhParamsFile }}
+      {{- fail "When TLS is enabled, dhParamsFile must be configured" }}
+    {{- end }}
+    {{- $dhFile := .Values.clickhouse.tls.dhParamsFile }}
+    {{- if not $dhFile.configFileName }}
+      {{- fail "When TLS is enabled, dhParamsFile.configFileName must be specified" }}
+    {{- end }}
+    {{- if and $dhFile.inlineFileContent $dhFile.secretReference }}
+      {{- fail "dhParamsFile: only one of inlineFileContent or secretReference can be specified" }}
+    {{- end }}
+    {{- if and (not $dhFile.inlineFileContent) (not $dhFile.secretReference) }}
+      {{- fail "dhParamsFile: one of inlineFileContent or secretReference must be specified" }}
+    {{- end }}
+    
+    {{- /* Validate opensslConfig */ -}}
+    {{- if not .Values.clickhouse.tls.opensslConfig }}
+      {{- fail "When TLS is enabled, opensslConfig must be specified" }}
+    {{- end }}
+  {{- end -}}
+{{- end -}}
+
 {{/*
 Common labels
 */}}
