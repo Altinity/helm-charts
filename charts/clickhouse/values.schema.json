@@ -369,6 +369,14 @@
           "type": "object",
           "description": "Annotations for Keeper pods."
         },
+        "podSecurityContext": {
+          "type": "object",
+          "description": "Pod security context for Keeper pods."
+        },
+        "securityContext": {
+          "type": "object",
+          "description": "Security context for Keeper containers."
+        },
         "volumeClaimAnnotations": {
           "type": "object",
           "description": "Annotations for Keeper volume claims."
