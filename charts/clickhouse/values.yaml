@@ -223,6 +223,14 @@ keeper:
     memoryRequestsMiB: 512Mi
     cpuLimitsMs: 500
     memoryLimitsMiB: 1Gi
+  
+  # @ignore
+  podSecurityContext: {}
+    # runAsUser: 101
+    # runAsGroup: 101
+
+  # @ignore
+  securityContext: {}
 
 operator:
   # -- Whether to enable the Altinity Operator for ClickHouse.
