@@ -1,6 +1,8 @@
 from tests.steps.system import *
 from tests.steps.kubernetes import *
+import tests.steps.clickhouse as clickhouse
 import json
+import xml.etree.ElementTree as ET
 
 
 @TestStep(Then)
@@ -46,20 +48,25 @@ def verify_tls_secret_references_in_chi(self, namespace, chi_name):
 
 
 @TestStep(Then)
-def verify_openssl_config_in_chi(self, namespace, chi_name):
-    """Verify openssl.xml is present in CHI spec."""
-    chi_info = run(cmd=f"kubectl get chi {chi_name} -n {namespace} -o json")
-    chi_data = json.loads(chi_info.stdout)
-    
-    files = chi_data.get("spec", {}).get("configuration", {}).get("files", {})
-    
-    assert "openssl.xml" in files, "openssl.xml not found in CHI"
-    openssl_content = files["openssl.xml"]
-    
-    assert "<openSSL>" in openssl_content, "openssl.xml missing <openSSL> tag"
-    assert "<server>" in openssl_content, "openssl.xml missing <server> tag"
-    
-    note(f"✓ openssl.xml present and valid")
+def verify_openssl_config_on_pod(self, namespace):
+    """Verify openssl.xml format on the ClickHouse pod."""
+    pod_name = clickhouse.get_ready_clickhouse_pod(namespace=namespace)
+
+    result = run(
+        cmd=f"kubectl exec -n {namespace} {pod_name} "
+        f"-- cat /etc/clickhouse-server/config.d/openssl.xml"
+    )
+    content = result.stdout
+
+    try:
+        root = ET.fromstring(content)
+    except ET.ParseError as e:
+        raise AssertionError(f"openssl.xml is not valid XML: {e}")
+
+    server_node = root.find(".//openSSL/server")
+    assert server_node is not None, "openssl.xml missing <openSSL><server> node"
+
+    note(f"✓ openssl.xml present and valid on pod at /etc/clickhouse-server/config.d/openssl.xml")
 
 
 @TestStep(When)
