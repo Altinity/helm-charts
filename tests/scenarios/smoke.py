@@ -80,12 +80,6 @@ def check_deployment(self, fixture_file, skip_external_keeper=True):
     if "tls" in fixture_name:
         with And("verify TLS configuration in CHI"):
             chi_name = f"{release_name}-clickhouse"
-            
-            tls.verify_openssl_config_in_chi(
-                namespace=namespace,
-                chi_name=chi_name
-            )
-            
             tls.verify_tls_files_in_chi(
                 namespace=namespace,
                 chi_name=chi_name,
@@ -94,6 +88,10 @@ def check_deployment(self, fixture_file, skip_external_keeper=True):
             tls.verify_tls_secret_references_in_chi(
                 namespace=namespace,
                 chi_name=chi_name,
+            )
+            
+            tls.verify_openssl_config_on_pod(
+                namespace=namespace,
             )
 
     # Verify metrics endpoint is accessible
