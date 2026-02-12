@@ -12,6 +12,7 @@ from tests.steps.deployment import HelmState
 FIXTURES = [
     "fixtures/01-minimal-single-node.yaml",
     "fixtures/02-replicated-with-users.yaml",
+    "fixtures/tls/01-tls.yaml",
     # "fixtures/03-sharded-advanced.yaml",
     # "fixtures/04-external-keeper.yaml",
     # "fixtures/05-persistence-disabled.yaml",
@@ -89,6 +90,10 @@ def check_deployment(self, fixture_file, skip_external_keeper=True):
             )
             
             tls.verify_openssl_config_on_pod(
+                namespace=namespace,
+            )
+            
+            tls.verify_tls_files_on_pod(
                 namespace=namespace,
             )
 

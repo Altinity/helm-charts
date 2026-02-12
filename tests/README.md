@@ -347,6 +347,7 @@ pip3 install -r tests/requirements.txt
 - `testflows.texts==2.0.211217.1011222` - Text utilities
 - `PyYAML==6.0.1` - YAML parsing
 - `requests==2.32.3` - HTTP requests
+- `cryptography==46.0.5` - TLS validation
 
 ---
 
