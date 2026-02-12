@@ -1,8 +1,12 @@
+import json
+import xml.etree.ElementTree as ET
+
+from cryptography.hazmat.primitives.serialization import load_pem_parameters, load_pem_private_key
+from cryptography.x509 import load_pem_x509_certificate
+
 from tests.steps.system import *
 from tests.steps.kubernetes import *
 import tests.steps.clickhouse as clickhouse
-import json
-import xml.etree.ElementTree as ET
 
 
 @TestStep(Then)
@@ -67,6 +71,45 @@ def verify_openssl_config_on_pod(self, namespace):
     assert server_node is not None, "openssl.xml missing <openSSL><server> node"
 
     note(f"✓ openssl.xml present and valid on pod at /etc/clickhouse-server/config.d/openssl.xml")
+
+
+@TestStep(Then)
+def verify_tls_files_on_pod(self, namespace):
+    """Verify TLS file contents on the ClickHouse pod."""
+
+    pod_name = clickhouse.get_ready_clickhouse_pod(namespace=namespace)
+
+    cert_pem = get_file_contents_from_pod(
+        namespace=namespace,
+        pod_name=pod_name,
+        file_path="/etc/clickhouse-server/config.d/foo.crt",
+    )
+
+    key_pem = get_file_contents_from_pod(
+        namespace=namespace,
+        pod_name=pod_name,
+        file_path="/etc/clickhouse-server/secrets.d/bar.key/clickhouse-certs/server.key",
+    )
+
+    cert = load_pem_x509_certificate(cert_pem.encode())
+    key = load_pem_private_key(key_pem.encode(), password=None)
+
+    cert_modulus = cert.public_key().public_numbers().n
+    key_modulus = key.public_key().public_numbers().n
+
+    assert cert_modulus == key_modulus, "Certificate and private key moduli do not match"
+    note("✓ Certificate and private key moduli match")
+
+    dh_pem = get_file_contents_from_pod(
+        namespace=namespace,
+        pod_name=pod_name,
+        file_path="/etc/clickhouse-server/secrets.d/dhparam.pem/clickhouse-certs/dhparam.pem",
+    )
+
+    dh_params = load_pem_parameters(dh_pem.encode())
+    assert dh_params.parameter_numbers().g == 2, \
+        f"Expected DH params generator g=2, got g={dh_params.parameter_numbers().g}"
+    note("✓ DH params valid (g=2)")
 
 
 @TestStep(When)

@@ -93,6 +93,10 @@ def check_deployment(self, fixture_file, skip_external_keeper=True):
             tls.verify_openssl_config_on_pod(
                 namespace=namespace,
             )
+            
+            tls.verify_tls_files_on_pod(
+                namespace=namespace,
+            )
 
     # Verify metrics endpoint is accessible
     with And("verify metrics endpoint"):
