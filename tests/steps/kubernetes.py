@@ -7,7 +7,7 @@ import time
 def get_pods(self, namespace):
     """Get the list of pods in the specified namespace and return in a list."""
 
-    pods = run(cmd=f"minikube kubectl -- get pods -n {namespace} -o json")
+    pods = run(cmd=f"kubectl get pods -n {namespace} -o json")
     pods = json.loads(pods.stdout)["items"]
 
     return [p["metadata"]["name"] for p in pods]
