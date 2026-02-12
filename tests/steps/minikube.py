@@ -2,6 +2,9 @@ from tests.steps.system import *
 from tests.steps.kubernetes import use_context
 
 
+CONTEXT_NAME = "minikube"
+
+
 @TestStep(Given)
 def minikube_start(self, cpus, memory):
     """Start minikube."""

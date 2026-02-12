@@ -2,7 +2,7 @@ from testflows.core import *
 
 import os
 import tests.steps.kubernetes as kubernetes
-import tests.steps.minikube as minikube
+import tests.steps.local_cluster as local_cluster
 import tests.steps.helm as helm
 import tests.steps.clickhouse as clickhouse
 from tests.steps.deployment import HelmState
@@ -51,7 +51,7 @@ def check_deployment(self, fixture_file, skip_external_keeper=True):
         return
 
     with When("install ClickHouse with fixture configuration"):
-        kubernetes.use_context(context_name="minikube")
+        kubernetes.use_context(context_name=local_cluster.get_context_name())
         helm.install(
             namespace=namespace, release_name=release_name, values_file=fixture_file
         )
@@ -101,7 +101,7 @@ def check_upgrade(self, initial_fixture, upgrade_fixture):
         note(f"Upgraded pods: {upgrade_state.get_expected_pod_count()}")
 
     with When("install ClickHouse with initial configuration"):
-        kubernetes.use_context(context_name="minikube")
+        kubernetes.use_context(context_name=local_cluster.get_context_name())
         helm.install(
             namespace=namespace, release_name=release_name, values_file=initial_fixture
         )
@@ -188,9 +188,9 @@ def check_all_upgrades(self):
 def feature(self):
     """Run all comprehensive smoke tests."""
 
-    with Given("minikube environment"):
-        minikube.setup_minikube_environment()
-        kubernetes.use_context(context_name="minikube")
+    with Given("local Kubernetes environment"):
+        local_cluster.setup_local_cluster()
+        kubernetes.use_context(context_name=local_cluster.get_context_name())
 
     Feature(run=check_all_fixtures)
 
