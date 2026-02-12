@@ -52,11 +52,11 @@ def verify_openssl_config_on_pod(self, namespace):
     """Verify openssl.xml format on the ClickHouse pod."""
     pod_name = clickhouse.get_ready_clickhouse_pod(namespace=namespace)
 
-    result = run(
-        cmd=f"kubectl exec -n {namespace} {pod_name} "
-        f"-- cat /etc/clickhouse-server/config.d/openssl.xml"
+    content = get_file_contents_from_pod(
+        namespace=namespace,
+        pod_name=pod_name,
+        file_path="/etc/clickhouse-server/config.d/openssl.xml",
     )
-    content = result.stdout
 
     try:
         root = ET.fromstring(content)
