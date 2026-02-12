@@ -273,7 +273,7 @@ Areas that **need additional testing or are not fully covered**:
 ## 🌍 Supported Environment
 
 - **Operating System**: [Ubuntu](https://ubuntu.com/) 22.04 / 24.04
-- **Python**: >= 3.10.12
+- **Python**: >= 3.10.12, <= 3.12 (3.13+ has `lzma` package that is incompatible with test framework)
 - **Kubernetes**: >= 1.24
 - **Helm**: >= 3.8.0
 - **Minikube**: >= 1.28.0 (for local testing)
