@@ -246,7 +246,6 @@ Areas that **need additional testing or are not fully covered**:
 - ❌ **Backup and restore** - No automated backup/restore testing
 - ❌ **Disaster recovery** - No full cluster failure scenarios
 - ❌ **Network policies** - Limited testing of K8s network restrictions
-- ❌ **TLS/SSL** - No certificate or encryption testing
 - ❌ **Monitoring integration** - Prometheus scraping tested only via annotations
 - ❌ **Logging integration** - No FluentD/ElasticSearch integration tests
 - ❌ **Multi-cluster** - No federation or distributed query tests
@@ -266,6 +265,7 @@ Areas that **need additional testing or are not fully covered**:
 - ⚠️ **Configuration drift** - No testing of manual changes vs. Helm state
 - ⚠️ **Resource exhaustion** - No OOM or disk full scenarios
 - ⚠️ **Long-running stability** - Tests are short-lived (minutes, not hours/days)
+- ⚠️ **TLS/SSL** - Only tests configuration and setup, does not test actual encryption
 
 
 ---

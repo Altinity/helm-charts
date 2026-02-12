@@ -5,6 +5,7 @@ import tests.steps.kubernetes as kubernetes
 import tests.steps.local_cluster as local_cluster
 import tests.steps.helm as helm
 import tests.steps.clickhouse as clickhouse
+import tests.steps.tls as tls
 from tests.steps.deployment import HelmState
 
 
@@ -50,6 +51,12 @@ def check_deployment(self, fixture_file, skip_external_keeper=True):
         skip("Skipping external keeper test (requires pre-existing keeper)")
         return
 
+    # Create TLS secrets if this is a TLS fixture
+    if "tls" in fixture_name:
+        with And("create TLS secrets"):
+            kubernetes.use_context(context_name=local_cluster.get_context_name())
+            tls.create_tls_secret(namespace=namespace)
+
     with When("install ClickHouse with fixture configuration"):
         kubernetes.use_context(context_name=local_cluster.get_context_name())
         helm.install(
@@ -67,6 +74,26 @@ def check_deployment(self, fixture_file, skip_external_keeper=True):
             )
             clickhouse.test_keeper_high_availability(
                 namespace=namespace, admin_password=admin_password
+            )
+
+    # Add TLS configuration verification for TLS fixtures
+    if "tls" in fixture_name:
+        with And("verify TLS configuration in CHI"):
+            chi_name = f"{release_name}-clickhouse"
+            
+            tls.verify_openssl_config_in_chi(
+                namespace=namespace,
+                chi_name=chi_name
+            )
+            
+            tls.verify_tls_files_in_chi(
+                namespace=namespace,
+                chi_name=chi_name,
+            )
+            
+            tls.verify_tls_secret_references_in_chi(
+                namespace=namespace,
+                chi_name=chi_name,
             )
 
     # Verify metrics endpoint is accessible
