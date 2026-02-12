@@ -501,3 +501,16 @@ def delete_pod(self, namespace, pod_name):
     """
     run(cmd=f"kubectl delete pod {pod_name} -n {namespace}", check=True)
     note(f"✓ Pod {pod_name} deleted from namespace {namespace}")
+
+
+@TestStep(When)
+def get_file_contents_from_pod(self, namespace, pod_name, file_path):
+    """Read the contents of a file from a pod.
+
+    Args:
+        namespace: Kubernetes namespace
+        pod_name: Name of the pod
+        file_path: Absolute path to the file inside the pod
+    """
+    result = run(cmd=f"kubectl exec -n {namespace} {pod_name} -- cat {file_path}")
+    return result.stdout
