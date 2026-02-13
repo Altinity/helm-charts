@@ -1,4 +1,5 @@
 import json
+import os
 import xml.etree.ElementTree as ET
 
 from cryptography.hazmat.primitives.serialization import load_pem_parameters, load_pem_private_key
@@ -132,9 +133,7 @@ def verify_tls_files_on_pod(self, namespace):
 
 @TestStep(When)
 def create_tls_secret(self, namespace):
-    """Create a Kubernetes secret in the namespace with TLS files from fixtures.
-    """
-    import os
+    """Create a Kubernetes secret with TLS files from ../fixtures/tls/."""
     
     tests_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     certs_dir = os.path.join(tests_dir, "fixtures", "tls")
