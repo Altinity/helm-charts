@@ -113,6 +113,10 @@ spec:
           tolerations:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- with $.Values.keeper.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml $.Values.keeper.imagePullSecrets | nindent 12 }}
+          {{- end }}
           containers:
             - name: clickhouse-keeper
               image: "{{ $.Values.keeper.image }}:{{ $.Values.keeper.tag }}"

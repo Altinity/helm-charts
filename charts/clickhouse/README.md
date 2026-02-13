@@ -255,8 +255,10 @@ EOSQL
 | clickhouse.shardsCount | int | `1` | number of shards. |
 | clickhouse.users | list | `[]` | Configure additional ClickHouse users. |
 | clickhouse.zones | list | `[]` |  |
+| extraManifests | list | `[]` | Extra manifests to deploy as an array |
 | keeper.enabled | bool | `false` | Whether to enable Keeper. Required for replicated tables. |
 | keeper.image | string | `"altinity/clickhouse-keeper"` |  |
+| keeper.imagePullSecrets | list | `[]` | Image pull secrets for Keeper pods |
 | keeper.localStorage.size | string | `"5Gi"` |  |
 | keeper.localStorage.storageClass | string | `""` |  |
 | keeper.metricsPort | string | `""` |  |

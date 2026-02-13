@@ -211,6 +211,7 @@ keeper:
     size: 5Gi
     storageClass: ""
   nodeSelector: {}
+  imagePullSecrets: []
   tolerations: []
   podAnnotations: {}
   volumeClaimAnnotations: {}
@@ -223,6 +224,16 @@ keeper:
     memoryRequestsMiB: 512Mi
     cpuLimitsMs: 500
     memoryLimitsMiB: 1Gi
+
+# Extra manifests to deploy as an array
+extraManifests: []
+  # - |
+  #   apiVersion: v1
+  #   kind: ConfigMap
+  #   metadata:
+  #    name: {{.Release.Name }}-config
+  #   data:
+  #     extra-data: "value"
 
 operator:
   # -- Whether to enable the Altinity Operator for ClickHouse.

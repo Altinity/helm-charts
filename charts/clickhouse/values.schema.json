@@ -14,6 +14,13 @@
       "type": "string",
       "description": "Custom cluster domain of Kubernetes cluster."
     },
+    "extraManifests": {
+      "type": "array",
+      "description": "Extra manifests to deploy as an array.",
+      "items": {
+        "type": "string"
+      }
+    },
     "clickhouse": {
       "type": "object",
       "properties": {
@@ -357,6 +364,13 @@
         "nodeSelector": {
           "type": "object",
           "description": "Node selector for Keeper pods."
+        },
+        "imagePullSecrets": {
+          "type": "array",
+          "description": "Image pull secrets for Keeper pods.",
+          "items": {
+            "type": "object"
+          }
         },
         "tolerations": {
           "type": "array",
