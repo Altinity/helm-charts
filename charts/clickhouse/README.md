@@ -205,6 +205,30 @@ EOSQL
 | clickhouse.settings | object | `{}` |  |
 | clickhouse.shardsCount | int | `1` | number of shards. |
 | clickhouse.users | list | `[]` | Configure additional ClickHouse users and per-user settings. |
+| clickhouse.tls | object | | TLS certificate configuration for HTTPS/TLS connections. See [examples/values-tls.yaml](examples/values-tls.yaml) for a concrete example. |
+| clickhouse.tls.enabled | bool | `false` | Enable TLS. When true, adds `https_port` and `tcp_port_secure` to ClickHouse settings and exposes secure ports on Service resources. Requires `clickhouse.extraPorts` to declare the corresponding container ports on the pod template. |
+| clickhouse.tls.httpsPort | int | `8443` | HTTPS port for secure HTTP connections. |
+| clickhouse.tls.secureTcpPort | int | `9440` | Secure native TCP port for encrypted client connections. |
+| clickhouse.tls.certificateFile | object | | Server X509 certificate file. Requires `configFileName` and exactly one of `inlineFileContent` or `secretReference`. |
+| clickhouse.tls.certificateFile.configFileName | string | | Part of the destination filepath within the ClickHouse pod. Inline content is placed under `config.d/`; secret reference is placed under `secrets.d/`. See [here](https://github.com/Altinity/clickhouse-operator/blob/release-0.25.6/docs/security_hardening.md?plain=1#L428-L429) for the exact filepath format. |
+| clickhouse.tls.certificateFile.inlineFileContent | string | | Certificate content embedded directly in the CHI spec. Mutually exclusive with `secretReference`. |
+| clickhouse.tls.certificateFile.secretReference | object | | Reference to a Kubernetes secret containing the certificate. Mutually exclusive with `inlineFileContent`. |
+| clickhouse.tls.certificateFile.secretReference.name | string | | Name of the Kubernetes secret. |
+| clickhouse.tls.certificateFile.secretReference.key | string | | Key within the secret that holds the certificate data. |
+| clickhouse.tls.privateKeyFile | object | | Private key file. Same structure as `certificateFile`. |
+| clickhouse.tls.privateKeyFile.configFileName | string | | See `certificateFile.configFileName`. |
+| clickhouse.tls.privateKeyFile.inlineFileContent | string | | See `certificateFile.inlineFileContent`. |
+| clickhouse.tls.privateKeyFile.secretReference | object | | See `certificateFile.secretReference`. |
+| clickhouse.tls.privateKeyFile.secretReference.name | string | | See `certificateFile.secretReference.name`. |
+| clickhouse.tls.privateKeyFile.secretReference.key | string | | See `certificateFile.secretReference.key`. |
+| clickhouse.tls.dhParamsFile | object | | Diffie-Hellman parameters file. Same structure as `certificateFile`. |
+| clickhouse.tls.dhParamsFile.configFileName | string | | See `certificateFile.configFileName`. |
+| clickhouse.tls.dhParamsFile.inlineFileContent | string | | See `certificateFile.inlineFileContent`. |
+| clickhouse.tls.dhParamsFile.secretReference | object | | See `certificateFile.secretReference`. |
+| clickhouse.tls.dhParamsFile.secretReference.name | string | | See `certificateFile.secretReference.name`. |
+| clickhouse.tls.dhParamsFile.secretReference.key | string | | See `certificateFile.secretReference.key`. |
+| clickhouse.tls.opensslConfig | string | | OpenSSL configuration XML rendered as `openssl.xml` in the ClickHouse pod. Must include the full `<clickhouse><openSSL><server>` structure with file paths matching your certificate, key, and DH params locations. See [here](https://docs.altinity.com/operationsguide/security/#generate-files) for another sample of the full structure. |
+| clickhouse.users | list | `[]` | Configure additional ClickHouse users. |
 | clickhouse.zones | list | `[]` |  |
 | keeper.enabled | bool | `false` | Whether to enable Keeper. Required for replicated tables. |
 | keeper.image | string | `"altinity/clickhouse-keeper"` |  |
