@@ -265,7 +265,7 @@ Areas that **need additional testing or are not fully covered**:
 - ⚠️ **Configuration drift** - No testing of manual changes vs. Helm state
 - ⚠️ **Resource exhaustion** - No OOM or disk full scenarios
 - ⚠️ **Long-running stability** - Tests are short-lived (minutes, not hours/days)
-- ⚠️ **TLS/SSL** - Only tests configuration and setup, does not test actual encryption
+- ⚠️ **TLS/SSL** - Only tests configuration setup, does not verify actual encryption
 
 
 ---
