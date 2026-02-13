@@ -18,8 +18,16 @@ clickhouse:
   service:
     type: ClusterIP
   
+  extraPorts:
+    - name: https
+      containerPort: &httpsPort 8444
+    - name: tcp-secure
+      containerPort: &tcpSecurePort 9441
+  
   tls:
     enabled: true
+    httpsPort: *httpsPort
+    secureTcpPort: *tcpSecurePort
     
     certificateFile:
       configFileName: foo.crt

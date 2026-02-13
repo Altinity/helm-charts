@@ -52,6 +52,24 @@ def verify_tls_secret_references_in_chi(self, namespace, chi_name):
 
 
 @TestStep(Then)
+def verify_settings_ports_in_chi(self, namespace, chi_name):
+    """Verify settings block has correct port configuration in CHI spec."""
+    chi_info = run(cmd=f"kubectl get chi {chi_name} -n {namespace} -o json")
+    chi_data = json.loads(chi_info.stdout)
+
+    settings = chi_data.get("spec", {}).get("configuration", {}).get("settings", {})
+    expected_https_port = 8444;
+    expected_tcp_secure_port = 9441;
+    assert settings.get("tcp_port") == 9000, \
+        f"Expected tcp_port: 9000, got: {settings.get('tcp_port')!r}"
+    assert settings.get("https_port") == expected_https_port, \
+        f"Expected https_port: {expected_https_port}, got: {settings.get('https_port')!r}"
+    assert settings.get("tcp_port_secure") == expected_tcp_secure_port, \
+        f"Expected tcp_port_secure: {expected_tcp_secure_port}, got: {settings.get('tcp_port_secure')!r}"
+    note(f"✓ Settings block has tcp_port: 9000, https_port: {expected_https_port}, and tcp_port_secure: {expected_tcp_secure_port}")
+
+
+@TestStep(Then)
 def verify_openssl_config_on_pod(self, namespace):
     """Verify openssl.xml format on the ClickHouse pod."""
     pod_name = clickhouse.get_ready_clickhouse_pod(namespace=namespace)
