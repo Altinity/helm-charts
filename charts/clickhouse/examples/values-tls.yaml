@@ -31,6 +31,7 @@ clickhouse:
     privateKeyFile:
       # configFileName maps to '<config_file_name>' for the
       # operator rule that specifies where the secret is mounted.
+      # See: https://github.com/Altinity/clickhouse-operator/blob/release-0.25.6/docs/security_hardening.md?plain=1#L428-L429
       configFileName: bar.key
       # Only one of `inlineFileContent` or `secretReference` can be specified.
       # inlineFileContent: |
