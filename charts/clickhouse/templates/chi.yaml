@@ -1,7 +1,7 @@
 {{- $service_name := tpl (include "clickhouse.serviceTemplateName" . ) . -}}
 {{- $tlsEnabled := and .Values.clickhouse.tls .Values.clickhouse.tls.enabled -}}
-{{- $httpsPort := ternary (.Values.clickhouse.tls.httpsPort | default 8443) 0 $tlsEnabled -}}
-{{- $secureTcpPort := ternary (.Values.clickhouse.tls.secureTcpPort | default 9440) 0 $tlsEnabled -}}
+{{- $httpsPort := (((.Values.clickhouse).tls).httpsPort) | default 8443 -}}
+{{- $secureTcpPort := (((.Values.clickhouse).tls).secureTcpPort) | default 9440 -}}
 ---
 apiVersion: "clickhouse.altinity.com/v1"
 kind: ClickHouseInstallation
