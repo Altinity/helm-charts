@@ -95,4 +95,8 @@ clickhouse:
 #           secretKeyRef:
 #             name: clickhouse-certs
 #             key: dhparam.pem
+#     settings:
+#       https_port: 8443
+#       tcp_port: 9000
+#       tcp_port_secure: 9440
 # ```
