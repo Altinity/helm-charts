@@ -111,6 +111,7 @@ def check_deployment(self, fixture_file, skip_external_keeper=True):
     with Finally("cleanup deployment"):
         helm.uninstall(namespace=namespace, release_name=release_name)
         kubernetes.delete_namespace(namespace=namespace)
+        kubernetes.remove_chi_finalizers(namespace=namespace)
 
 
 @TestScenario
@@ -193,6 +194,7 @@ def check_upgrade(self, initial_fixture, upgrade_fixture):
     with Finally("cleanup deployment"):
         helm.uninstall(namespace=namespace, release_name=release_name)
         kubernetes.delete_namespace(namespace=namespace)
+        kubernetes.remove_chi_finalizers(namespace=namespace)
 
 
 @TestFeature
