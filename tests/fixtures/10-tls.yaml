@@ -31,26 +31,40 @@ clickhouse:
     
     certificateFile:
       configFileName: foo.crt
+      # To regenerate the public certificate:
+      #   cd tests/fixtures/tls/    # this directory
+      #   openssl req -x509 -key test-server.key -days 10950 \
+      #     -out server.crt -config public-cert.cnf -extensions v3_req
+      #
+      # Update inlineFileContent with the new certificate content for
+      # the public certificate to be used in the TLS test fixture.
+      #
+      # To verify the public certificate:
+      #   openssl x509 -in server.crt -text -noout
+      #
+      # To verify that the private key & public certificate moduli match:
+      #   openssl x509 -noout -modulus -in server.crt | openssl md5
+      #   openssl rsa -noout -modulus -in test-server.key | openssl md5
       inlineFileContent: |
         -----BEGIN CERTIFICATE-----
-        MIIDUTCCAjmgAwIBAgIUDhCxWuuYVzPa4GqNNvchTlbogwYwDQYJKoZIhvcNAQEL
-        BQAwNzE1MDMGA1UEAwwsdDAxLXRscy1jbGlja2hvdXNlLnQwMS10bHMuc3ZjLmNs
-        dXN0ZXIubG9jYWwwIBcNMjYwMjExMDEyNTA0WhgPMjA1NjAyMDQwMTI1MDRaMDcx
-        NTAzBgNVBAMMLHQwMS10bHMtY2xpY2tob3VzZS50MDEtdGxzLnN2Yy5jbHVzdGVy
-        LmxvY2FsMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAi8a6ln0VHcMs
-        LVH/7uFtTJIphIhg6d9lAGd+QxXIsEN2nVZf1qykksRprM7StTiXRiOqcuydyS4H
-        Gas47PN40D7wTEGQ8QA1H+ZE4whzBeGt0U7exYfZqZWdwcVTGynCAOFtknTN9U21
-        CjRD8m2FNYaphb7gdsOfM5ZaRSjbehlwKXIQtNuFCK3GCuw5TIMhxHZk1p7fK55U
-        CgoXXZ8fhKazvkUu/DCVS5ZTcXWUkqv9Tuc/EF2XoJj+w9chOi/YtybCVAt5sJyG
-        NUHeQS88olEE+ZbQPKuv0hHLITFTep9h3Owl1k4dj+o4HQPDjapeiWR/Yvmboa1b
-        cQWGeozlKwIDAQABo1MwUTAdBgNVHQ4EFgQUMz4g29Owh+XSlm+cWGtT6Brc+OYw
-        HwYDVR0jBBgwFoAUMz4g29Owh+XSlm+cWGtT6Brc+OYwDwYDVR0TAQH/BAUwAwEB
-        /zANBgkqhkiG9w0BAQsFAAOCAQEAEDfO4htKuHJCvtL2H3BE0FnH3HdZKcOy3hGi
-        Ol20fZ9cq5FxkDRTCd0dUVwiiJj/2Op7ZjEBoMD1L1iENKQlgK1WCsP3M9xsCa83
-        xNwu6oY74YWoyXPx54/MWIo53s7ltRQX/6fmgWdPB2r8fi5Or4lI+71m0Uo0cOZI
-        loqQk6cRS6OibzIIz+ejrIWV51h+jCRLzN3IC9R95TlSy6J+0iEVxCDruMEbMxI8
-        J5/t0gqNjb52lcTUZ1MyvPWvrC1i0UePi1752fvjgFI3Q1S2wK6drOUN2jHCsIt4
-        JSPST1w6EiAIi2AhblMcLQRhcJ+7o5KcMQcWb8MCFMvRPtdIhA==
+        MIIDQjCCAiqgAwIBAgIUcO0XSvYJxJ0H7x7Tw8fAQPom/1gwDQYJKoZIhvcNAQEL
+        BQAwHjEcMBoGA1UEAwwTKi5zdmMuY2x1c3Rlci5sb2NhbDAgFw0yNjAyMTMyMjU0
+        MjlaGA8yMDU2MDIwNjIyNTQyOVowHjEcMBoGA1UEAwwTKi5zdmMuY2x1c3Rlci5s
+        b2NhbDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAIvGupZ9FR3DLC1R
+        /+7hbUySKYSIYOnfZQBnfkMVyLBDdp1WX9aspJLEaazO0rU4l0YjqnLsnckuBxmr
+        OOzzeNA+8ExBkPEANR/mROMIcwXhrdFO3sWH2amVncHFUxspwgDhbZJ0zfVNtQo0
+        Q/JthTWGqYW+4HbDnzOWWkUo23oZcClyELTbhQitxgrsOUyDIcR2ZNae3yueVAoK
+        F12fH4Sms75FLvwwlUuWU3F1lJKr/U7nPxBdl6CY/sPXITov2LcmwlQLebCchjVB
+        3kEvPKJRBPmW0Dyrr9IRyyExU3qfYdzsJdZOHY/qOB0Dw42qXolkf2L5m6GtW3EF
+        hnqM5SsCAwEAAaN2MHQwCwYDVR0PBAQDAgQwMBMGA1UdJQQMMAoGCCsGAQUFBwMB
+        MDEGA1UdEQQqMCiCFSouKi5zdmMuY2x1c3Rlci5sb2NhbIIJbG9jYWxob3N0hwR/
+        AAABMB0GA1UdDgQWBBQzPiDb07CH5dKWb5xYa1PoGtz45jANBgkqhkiG9w0BAQsF
+        AAOCAQEAAUKfIa7zYH6Agbud2/LMii7/61wiG98MEeONQ7HFbggO0QkQ1DvaR83z
+        qvSngQcpzuNMIPKglWd5cyVwjWNrE7LNQICLTRuYNQNNXcFcaGpX3/C7g9djDeXB
+        lDX1lklxqfunRaXsJlqtEDDFtzlOZtPOrzXO8d9ZmAHfURfEr75y4mzNP4yLPPpR
+        Djfjin1Rgwga4fnzPupWcssDtUbjca7wRWIcMbjx9stuxGgsGTNApZl9Dq/4ExOh
+        w+PDhQhpQSvtcOFZUCstkrdZ0ufnN2sa8fJ0xuybLUEs3MnP0IB9kkmAuN8n59Zt
+        WAmV2mQ5TRTro0OxxyOQSGhlJByc/Q==
         -----END CERTIFICATE-----
     
     privateKeyFile:
