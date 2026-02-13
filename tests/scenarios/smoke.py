@@ -98,6 +98,11 @@ def check_deployment(self, fixture_file, skip_external_keeper=True):
                 namespace=namespace,
             )
 
+            tls.verify_settings_ports_in_chi(
+                namespace=namespace,
+                chi_name=chi_name,
+            )
+
     # Verify metrics endpoint is accessible
     with And("verify metrics endpoint"):
         clickhouse.verify_metrics_endpoint(namespace=namespace)

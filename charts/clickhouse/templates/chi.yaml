@@ -1,4 +1,7 @@
 {{- $service_name := tpl (include "clickhouse.serviceTemplateName" . ) . -}}
+{{- $tlsEnabled := and .Values.clickhouse.tls .Values.clickhouse.tls.enabled -}}
+{{- $httpsPort := ternary (.Values.clickhouse.tls.httpsPort | default 8443) 0 $tlsEnabled -}}
+{{- $secureTcpPort := ternary (.Values.clickhouse.tls.secureTcpPort | default 9440) 0 $tlsEnabled -}}
 ---
 apiVersion: "clickhouse.altinity.com/v1"
 kind: ClickHouseInstallation
@@ -62,6 +65,14 @@ spec:
               targetPort: {{ .containerPort }}
             {{- end }}
             {{- end }}
+            {{- if $tlsEnabled }}
+            - name: https
+              port: {{ $httpsPort }}
+              targetPort: {{ $httpsPort }}
+            - name: tcp-secure
+              port: {{ $secureTcpPort }}
+              targetPort: {{ $secureTcpPort }}
+            {{- end }}
           selector:
             {{- include "clickhouse.selectorLabels" . | nindent 12 }}
       {{- if .Values.clickhouse.lbService.enabled }}
@@ -95,6 +106,14 @@ spec:
               port: {{ .containerPort }}
               targetPort: {{ .containerPort }}
             {{- end }}
+            {{- end }}
+            {{- if $tlsEnabled }}
+            - name: https
+              port: {{ $httpsPort }}
+              targetPort: {{ $httpsPort }}
+            - name: tcp-secure
+              port: {{ $secureTcpPort }}
+              targetPort: {{ $secureTcpPort }}
             {{- end }}
           selector:
             {{- include "clickhouse.selectorLabels" . | nindent 12 }}
@@ -235,9 +254,14 @@ spec:
           - host: {{ $keeper_host }}
             port: {{ .Values.clickhouse.keeper.port }}
     {{- end }}
+    {{- if $tlsEnabled }}
+    settings:
+        tcp_port: 9000
+        tcp_port_secure: {{ $secureTcpPort }}
+        https_port: {{ $httpsPort }}
+    {{- end }}
     {{- $extraConfig := tpl (include "clickhouse.extraConfig" . ) . -}}
     {{- $extraUsers := tpl (include "clickhouse.extraUsers" . ) . -}}
-    {{- $tlsEnabled := and .Values.clickhouse.tls .Values.clickhouse.tls.enabled -}}
     {{- if not (and (empty $extraConfig) (empty $extraUsers) (not $tlsEnabled)) }}
     files:
         {{- if not (empty $extraConfig) }}
