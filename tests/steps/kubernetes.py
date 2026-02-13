@@ -473,6 +473,29 @@ def get_secrets(self, namespace):
 
 
 @TestStep(Finally)
+def remove_chi_finalizers(self, namespace):
+    """Remove finalizers from CHI resources to unblock namespace deletion.
+
+    Unless the operator is externally deployed, after a helm uninstall, the
+    operator disappears but CHI resources will still have finalizers that block
+    namespace deletion, causing the namespace to persist with 'Terminating' status.
+
+    Args:
+        namespace: Kubernetes namespace to delete
+    """
+    result = run(
+        cmd=f"kubectl get chi -n {namespace} -o name",
+    )
+    chi_resource_names = result.stdout.strip().split()
+    for resource_name in chi_resource_names:
+        run(
+            cmd=f"kubectl patch {resource_name} -n {namespace} "
+                f"--type json -p '[{{\"op\": \"remove\", \"path\": \"/metadata/finalizers\"}}]'",
+        )
+        note(f"✓ Removed finalizers from {resource_name}: {namespace}/{resource_name}")
+
+
+@TestStep(Finally)
 def delete_namespace(self, namespace):
     """Delete a Kubernetes namespace.
 
