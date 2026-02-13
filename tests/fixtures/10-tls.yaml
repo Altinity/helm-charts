@@ -21,6 +21,9 @@ clickhouse:
   lbService:
     enabled: true
   
+  settings:
+    https_port: 8444
+
   configurationFiles:
     # To regenerate the public certificate:
     #   cd tests/fixtures/tls/    # this directory
