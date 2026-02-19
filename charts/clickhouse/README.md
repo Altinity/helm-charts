@@ -1,5 +1,5 @@
 # clickhouse
-![Version: 0.3.8](https://img.shields.io/badge/Version-0.3.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.3.6.10034](https://img.shields.io/badge/AppVersion-25.3.6.10034-informational?style=flat-square)
+![Version: 0.3.9](https://img.shields.io/badge/Version-0.3.9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.3.6.10034](https://img.shields.io/badge/AppVersion-25.3.6.10034-informational?style=flat-square)
 
 A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for ClickHouse
 
@@ -31,7 +31,7 @@ Note that by default the chart includes the Altinity Operator. For most producti
 
 ```sh
 # add the altinity operator chart repository
-helm repo add altinity-operator https://docs.altinity.com/clickhouse-operator
+helm repo add altinity https://helm.altinity.com/
 
 # create the namespace
 kubectl create namespace clickhouse
@@ -40,64 +40,12 @@ kubectl create namespace clickhouse
 helm install clickhouse-operator altinity/altinity-clickhouse-operator \
 --namespace clickhouse
 
-# add the altinity chart repository
-helm repo add altinity https://helm.altinity.com
-
 # install the clickhouse chart without the operator
 helm install release-name altinity/clickhouse --namespace clickhouse \
 --set operator.enabled=false
 ```
 
 > Yes, we're aware that the domains for the helm repos are a bit odd. We're working on it.
-
-### Configuring the bundled operator
-
-The ClickHouse chart vendors the Altinity ClickHouse Operator as a dependency using the
-`operator` alias. Any values you pass under the `operator` key are forwarded to the
-dependency chart unchanged, which means you can configure the operator exactly the same
-way you would when installing it directly. By default the dependency installs into the
-same namespace as the Helm release, watches all namespaces, and creates cluster-scoped
-RBAC resources.
-
-Common examples include overriding the namespace where the operator runs and toggling
-`rbac.namespaceScoped`:
-
-```sh
-helm install release-name altinity/clickhouse \
-  --namespace test --create-namespace \
-  --set operator.namespaceOverride=test \
-  --set operator.rbac.namespaceScoped=true
-```
-
-When you are running multiple operators across different namespaces, install a separate
-release into each namespace and scope it to that namespace only. Set the operator's
-`namespaceOverride`, enable `rbac.namespaceScoped`, and restrict `watch.namespaces` to the
-release namespace so each operator manages only its own resources.
-
-```sh
-helm install second-release altinity/clickhouse \
-  --namespace test \
-  --set operator.namespaceOverride=test \
-  --set operator.rbac.namespaceScoped=true \
-  --set operator.configs.files.config\\.yaml.watch.namespaces=\{test\}
-```
-
-By default, the operator installs the Custom Resource Definitions (CRDs) for ClickHouse resources.
-If you have already installed the CRDs separately, you can disable automatic CRD installation:
-
-```sh
-# Helm 3+ requires --skip-crds see link below
-helm install third-release altinity/clickhouse --namespace clickhouse \
-  --namespace test \
-  --skip-crds \
-  --set operator.crdHook.enabled=false
-```
-
-Documentation: [Helm documentation explaining crds/ folder behavior](https://helm.sh/docs/chart_best_practices/custom_resource_definitions/#install-a-crd-declaration-before-using-the-resource)
-
-Consult the [Altinity ClickHouse Operator chart documentation](https://helm.altinity.com/)
-for the full list of available options. Any of those settings can be applied through the
-`operator` value prefix when installing or upgrading this chart.
 
 ## Upgrading the Chart
 
@@ -218,7 +166,7 @@ EOSQL
 | clickhouse.defaultUser.password | string | `""` |  |
 | clickhouse.defaultUser.password_secret_name | string | `""` | Name of an existing Kubernetes secret containing the default user password. If set, the password will be read from the secret instead of using the password field. The secret should contain a key named 'password'. |
 | clickhouse.extraConfig | string | `"<clickhouse>\n</clickhouse>\n"` | Miscellanous config for ClickHouse (in xml format) |
-| clickhouse.extraContainers | list | `[]` |  |
+| clickhouse.extraContainers | list | `[]` | Extra containers for clickhouse pods |
 | clickhouse.extraPorts | list | `[]` | Additional ports to expose in the ClickHouse container Example: extraPorts:   - name: custom-port     containerPort: 8080 |
 | clickhouse.extraUsers | string | `"<clickhouse>\n</clickhouse>\n"` | Additional users config for ClickHouse (in xml format) |
 | clickhouse.extraVolumes | list | `[]` | Extra volumes for clickhouse pods |
@@ -245,17 +193,18 @@ EOSQL
 | clickhouse.persistence.storageClass | string | `""` |  |
 | clickhouse.podAnnotations | object | `{}` |  |
 | clickhouse.podLabels | object | `{}` |  |
+| clickhouse.profiles | object | `{}` |  |
 | clickhouse.replicasCount | int | `1` | number of replicas. If greater than 1, keeper must be enabled or a keeper host should be provided under clickhouse.keeper.host. Will be ignored if `zones` is set. |
+| clickhouse.resources | object | `{}` |  |
 | clickhouse.service.serviceAnnotations | object | `{}` |  |
 | clickhouse.service.serviceLabels | object | `{}` |  |
 | clickhouse.service.type | string | `"ClusterIP"` |  |
 | clickhouse.serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | clickhouse.serviceAccount.create | bool | `false` | Specifies whether a service account should be created |
 | clickhouse.serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
+| clickhouse.settings | object | `{}` |  |
 | clickhouse.shardsCount | int | `1` | number of shards. |
-| clickhouse.users | list | `[]` | Configure additional ClickHouse users. |
-| clickhouse.profiles | object | `{}` | Named profiles to apply to users via users[].profile. |
-| clickhouse.settings | object | `{}` | Server-level settings for each ClickHouse replica. |
+| clickhouse.users | list | `[]` | Configure additional ClickHouse users and per-user settings. |
 | clickhouse.zones | list | `[]` |  |
 | keeper.enabled | bool | `false` | Whether to enable Keeper. Required for replicated tables. |
 | keeper.image | string | `"altinity/clickhouse-keeper"` |  |
@@ -265,10 +214,10 @@ EOSQL
 | keeper.nodeSelector | object | `{}` |  |
 | keeper.podAnnotations | object | `{}` |  |
 | keeper.replicaCount | int | `3` | Number of keeper replicas. Must be an odd number. !! DO NOT CHANGE AFTER INITIAL DEPLOYMENT |
-| keeper.resources.cpuLimitsMs | int | `3` |  |
-| keeper.resources.cpuRequestsMs | int | `2` |  |
-| keeper.resources.memoryLimitsMiB | string | `"3Gi"` |  |
-| keeper.resources.memoryRequestsMiB | string | `"3Gi"` |  |
+| keeper.resources.cpuLimitsMs | int | `500` |  |
+| keeper.resources.cpuRequestsMs | int | `100` |  |
+| keeper.resources.memoryLimitsMiB | string | `"1Gi"` |  |
+| keeper.resources.memoryRequestsMiB | string | `"512Mi"` |  |
 | keeper.settings | object | `{}` |  |
 | keeper.tag | string | `"25.3.6.10034.altinitystable"` |  |
 | keeper.tolerations | list | `[]` |  |

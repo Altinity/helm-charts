@@ -29,17 +29,14 @@ Note that by default the chart includes the Altinity Operator. For most producti
 
 ```sh
 # add the altinity operator chart repository
-helm repo add altinity-operator https://docs.altinity.com/clickhouse-operator
+helm repo add altinity https://helm.altinity.com/
 
 # create the namespace
 kubectl create namespace clickhouse
 
 # install operator into namespace
-helm install clickhouse-operator altinity-docs/altinity-clickhouse-operator \
+helm install clickhouse-operator altinity/altinity-clickhouse-operator \
 --namespace clickhouse
-
-# add the altinity chart repository
-helm repo add altinity https://helm.altinity.com
 
 # install the clickhouse chart without the operator
 helm install release-name altinity/clickhouse --namespace clickhouse \
