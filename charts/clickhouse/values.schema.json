@@ -44,7 +44,7 @@
               "name": {
                 "type": "string",
                 "description": "Name for the user",
-                "pattern": "^[a-zA-Z0-9]+$"
+                "pattern": "^[a-zA-Z0-9_]+$"
               },
               "hostIP": {
                 "oneOf": [
@@ -71,6 +71,10 @@
                 "type": "string",
                 "description": "SHA256 of the password (ignored if password_secret_name is passed)"
               },
+              "profile": {
+                "type": "string",
+                "description": "Name of the profile to apply for this user."
+              },
               "grants": {
                 "type": "array",
                 "description": "List of grants to provide for the user",
@@ -81,9 +85,24 @@
                     "GRANT SELECT, DELETE ON foo.bar"
                   ]
                 }
+              },
+              "settings": {
+                "type": "object",
+                "description": "Per-user settings to apply directly under the user."
               }
             }
           }
+        },
+        "profiles": {
+          "type": "object",
+          "description": "Named profiles to apply to users via users[].profile.",
+          "propertyNames": {
+            "pattern": "^[a-zA-Z0-9_]+$"
+          }
+        },
+        "settings": {
+          "type": "object",
+          "description": "Server-level settings for each ClickHouse replica."
         },
         "replicasCount": {
           "type": "integer",
@@ -294,6 +313,10 @@
           "items": {
             "type": "object"
           }
+        },
+        "resources": {
+          "type": "object",
+          "description": "Resource requests/limits for ClickHouse containers."
         },
         "initScripts": {
           "type": "object",

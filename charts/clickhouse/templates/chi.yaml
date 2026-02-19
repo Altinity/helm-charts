@@ -155,7 +155,30 @@ spec:
       {{- else if .password_sha256_hex }}
       {{ .name }}/password_sha256_hex: {{ .password_sha256_hex | quote }}
       {{- end }}
+      {{- if .profile }}
+      {{ .name }}/profile: {{ .profile | quote }}
       {{- end }}
+      {{- if .settings }}
+      {{- $user := .name }}
+      {{- range $key, $value := .settings }}
+      {{ $user }}/{{ $key }}: "{{ $value }}"
+      {{- end }}
+      {{- end }}
+      {{- end }}
+    {{- if .Values.clickhouse.profiles }}
+    profiles:
+    {{- range $profile, $settings := .Values.clickhouse.profiles }}
+      {{- range $key, $value := $settings }}
+      {{ $profile }}/{{ $key }}: "{{ $value }}"
+      {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- if .Values.clickhouse.settings }}
+    settings:
+    {{- range $key, $value := .Values.clickhouse.settings }}
+      {{ $key }}: "{{ $value }}"
+    {{- end }}
+    {{- end }}
     clusters:
       - name: {{ include "clickhouse.clustername" . }}
         {{- if .Values.clickhouse.clusterSecret.enabled }}
