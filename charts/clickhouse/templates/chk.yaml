@@ -113,12 +113,16 @@ spec:
           tolerations:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- with $.Values.keeper.podSecurityContext }}
           securityContext:
-            {{- toYaml .Values.keeper.podSecurityContext | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           containers:
             - name: clickhouse-keeper
+              {{- with $.Values.keeper.securityContext }}
               securityContext:
-                {{- toYaml .Values.keeper.securityContext | nindent 16 }}
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
               image: "{{ $.Values.keeper.image }}:{{ $.Values.keeper.tag }}"
               {{- if not (empty $.Values.keeper.metricsPort) }}
               ports:
