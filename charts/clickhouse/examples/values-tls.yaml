@@ -1,16 +1,4 @@
 clickhouse:
-  # If you enable TLS _without_ enabling secret-based cluster communication
-  # (i.e. `clusterSecret.enabled: false`), then you need to expose the secure ports
-  # on the pod containers via the `extraPorts:` config. Otherwise, the load balancer
-  # won't be able to route traffic to them. This is not necessary if you also enable
-  # secret-based cluster communication (i.e. `clusterSecret.enabled: true`).
-  # See: https://github.com/Altinity/clickhouse-operator/blob/release-0.25.6/docs/security_hardening.md?plain=1#L516
-  extraPorts:
-    - name: https
-      containerPort: &httpsPort 8443
-    - name: tcp-secure
-      containerPort: &tcpSecurePort 9440
-
   tls:
     enabled: true
     # httpsPort: *httpsPort          # HTTPS port (default: 8443)

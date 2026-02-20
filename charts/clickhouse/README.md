@@ -206,9 +206,9 @@ EOSQL
 | clickhouse.shardsCount | int | `1` | number of shards. |
 | clickhouse.users | list | `[]` | Configure additional ClickHouse users and per-user settings. |
 | clickhouse.tls | object | | TLS certificate configuration for HTTPS/TLS connections. See [examples/values-tls.yaml](examples/values-tls.yaml) for a concrete example. |
-| clickhouse.tls.enabled | bool | `false` | Enable TLS. When true, adds `https_port` and `tcp_port_secure` to ClickHouse settings and exposes secure ports on Service resources. Requires `clickhouse.extraPorts` to declare the corresponding container ports on the pod template. |
-| clickhouse.tls.httpsPort | int | `8443` | HTTPS port for secure HTTP connections. |
-| clickhouse.tls.secureTcpPort | int | `9440` | Secure native TCP port for encrypted client connections. |
+| clickhouse.tls.enabled | bool | `false` | Enable TLS. When true, adds `https_port` and `tcp_port_secure` to ClickHouse settings and exposes secure ports on Service resources. |
+| clickhouse.tls.httpsPort | int | `8443` | HTTPS port for secure HTTP connections. Will automatically be added to Service resources with the name `https` iff that name isn't already used in `clickhouse.extraPorts`. |
+| clickhouse.tls.secureTcpPort | int | `9440` | Secure native TCP port for encrypted client connections. Will automatically be added to Service resources with the name `tcp-secure` iff that name isn't already used in `clickhouse.extraPorts`. |
 | clickhouse.tls.certificateFile | object | | Server X509 certificate file. Requires `configFileName` and exactly one of `inlineFileContent` or `secretReference`. |
 | clickhouse.tls.certificateFile.configFileName | string | | Part of the destination filepath within the ClickHouse pod. Inline content is placed under `config.d/`; secret reference is placed under `secrets.d/`. See [here](https://github.com/Altinity/clickhouse-operator/blob/release-0.25.6/docs/security_hardening.md?plain=1#L428-L429) for the exact filepath format. |
 | clickhouse.tls.certificateFile.inlineFileContent | string | | Certificate content embedded directly in the CHI spec. Mutually exclusive with `secretReference`. |

@@ -1,4 +1,8 @@
 {{- $service_name := tpl (include "clickhouse.serviceTemplateName" . ) . -}}
+{{- $extraPortNames := list }}
+{{- range .Values.clickhouse.extraPorts }}
+{{- $extraPortNames = append $extraPortNames .name }}
+{{- end }}
 {{- $tlsEnabled := and .Values.clickhouse.tls .Values.clickhouse.tls.enabled -}}
 {{- $httpsPort := (((.Values.clickhouse).tls).httpsPort) | default 8443 -}}
 {{- $secureTcpPort := (((.Values.clickhouse).tls).secureTcpPort) | default 9440 -}}
@@ -66,12 +70,16 @@ spec:
             {{- end }}
             {{- end }}
             {{- if $tlsEnabled }}
+              {{- if not (has "https" $extraPortNames) }}
             - name: https
               port: {{ $httpsPort }}
               targetPort: {{ $httpsPort }}
+              {{- end }}
+              {{- if not (has "tcp-secure" $extraPortNames) }}
             - name: tcp-secure
               port: {{ $secureTcpPort }}
               targetPort: {{ $secureTcpPort }}
+              {{- end }}
             {{- end }}
           selector:
             {{- include "clickhouse.selectorLabels" . | nindent 12 }}
@@ -108,12 +116,16 @@ spec:
             {{- end }}
             {{- end }}
             {{- if $tlsEnabled }}
+              {{- if not (has "https" $extraPortNames) }}
             - name: https
               port: {{ $httpsPort }}
               targetPort: {{ $httpsPort }}
+              {{- end }}
+              {{- if not (has "tcp-secure" $extraPortNames) }}
             - name: tcp-secure
               port: {{ $secureTcpPort }}
               targetPort: {{ $secureTcpPort }}
+              {{- end }}
             {{- end }}
           selector:
             {{- include "clickhouse.selectorLabels" . | nindent 12 }}
