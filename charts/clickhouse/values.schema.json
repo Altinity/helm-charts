@@ -337,6 +337,118 @@
               "default": true
             }
           }
+        },
+        "tls": {
+          "type": "object",
+          "description": "TLS certificate configuration for HTTPS/TLS connections to ClickHouse.",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable TLS certificate configuration.",
+              "default": false
+            },
+            "httpsPort": {
+              "type": "integer",
+              "description": "HTTPS port for secure HTTP connections.",
+              "default": 8443
+            },
+            "secureTcpPort": {
+              "type": "integer",
+              "description": "Secure native TCP port for encrypted client connections.",
+              "default": 9440
+            },
+            "certificateFile": {
+              "type": "object",
+              "description": "Server X509 certificate file configuration.",
+              "properties": {
+                "configFileName": {
+                  "type": "string",
+                  "description": "Filename used as part of the destination filepath within the ClickHouse pod."
+                },
+                "inlineFileContent": {
+                  "type": "string"
+                },
+                "secretReference": {
+                  "type": "object",
+                  "description": "Reference to Kubernetes secret containing the X509 certificate.",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Name of the Kubernetes secret."
+                    },
+                    "key": {
+                      "type": "string",
+                      "description": "Key in the secret containing the data."
+                    }
+                  },
+                  "required": ["name", "key"]
+                }
+              },
+              "required": ["configFileName"]
+            },
+            "privateKeyFile": {
+              "type": "object",
+              "description": "Private key file configuration.",
+              "properties": {
+                "configFileName": {
+                  "type": "string",
+                  "description": "Filename used as part of the destination filepath within the ClickHouse pod."
+                },
+                "inlineFileContent": {
+                  "type": "string"
+                },
+                "secretReference": {
+                  "type": "object",
+                  "description": "Reference to Kubernetes secret containing the private key.",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Name of the Kubernetes secret."
+                    },
+                    "key": {
+                      "type": "string",
+                      "description": "Key in the secret containing the data."
+                    }
+                  },
+                  "required": ["name", "key"]
+                }
+              },
+              "required": ["configFileName"]
+            },
+            "dhParamsFile": {
+              "type": "object",
+              "description": "Diffie-Hellman parameters file configuration.",
+              "properties": {
+                "configFileName": {
+                  "type": "string",
+                  "description": "Filename used as part of the destination filepath within the ClickHouse pod."
+                },
+                "inlineFileContent": {
+                  "type": "string"
+                },
+                "secretReference": {
+                  "type": "object",
+                  "description": "Reference to Kubernetes secret containing the Diffie-Hellman parameters.",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Name of the Kubernetes secret."
+                    },
+                    "key": {
+                      "type": "string",
+                      "description": "Key in the secret containing the data."
+                    }
+                  },
+                  "required": ["name", "key"]
+                }
+              },
+              "required": ["configFileName"]
+            },
+            "opensslConfig": {
+              "type": "string",
+              "description": "OpenSSL config for ClickHouse in XML format."
+            }
+          }
         }
       }
     },

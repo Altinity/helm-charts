@@ -2,9 +2,10 @@ from testflows.core import *
 
 import os
 import tests.steps.kubernetes as kubernetes
-import tests.steps.minikube as minikube
+import tests.steps.local_cluster as local_cluster
 import tests.steps.helm as helm
 import tests.steps.clickhouse as clickhouse
+import tests.steps.tls as tls
 from tests.steps.deployment import HelmState
 
 
@@ -13,6 +14,7 @@ FIXTURES = [
     "fixtures/02-replicated-with-users.yaml",
     "fixtures/08-extracontainer-data-mount.yaml",
     "fixtures/09-usersprofiles-settings.yaml",
+    "fixtures/10-tls.yaml",
     # "fixtures/03-sharded-advanced.yaml",
     # "fixtures/04-external-keeper.yaml",
     # "fixtures/05-persistence-disabled.yaml",
@@ -50,8 +52,14 @@ def check_deployment(self, fixture_file, skip_external_keeper=True):
         skip("Skipping external keeper test (requires pre-existing keeper)")
         return
 
+    # Create TLS secrets if this is a TLS fixture
+    if "tls" in fixture_name:
+        with And("create TLS secrets"):
+            kubernetes.use_context(context_name=local_cluster.get_context_name())
+            tls.create_tls_secret(namespace=namespace)
+
     with When("install ClickHouse with fixture configuration"):
-        kubernetes.use_context(context_name="minikube")
+        kubernetes.use_context(context_name=local_cluster.get_context_name())
         helm.install(
             namespace=namespace, release_name=release_name, values_file=fixture_file
         )
@@ -69,6 +77,33 @@ def check_deployment(self, fixture_file, skip_external_keeper=True):
                 namespace=namespace, admin_password=admin_password
             )
 
+    # Add TLS configuration verification for TLS fixtures
+    if "tls" in fixture_name:
+        with And("verify TLS configuration in CHI"):
+            chi_name = f"{release_name}-clickhouse"
+            tls.verify_tls_files_in_chi(
+                namespace=namespace,
+                chi_name=chi_name,
+            )
+            
+            tls.verify_tls_secret_references_in_chi(
+                namespace=namespace,
+                chi_name=chi_name,
+            )
+            
+            tls.verify_openssl_config_on_pod(
+                namespace=namespace,
+            )
+            
+            tls.verify_tls_files_on_pod(
+                namespace=namespace,
+            )
+
+            tls.verify_settings_ports_in_chi(
+                namespace=namespace,
+                chi_name=chi_name,
+            )
+
     # Verify metrics endpoint is accessible
     with And("verify metrics endpoint"):
         clickhouse.verify_metrics_endpoint(namespace=namespace)
@@ -76,6 +111,7 @@ def check_deployment(self, fixture_file, skip_external_keeper=True):
     with Finally("cleanup deployment"):
         helm.uninstall(namespace=namespace, release_name=release_name)
         kubernetes.delete_namespace(namespace=namespace)
+        kubernetes.remove_chi_finalizers(namespace=namespace)
 
 
 @TestScenario
@@ -101,7 +137,7 @@ def check_upgrade(self, initial_fixture, upgrade_fixture):
         note(f"Upgraded pods: {upgrade_state.get_expected_pod_count()}")
 
     with When("install ClickHouse with initial configuration"):
-        kubernetes.use_context(context_name="minikube")
+        kubernetes.use_context(context_name=local_cluster.get_context_name())
         helm.install(
             namespace=namespace, release_name=release_name, values_file=initial_fixture
         )
@@ -158,6 +194,7 @@ def check_upgrade(self, initial_fixture, upgrade_fixture):
     with Finally("cleanup deployment"):
         helm.uninstall(namespace=namespace, release_name=release_name)
         kubernetes.delete_namespace(namespace=namespace)
+        kubernetes.remove_chi_finalizers(namespace=namespace)
 
 
 @TestFeature
@@ -188,9 +225,9 @@ def check_all_upgrades(self):
 def feature(self):
     """Run all comprehensive smoke tests."""
 
-    with Given("minikube environment"):
-        minikube.setup_minikube_environment()
-        kubernetes.use_context(context_name="minikube")
+    with Given("local Kubernetes environment"):
+        local_cluster.setup_local_cluster()
+        kubernetes.use_context(context_name=local_cluster.get_context_name())
 
     Feature(run=check_all_fixtures)
 

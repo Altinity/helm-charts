@@ -1,4 +1,11 @@
 {{- $service_name := tpl (include "clickhouse.serviceTemplateName" . ) . -}}
+{{- $extraPortNames := list }}
+{{- range .Values.clickhouse.extraPorts }}
+{{- $extraPortNames = append $extraPortNames .name }}
+{{- end }}
+{{- $tlsEnabled := and .Values.clickhouse.tls .Values.clickhouse.tls.enabled -}}
+{{- $httpsPort := (((.Values.clickhouse).tls).httpsPort) | default 8443 -}}
+{{- $secureTcpPort := (((.Values.clickhouse).tls).secureTcpPort) | default 9440 -}}
 ---
 apiVersion: "clickhouse.altinity.com/v1"
 kind: ClickHouseInstallation
@@ -62,6 +69,18 @@ spec:
               targetPort: {{ .containerPort }}
             {{- end }}
             {{- end }}
+            {{- if $tlsEnabled }}
+              {{- if not (has "https" $extraPortNames) }}
+            - name: https
+              port: {{ $httpsPort }}
+              targetPort: {{ $httpsPort }}
+              {{- end }}
+              {{- if not (has "tcp-secure" $extraPortNames) }}
+            - name: tcp-secure
+              port: {{ $secureTcpPort }}
+              targetPort: {{ $secureTcpPort }}
+              {{- end }}
+            {{- end }}
           selector:
             {{- include "clickhouse.selectorLabels" . | nindent 12 }}
       {{- if .Values.clickhouse.lbService.enabled }}
@@ -95,6 +114,18 @@ spec:
               port: {{ .containerPort }}
               targetPort: {{ .containerPort }}
             {{- end }}
+            {{- end }}
+            {{- if $tlsEnabled }}
+              {{- if not (has "https" $extraPortNames) }}
+            - name: https
+              port: {{ $httpsPort }}
+              targetPort: {{ $httpsPort }}
+              {{- end }}
+              {{- if not (has "tcp-secure" $extraPortNames) }}
+            - name: tcp-secure
+              port: {{ $secureTcpPort }}
+              targetPort: {{ $secureTcpPort }}
+              {{- end }}
             {{- end }}
           selector:
             {{- include "clickhouse.selectorLabels" . | nindent 12 }}
@@ -235,9 +266,15 @@ spec:
           - host: {{ $keeper_host }}
             port: {{ .Values.clickhouse.keeper.port }}
     {{- end }}
+    {{- if $tlsEnabled }}
+    settings:
+        tcp_port: 9000
+        tcp_port_secure: {{ $secureTcpPort }}
+        https_port: {{ $httpsPort }}
+    {{- end }}
     {{- $extraConfig := tpl (include "clickhouse.extraConfig" . ) . -}}
     {{- $extraUsers := tpl (include "clickhouse.extraUsers" . ) . -}}
-    {{- if not (and (empty $extraConfig) (empty $extraUsers)) }}
+    {{- if not (and (empty $extraConfig) (empty $extraUsers) (not $tlsEnabled)) }}
     files:
         {{- if not (empty $extraConfig) }}
         config.d/extra_config.xml: |
@@ -247,9 +284,44 @@ spec:
         users.d/extra_users.xml: |
           {{- tpl $extraUsers . | nindent 10 }}
         {{- end }}
+        {{- if $tlsEnabled }}
+        openssl.xml: |
+          {{- .Values.clickhouse.tls.opensslConfig | nindent 10 }}
+        {{- if .Values.clickhouse.tls.certificateFile.inlineFileContent }}
+        config.d/{{ .Values.clickhouse.tls.certificateFile.configFileName }}: |
+          {{- .Values.clickhouse.tls.certificateFile.inlineFileContent | nindent 10 }}
+        {{- else }}
+        {{ .Values.clickhouse.tls.certificateFile.configFileName }}:
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.clickhouse.tls.certificateFile.secretReference.name }}
+              key: {{ .Values.clickhouse.tls.certificateFile.secretReference.key }}
+        {{- end }}
+        {{- if .Values.clickhouse.tls.privateKeyFile.inlineFileContent }}
+        config.d/{{ .Values.clickhouse.tls.privateKeyFile.configFileName }}: |
+          {{- .Values.clickhouse.tls.privateKeyFile.inlineFileContent | nindent 10 }}
+        {{- else }}
+        {{ .Values.clickhouse.tls.privateKeyFile.configFileName }}:
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.clickhouse.tls.privateKeyFile.secretReference.name }}
+              key: {{ .Values.clickhouse.tls.privateKeyFile.secretReference.key }}
+        {{- end }}
+        {{- if .Values.clickhouse.tls.dhParamsFile.inlineFileContent }}
+        config.d/{{ .Values.clickhouse.tls.dhParamsFile.configFileName }}: |
+          {{- .Values.clickhouse.tls.dhParamsFile.inlineFileContent | nindent 10 }}
+        {{- else }}
+        {{ .Values.clickhouse.tls.dhParamsFile.configFileName }}:
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.clickhouse.tls.dhParamsFile.secretReference.name }}
+              key: {{ .Values.clickhouse.tls.dhParamsFile.secretReference.key }}
+        {{- end }}
+        {{- end }}
     {{- end }}
   {{- if not (empty .Values.namespaceDomainPattern) }}
   namespaceDomainPattern: {{ .Values.namespaceDomainPattern | quote }}
   {{- end }}
 
 {{ include "validate.clickhouse.keeper" . }}
+{{ include "validate.clickhouse.tls" . }}
