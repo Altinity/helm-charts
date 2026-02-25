@@ -190,7 +190,8 @@ spec:
     {{- if .Values.clickhouse.settings }}
     settings:
     {{- range $key, $value := .Values.clickhouse.settings }}
-      {{ $key }}: "{{ $value }}"
+      {{- $valueIsNumeric := regexMatch "^[0-9]+$" ( $value | toString ) }}
+      {{ $key }}: {{ ternary $value ( $value | quote ) $valueIsNumeric }}
     {{- end }}
     {{- end }}
     clusters:
