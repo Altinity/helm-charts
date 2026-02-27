@@ -1,4 +1,3 @@
-import json
 import os
 import xml.etree.ElementTree as ET
 
@@ -11,11 +10,10 @@ import tests.steps.clickhouse as clickhouse
 
 
 @TestStep(Then)
-def verify_tls_files_in_chi(self, namespace, chi_name):
+def verify_tls_files_in_chi(self, namespace):
     """Verify TLS files are present in CHI spec."""
-    chi_info = run(cmd=f"kubectl get chi {chi_name} -n {namespace} -o json")
-    chi_data = json.loads(chi_info.stdout)
-    
+    chi_data = clickhouse.get_chi_info(namespace=namespace)
+
     files = chi_data.get("spec", {}).get("configuration", {}).get("files", {})
     
     for expected_file in ["config.d/foo.crt", "bar.key", "dhparam.pem", "config.d/openssl.xml"]:
@@ -24,11 +22,10 @@ def verify_tls_files_in_chi(self, namespace, chi_name):
 
 
 @TestStep(Then)
-def verify_tls_secret_references_in_chi(self, namespace, chi_name):
+def verify_tls_secret_references_in_chi(self, namespace):
     """Verify secret references are correct in CHI spec."""
-    chi_info = run(cmd=f"kubectl get chi {chi_name} -n {namespace} -o json")
-    chi_data = json.loads(chi_info.stdout)
-    
+    chi_data = clickhouse.get_chi_info(namespace=namespace)
+
     files = chi_data.get("spec", {}).get("configuration", {}).get("files", {})
     
     expected_secrets = {
@@ -53,10 +50,9 @@ def verify_tls_secret_references_in_chi(self, namespace, chi_name):
 
 
 @TestStep(Then)
-def verify_settings_ports_in_chi(self, namespace, chi_name):
+def verify_settings_ports_in_chi(self, namespace):
     """Verify settings block has correct port configuration in CHI spec."""
-    chi_info = run(cmd=f"kubectl get chi {chi_name} -n {namespace} -o json")
-    chi_data = json.loads(chi_info.stdout)
+    chi_data = clickhouse.get_chi_info(namespace=namespace)
 
     settings = chi_data.get("spec", {}).get("configuration", {}).get("settings", {})
     expected_https_port = 8444;
