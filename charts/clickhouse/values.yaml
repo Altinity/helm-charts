@@ -207,6 +207,21 @@ clickhouse:
     <clickhouse>
     </clickhouse>
 
+  # -- Additional entries for spec.configuration.files.
+  # String values are rendered inline; map values (e.g. valueFrom) are passed as structured YAML.
+  # Example:
+  #   configurationFiles:
+  #     config.d/tls.xml: |
+  #       <clickhouse>
+  #         <https_port>8443</https_port>
+  #       </clickhouse>
+  #     tls.crt:
+  #       valueFrom:
+  #         secretKeyRef:
+  #           name: my-tls-secret
+  #           key: tls.crt
+  configurationFiles: {}
+
   # -- Extra containers for clickhouse pods
   extraContainers: []
 # If you want to make use of clickhouse data volume, which is the case of clickhouse-backup, you can specify the volumeMounts like this.

@@ -237,7 +237,8 @@ spec:
     {{- end }}
     {{- $extraConfig := tpl (include "clickhouse.extraConfig" . ) . -}}
     {{- $extraUsers := tpl (include "clickhouse.extraUsers" . ) . -}}
-    {{- if not (and (empty $extraConfig) (empty $extraUsers)) }}
+    {{- $hasConfigFiles := not (empty .Values.clickhouse.configurationFiles) -}}
+    {{- if or (not (and (empty $extraConfig) (empty $extraUsers))) $hasConfigFiles }}
     files:
         {{- if not (empty $extraConfig) }}
         config.d/extra_config.xml: |
@@ -246,6 +247,15 @@ spec:
         {{- if not (empty $extraUsers) }}
         users.d/extra_users.xml: |
           {{- tpl $extraUsers . | nindent 10 }}
+        {{- end }}
+        {{- range $path, $content := .Values.clickhouse.configurationFiles }}
+        {{- if kindIs "string" $content }}
+        {{ $path }}: |
+          {{- $content | nindent 10 }}
+        {{- else }}
+        {{ $path }}:
+          {{- toYaml $content | nindent 10 }}
+        {{- end }}
         {{- end }}
     {{- end }}
   {{- if not (empty .Values.namespaceDomainPattern) }}
