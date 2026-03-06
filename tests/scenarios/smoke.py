@@ -79,6 +79,7 @@ def check_deployment(self, fixture_file, skip_external_keeper=True):
 
     # Add TLS configuration verification for TLS fixtures
     if "tls" in fixture_name:
+        https_port = 8444
         with And("verify TLS configuration in CHI"):
             tls.verify_tls_files_in_chi(
                 namespace=namespace,
@@ -98,6 +99,13 @@ def check_deployment(self, fixture_file, skip_external_keeper=True):
 
             tls.verify_settings_ports_in_chi(
                 namespace=namespace,
+                expected_https_port=https_port,
+            )
+
+        with And("verify HTTPS endpoint certificate"):
+            tls.verify_https_certificate(
+                namespace=namespace,
+                https_port=https_port,
             )
 
     # Verify metrics endpoint is accessible

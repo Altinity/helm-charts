@@ -173,6 +173,7 @@ The test suite provides comprehensive coverage across multiple dimensions:
 #### **2. ClickHouse Functionality**
 - ✅ Version verification
 - ✅ Connection testing
+- ✅ Server-side TLS/SSL and HTTPS
 - ✅ Query execution
 - ✅ Cluster topology (system.clusters)
 - ✅ Replication health (system.replicas)
@@ -265,7 +266,6 @@ Areas that **need additional testing or are not fully covered**:
 - ⚠️ **Configuration drift** - No testing of manual changes vs. Helm state
 - ⚠️ **Resource exhaustion** - No OOM or disk full scenarios
 - ⚠️ **Long-running stability** - Tests are short-lived (minutes, not hours/days)
-- ⚠️ **TLS/SSL** - Only tests configuration setup, does not verify actual encryption
 
 
 ---
