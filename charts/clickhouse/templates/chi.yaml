@@ -1,4 +1,10 @@
 {{- $service_name := tpl (include "clickhouse.serviceTemplateName" . ) . -}}
+{{- $extraPortNames := list }}
+{{- range .Values.clickhouse.extraPorts }}
+{{- $extraPortNames = append $extraPortNames .name }}
+{{- end }}
+{{- $serviceHttpsPort := (((.Values.clickhouse).settings).https_port) | default "" -}}
+{{- $serviceSecureTcpPort := (((.Values.clickhouse).settings).tcp_port_secure) | default "" -}}
 ---
 apiVersion: "clickhouse.altinity.com/v1"
 kind: ClickHouseInstallation
@@ -62,6 +68,16 @@ spec:
               targetPort: {{ .containerPort }}
             {{- end }}
             {{- end }}
+            {{- if and $serviceHttpsPort (not (has "https" $extraPortNames)) }}
+            - name: https
+              port: {{ $serviceHttpsPort }}
+              targetPort: {{ $serviceHttpsPort }}
+            {{- end }}
+            {{- if and $serviceSecureTcpPort (not (has "tcp-secure" $extraPortNames)) }}
+            - name: tcp-secure
+              port: {{ $serviceSecureTcpPort }}
+              targetPort: {{ $serviceSecureTcpPort }}
+            {{- end }}
           selector:
             {{- include "clickhouse.selectorLabels" . | nindent 12 }}
       {{- if .Values.clickhouse.lbService.enabled }}
@@ -95,6 +111,16 @@ spec:
               port: {{ .containerPort }}
               targetPort: {{ .containerPort }}
             {{- end }}
+            {{- end }}
+            {{- if and $serviceHttpsPort (not (has "https" $extraPortNames)) }}
+            - name: https
+              port: {{ $serviceHttpsPort }}
+              targetPort: {{ $serviceHttpsPort }}
+            {{- end }}
+            {{- if and $serviceSecureTcpPort (not (has "tcp-secure" $extraPortNames)) }}
+            - name: tcp-secure
+              port: {{ $serviceSecureTcpPort }}
+              targetPort: {{ $serviceSecureTcpPort }}
             {{- end }}
           selector:
             {{- include "clickhouse.selectorLabels" . | nindent 12 }}
@@ -190,7 +216,8 @@ spec:
     {{- if .Values.clickhouse.settings }}
     settings:
     {{- range $key, $value := .Values.clickhouse.settings }}
-      {{ $key }}: "{{ $value }}"
+      {{- $valueIsNumeric := regexMatch "^[0-9]+$" ( $value | toString ) }}
+      {{ $key }}: {{ ternary $value ( $value | quote ) $valueIsNumeric }}
     {{- end }}
     {{- end }}
     clusters:

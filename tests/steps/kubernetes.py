@@ -7,7 +7,7 @@ import time
 def get_pods(self, namespace):
     """Get the list of pods in the specified namespace and return in a list."""
 
-    pods = run(cmd=f"minikube kubectl -- get pods -n {namespace} -o json")
+    pods = run(cmd=f"kubectl get pods -n {namespace} -o json")
     pods = json.loads(pods.stdout)["items"]
 
     return [p["metadata"]["name"] for p in pods]
@@ -473,6 +473,29 @@ def get_secrets(self, namespace):
 
 
 @TestStep(Finally)
+def remove_chi_finalizers(self, namespace):
+    """Remove finalizers from CHI resources to unblock namespace deletion.
+
+    Unless the operator is externally deployed, after a helm uninstall, the
+    operator disappears but CHI resources will still have finalizers that block
+    namespace deletion, causing the namespace to persist with 'Terminating' status.
+
+    Args:
+        namespace: Kubernetes namespace to delete
+    """
+    result = run(
+        cmd=f"kubectl get chi -n {namespace} -o name",
+    )
+    chi_resource_names = result.stdout.strip().split()
+    for resource_name in chi_resource_names:
+        run(
+            cmd=f"kubectl patch {resource_name} -n {namespace} "
+                f"--type json -p '[{{\"op\": \"remove\", \"path\": \"/metadata/finalizers\"}}]'",
+        )
+        note(f"✓ Removed finalizers from {resource_name}: {namespace}/{resource_name}")
+
+
+@TestStep(Finally)
 def delete_namespace(self, namespace):
     """Delete a Kubernetes namespace.
 
@@ -501,3 +524,16 @@ def delete_pod(self, namespace, pod_name):
     """
     run(cmd=f"kubectl delete pod {pod_name} -n {namespace}", check=True)
     note(f"✓ Pod {pod_name} deleted from namespace {namespace}")
+
+
+@TestStep(When)
+def get_file_contents_from_pod(self, namespace, pod_name, file_path):
+    """Read the contents of a file from a pod.
+
+    Args:
+        namespace: Kubernetes namespace
+        pod_name: Name of the pod
+        file_path: Absolute path to the file inside the pod
+    """
+    result = run(cmd=f"kubectl exec -n {namespace} {pod_name} -- cat {file_path}")
+    return result.stdout

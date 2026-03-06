@@ -173,6 +173,7 @@ The test suite provides comprehensive coverage across multiple dimensions:
 #### **2. ClickHouse Functionality**
 - ✅ Version verification
 - ✅ Connection testing
+- ✅ Server-side TLS/SSL and HTTPS
 - ✅ Query execution
 - ✅ Cluster topology (system.clusters)
 - ✅ Replication health (system.replicas)
@@ -246,7 +247,6 @@ Areas that **need additional testing or are not fully covered**:
 - ❌ **Backup and restore** - No automated backup/restore testing
 - ❌ **Disaster recovery** - No full cluster failure scenarios
 - ❌ **Network policies** - Limited testing of K8s network restrictions
-- ❌ **TLS/SSL** - No certificate or encryption testing
 - ❌ **Monitoring integration** - Prometheus scraping tested only via annotations
 - ❌ **Logging integration** - No FluentD/ElasticSearch integration tests
 - ❌ **Multi-cluster** - No federation or distributed query tests
@@ -273,11 +273,12 @@ Areas that **need additional testing or are not fully covered**:
 ## 🌍 Supported Environment
 
 - **Operating System**: [Ubuntu](https://ubuntu.com/) 22.04 / 24.04
-- **Python**: >= 3.10.12
+- **Python**: >= 3.10.12, <= 3.12 (3.13+ has `lzma` package that is incompatible with the test framework)
 - **Kubernetes**: >= 1.24
 - **Helm**: >= 3.8.0
 - **Minikube**: >= 1.28.0 (for local testing)
 - **Docker**: Required as Minikube driver
+  - (alternatively) **OrbStack**: >= 2.0
 - **kubectl**: Latest stable version
 
 ---
@@ -286,7 +287,9 @@ Areas that **need additional testing or are not fully covered**:
 
 ### Kubernetes Cluster
 
-You need access to a Kubernetes cluster. For **local testing**, use Minikube:
+You need access to a Kubernetes cluster. For **local testing**, two providers are supported:
+
+#### Option 1: Minikube (default)
 
 ```bash
 # Install Minikube
@@ -296,6 +299,27 @@ sudo install minikube-linux-amd64 /usr/local/bin/minikube
 # Verify installation
 minikube version
 ```
+
+#### Option 2: OrbStack (account required, may need license)
+
+1. Install OrbStack by following the [_Quick start_ guide \(docs.orbstack.dev\)](
+   https://docs.orbstack.dev/quick-start#installation).
+2. Enable Kubernetes in OrbStack:
+    1. Open the OrbStack app
+    2. Go to Settings... (`Cmd ⌘ + ,`) → Kubernetes
+    3. Toggle the `Enable Kubernetes cluster` option
+    4. Click the `Apply and Restart` button
+3. Verify that OrbStack is running.
+    ```sh
+    $ orb status
+    # Running
+    ```
+4. Verify the Kubernetes context.
+    ```sh
+    $ kubectl config get-contexts orbstack
+    # CURRENT   NAME       CLUSTER    AUTHINFO   NAMESPACE
+    # *         orbstack   orbstack   orbstack
+    ```
 
 ### Helm
 
@@ -323,6 +347,7 @@ pip3 install -r tests/requirements.txt
 - `testflows.texts==2.0.211217.1011222` - Text utilities
 - `PyYAML==6.0.1` - YAML parsing
 - `requests==2.32.3` - HTTP requests
+- `cryptography==46.0.5` - TLS validation
 
 ---
 
@@ -334,14 +359,18 @@ To run the complete test suite (all active fixtures + upgrades):
 
 ```bash
 # From the repository root
+# With Minikube (default)
 python3 ./tests/run/smoke.py
+
+# With OrbStack
+LOCAL_K8S_PROVIDER=orbstack python3 ./tests/run/smoke.py
 ```
 
 This will:
-1. Start/restart Minikube with 4 CPUs and 6GB memory
+1. \[Minikube only\] Start/restart Minikube with 4 CPUs and 6GB memory
 2. Run all enabled fixture deployments
 3. Run upgrade scenarios
-4. Clean up and delete Minikube
+4. \[Minikube only\] Clean up and delete Minikube
 
 **Expected Duration**: 10 minutes 
 
