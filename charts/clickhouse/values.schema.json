@@ -314,6 +314,13 @@
             "type": "object"
           }
         },
+        "extraVolumeMounts": {
+          "type": "array",
+          "description": "Extra volume mounts for Clickhouse pod.",
+          "items": {
+            "type": "object"
+          }
+        },
         "resources": {
           "type": "object",
           "description": "Resource requests/limits for ClickHouse containers."
