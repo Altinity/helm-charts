@@ -114,9 +114,16 @@ Pod Template Base
                 - name: CLICKHOUSE_ALWAYS_RUN_INITDB_SCRIPTS
                   value: "true"
                 {{- end }}
+              {{- end }}
+              {{- if or .Values.clickhouse.initScripts.enabled  .Values.clickhouse.extraVolumeMounts }}
               volumeMounts:
+                {{ if .Values.clickhouse.initScripts.enabled }}
                 - name: init-scripts-configmap
                   mountPath: /docker-entrypoint-initdb.d
+                {{- end }}
+                {{- with .Values.clickhouse.extraVolumeMounts }}
+                {{- toYaml . | nindent 16 }}
+                {{- end }}
               {{- end }}
               resources:
                 {{- toYaml .Values.clickhouse.resources | nindent 16 }}
