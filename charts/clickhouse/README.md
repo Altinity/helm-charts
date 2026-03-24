@@ -170,6 +170,7 @@ EOSQL
 | clickhouse.extraContainers | list | `[]` | Extra containers for clickhouse pods |
 | clickhouse.extraPorts | list | `[]` | Additional ports to expose in the ClickHouse container Example: extraPorts:   - name: custom-port     containerPort: 8080 |
 | clickhouse.extraUsers | string | `"<clickhouse>\n</clickhouse>\n"` | Additional users config for ClickHouse (in xml format) |
+| clickhouse.extraVolumeMounts | list | `[]` | Extra volume mounts for clickhouse pods |
 | clickhouse.extraVolumes | list | `[]` | Extra volumes for clickhouse pods |
 | clickhouse.image.pullPolicy | string | `"IfNotPresent"` |  |
 | clickhouse.image.repository | string | `"altinity/clickhouse-server"` |  |
