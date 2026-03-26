@@ -478,8 +478,8 @@ def verify_profiles_and_user_settings(
         actual_value = settings_cfg.get(key)
         expected_value = str(value)
         assert (
-            actual_value == expected_value
-        ), f"Expected setting {key}={expected_value}, got {actual_value}"
+            str(actual_value) == expected_value
+        ), f"Expected setting {key}={expected_value!r}, got {actual_value!r}"
 
     note("Users, profiles, and settings configuration verified")
 
