@@ -190,7 +190,12 @@ spec:
     {{- if .Values.clickhouse.settings }}
     settings:
     {{- range $key, $value := .Values.clickhouse.settings }}
-      {{ $key }}: "{{ $value }}"
+      {{- if kindIs "map" $value }}
+      {{ $key }}:
+        {{- toYaml $value | nindent 8 }}
+      {{- else }}
+      {{ $key }}: {{ $value | quote }}
+      {{- end }}
     {{- end }}
     {{- end }}
     clusters:
