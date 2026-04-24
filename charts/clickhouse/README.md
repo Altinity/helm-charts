@@ -183,6 +183,7 @@ EOSQL
 | clickhouse.keeper.host | string | `""` | Specify a keeper host. Should be left empty if `clickhouse-keeper.enabled` is `true`. Will override the defaults set from `clickhouse-keeper.enabled`. |
 | clickhouse.keeper.port | int | `2181` | Override the default keeper port |
 | clickhouse.lbService.enabled | bool | `false` |  |
+| clickhouse.lbService.externalTrafficPolicy | string | `""` | Set the external traffic policy for the LoadBalancer service, allowed values are `Cluster` (default) or `Local` (see [here](https://kubernetes.io/docs/reference/networking/virtual-ips/#traffic-policies) for more details). |
 | clickhouse.lbService.loadBalancerSourceRanges | list | `[]` | Specify source IP ranges to the LoadBalancer service. If supported by the platform, this will restrict traffic through the cloud-provider load-balancer to the specified client IPs. This is ignored if the cloud-provider does not support the feature. |
 | clickhouse.lbService.serviceAnnotations | object | `{}` |  |
 | clickhouse.lbService.serviceLabels | object | `{}` |  |
