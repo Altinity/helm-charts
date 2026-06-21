@@ -796,6 +796,23 @@ entries:
   clickhouse:
   - apiVersion: v2
     appVersion: 25.3.6.10034
+    created: "2026-06-21T19:17:27.825363737Z"
+    dependencies:
+    - alias: operator
+      condition: operator.enabled
+      name: altinity-clickhouse-operator
+      repository: https://helm.altinity.com
+      version: 0.27.1
+    description: A Helm chart for creating a ClickHouse® Cluster with the Altinity
+      Operator for ClickHouse
+    digest: 217111c7669d9edfa66fe04a75151b78f1bad672c8838e2ebafc0cf17a8a5232
+    name: clickhouse
+    type: application
+    urls:
+    - https://github.com/Altinity/helm-charts/releases/download/clickhouse-0.3.12/clickhouse-0.3.12.tgz
+    version: 0.3.12
+  - apiVersion: v2
+    appVersion: 25.3.6.10034
     created: "2026-04-20T18:39:31.296418504Z"
     dependencies:
     - alias: operator
@@ -1350,4 +1367,4 @@ entries:
     urls:
     - https://github.com/Altinity/kubernetes-blueprints-for-clickhouse/releases/download/keeper-sts-0.1.1/keeper-sts-0.1.1.tgz
     version: 0.1.1
-generated: "2026-06-04T13:43:08.070836604Z"
+generated: "2026-06-21T19:17:27.825559747Z"
