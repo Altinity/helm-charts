@@ -28,6 +28,19 @@ spec:
       {{ $k }}: {{ $v }}
     {{- end }}
     {{- end }}
+    {{- $hasConfigFiles := not (empty .Values.keeper.configurationFiles) -}}
+    {{- if $hasConfigFiles }}
+    files:
+        {{- range $path, $content := .Values.keeper.configurationFiles }}
+        {{- if kindIs "string" $content }}
+        {{ $path }}: |
+          {{- $content | nindent 10 }}
+        {{- else }}
+        {{ $path }}:
+          {{- toYaml $content | nindent 10 }}
+        {{- end }}
+        {{- end }}
+    {{- end }}
   defaults:
     storageManagement:
       provisioner: Operator
@@ -47,6 +60,13 @@ spec:
             - name: raft
               port: 9444
               targetPort: 9444
+            {{- if $.Values.keeper.extraPorts }}
+            {{- range $.Values.keeper.extraPorts }}
+            - name: {{ .name }}
+              port: {{ .containerPort }}
+              targetPort: {{ .containerPort }}
+            {{- end }}
+            {{- end }}
             {{- if not (empty $.Values.keeper.metricsPort) }}
             - name: metrics
               port: {{ $.Values.keeper.metricsPort }}

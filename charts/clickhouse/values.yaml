@@ -190,7 +190,6 @@ clickhouse:
   # @ignore
   topologySpreadConstraints: []
 
-
   # -- Additional ports to expose in the ClickHouse container
   # Example:
   # extraPorts:
@@ -296,6 +295,28 @@ keeper:
 
   # @ignore
   securityContext: {}
+
+  # -- Additional ports to expose in the ClickHouse container
+  # Example:
+  # extraPorts:
+  #   - name: custom-port
+  #     containerPort: 8080
+  extraPorts: []
+
+  # -- Additional entries for spec.configuration.files.
+  # String values are rendered inline; map values (e.g. valueFrom) are passed as structured YAML.
+  # Example:
+  #   configurationFiles:
+  #     config.d/tls.xml: |
+  #       <clickhouse>
+  #         <https_port>8443</https_port>
+  #       </clickhouse>
+  #     tls.crt:
+  #       valueFrom:
+  #         secretKeyRef:
+  #           name: my-tls-secret
+  #           key: tls.crt
+  configurationFiles: {}
 
 operator:
   # -- Whether to enable the Altinity Operator for ClickHouse.
