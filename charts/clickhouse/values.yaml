@@ -167,6 +167,11 @@ clickhouse:
     # If not set and create is true, a name is generated using the fullname template
     name: ""
 
+  # -- PriorityClass for the ClickHouse server pods.
+  # Set this when the servers are pinned to a node pool that other workloads may
+  # also use: without a priority, a pod that can only be scheduled on that pool
+  # waits behind pods that could have gone anywhere.
+  priorityClassName: ""
   podAnnotations: {}
   podLabels: {}
 
@@ -277,6 +282,8 @@ keeper:
     storageClass: ""
   nodeSelector: {}
   tolerations: []
+  # -- PriorityClass for the Keeper pods.
+  priorityClassName: ""
   podAnnotations: {}
   volumeClaimAnnotations: {}
   # topologySpreadConstraints over `zone`, by deafult there is only

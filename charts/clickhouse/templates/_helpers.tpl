@@ -79,6 +79,9 @@ Pod Template Base
         podDistribution:
           {{- include "clickhouse.podDistribution" . | nindent 10 }}
         spec:
+          {{- with .Values.clickhouse.priorityClassName }}
+          priorityClassName: {{ . | quote }}
+          {{- end }}
           {{- with .Values.clickhouse.imagePullSecrets }}
           imagePullSecrets:
             {{- toYaml . | nindent 12 }}
