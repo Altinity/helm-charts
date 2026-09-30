@@ -881,6 +881,44 @@ def verify_keeper_annotations(self, namespace, expected_annotations):
 
 
 @TestStep(Then)
+def verify_clickhouse_priority_class_name(self, namespace, expected_name):
+    """Verify that ClickHouse server pods have the expected priorityClassName.
+
+    Exercises clickhouse.extraPodSpec landing in the CHI pod template spec.
+    """
+    clickhouse_pods = get_clickhouse_pods(namespace=namespace)
+    assert len(clickhouse_pods) > 0, "No ClickHouse pods found"
+
+    for pod in clickhouse_pods:
+        pod_info = kubernetes.get_pod_info(namespace=namespace, pod_name=pod)
+        actual = pod_info.get("spec", {}).get("priorityClassName")
+        assert (
+            actual == expected_name
+        ), f"Expected priorityClassName '{expected_name}', got '{actual}' in pod {pod}"
+
+    note(f"✓ ClickHouse priorityClassName '{expected_name}' verified on {len(clickhouse_pods)} pods")
+
+
+@TestStep(Then)
+def verify_keeper_priority_class_name(self, namespace, expected_name):
+    """Verify that Keeper pods have the expected priorityClassName.
+
+    Exercises keeper.extraPodSpec landing in the CHK pod template spec.
+    """
+    keeper_pods = get_keeper_pods(namespace=namespace)
+    assert len(keeper_pods) > 0, "No Keeper pods found"
+
+    for pod in keeper_pods:
+        pod_info = kubernetes.get_pod_info(namespace=namespace, pod_name=pod)
+        actual = pod_info.get("spec", {}).get("priorityClassName")
+        assert (
+            actual == expected_name
+        ), f"Expected priorityClassName '{expected_name}', got '{actual}' in Keeper pod {pod}"
+
+    note(f"✓ Keeper priorityClassName '{expected_name}' verified on {len(keeper_pods)} pods")
+
+
+@TestStep(Then)
 def verify_keeper_resources(self, namespace, expected_resources):
     """Verify that Keeper pods have expected resource requests and limits."""
     keeper_pods = get_keeper_pods(namespace=namespace)

@@ -109,8 +109,8 @@ spec:
             labelSelector:
               matchLabels:
                 clickhouse-keeper.altinity.com/cluster: "{{ $cluster_name }}"
-          {{- with $.Values.keeper.priorityClassName }}
-          priorityClassName: {{ . | quote }}
+          {{- with $.Values.keeper.extraPodSpec }}
+          {{- toYaml . | nindent 10 }}
           {{- end }}
           {{- with $.Values.keeper.tolerations }}
           tolerations:

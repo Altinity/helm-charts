@@ -167,11 +167,15 @@ clickhouse:
     # If not set and create is true, a name is generated using the fullname template
     name: ""
 
-  # -- PriorityClass for the ClickHouse server pods.
-  # Set this when the servers are pinned to a node pool that other workloads may
-  # also use: without a priority, a pod that can only be scheduled on that pool
-  # waits behind pods that could have gone anywhere.
-  priorityClassName: ""
+  # -- Extra fields merged into the ClickHouse server pod spec.
+  # Any top-level PodSpec field the operator supports (e.g. priorityClassName,
+  # runtimeClassName, schedulerName, hostAliases). This is appended, not deep-merged:
+  # do not set keys the chart already renders (containers, tolerations, affinity,
+  # nodeSelector, securityContext, imagePullSecrets, volumes, topologySpreadConstraints).
+  # Example:
+  #   extraPodSpec:
+  #     priorityClassName: high-priority
+  extraPodSpec: {}
   podAnnotations: {}
   podLabels: {}
 
@@ -282,8 +286,15 @@ keeper:
     storageClass: ""
   nodeSelector: {}
   tolerations: []
-  # -- PriorityClass for the Keeper pods.
-  priorityClassName: ""
+  # -- Extra fields merged into the Keeper pod spec.
+  # Any top-level PodSpec field the operator supports (e.g. priorityClassName,
+  # runtimeClassName, schedulerName, hostAliases). This is appended, not deep-merged:
+  # do not set keys the chart already renders (containers, tolerations, affinity,
+  # securityContext, imagePullSecrets, topologySpreadConstraints).
+  # Example:
+  #   extraPodSpec:
+  #     priorityClassName: high-priority
+  extraPodSpec: {}
   podAnnotations: {}
   volumeClaimAnnotations: {}
   # topologySpreadConstraints over `zone`, by deafult there is only

@@ -13,6 +13,7 @@ FIXTURES = [
     "fixtures/02-replicated-with-users.yaml",
     "fixtures/08-extracontainer-data-mount.yaml",
     "fixtures/09-usersprofiles-settings.yaml",
+    "fixtures/10-priority-class.yaml",
     # "fixtures/03-sharded-advanced.yaml",
     # "fixtures/04-external-keeper.yaml",
     # "fixtures/05-persistence-disabled.yaml",
@@ -50,8 +51,14 @@ def check_deployment(self, fixture_file, skip_external_keeper=True):
         skip("Skipping external keeper test (requires pre-existing keeper)")
         return
 
+    # Any PriorityClass referenced via extraPodSpec must exist before install,
+    # otherwise the pods are rejected at admission and never schedule.
+    priority_class_names = state.get_priority_class_names()
+
     with When("install ClickHouse with fixture configuration"):
         kubernetes.use_context(context_name="minikube")
+        for pc_name in priority_class_names:
+            kubernetes.create_priority_class(name=pc_name)
         helm.install(
             namespace=namespace, release_name=release_name, values_file=fixture_file
         )
@@ -76,6 +83,8 @@ def check_deployment(self, fixture_file, skip_external_keeper=True):
     with Finally("cleanup deployment"):
         helm.uninstall(namespace=namespace, release_name=release_name)
         kubernetes.delete_namespace(namespace=namespace)
+        for pc_name in priority_class_names:
+            kubernetes.delete_priority_class(name=pc_name)
 
 
 @TestScenario

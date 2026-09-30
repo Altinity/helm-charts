@@ -1,5 +1,5 @@
 # clickhouse
-![Version: 0.3.10](https://img.shields.io/badge/Version-0.3.10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.3.6.10034](https://img.shields.io/badge/AppVersion-25.3.6.10034-informational?style=flat-square)
+![Version: 0.3.13](https://img.shields.io/badge/Version-0.3.13-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.3.6.10034](https://img.shields.io/badge/AppVersion-25.3.6.10034-informational?style=flat-square)
 
 A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for ClickHouse
 
@@ -15,7 +15,7 @@ A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for 
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://helm.altinity.com | operator(altinity-clickhouse-operator) | 0.25.6 |
+| https://helm.altinity.com | operator(altinity-clickhouse-operator) | 0.27.2 |
 
 ## Installing the Chart
 
@@ -168,6 +168,7 @@ EOSQL
 | clickhouse.defaultUser.password_secret_name | string | `""` | Name of an existing Kubernetes secret containing the default user password. If set, the password will be read from the secret instead of using the password field. The secret should contain a key named 'password'. |
 | clickhouse.extraConfig | string | `"<clickhouse>\n</clickhouse>\n"` | Miscellanous config for ClickHouse (in xml format) |
 | clickhouse.extraContainers | list | `[]` | Extra containers for clickhouse pods |
+| clickhouse.extraPodSpec | object | `{}` | Extra fields merged into the ClickHouse server pod spec. Any top-level PodSpec field the operator supports (e.g. priorityClassName, runtimeClassName, schedulerName, hostAliases). This is appended, not deep-merged: do not set keys the chart already renders (containers, tolerations, affinity, nodeSelector, securityContext, imagePullSecrets, volumes, topologySpreadConstraints). Example:   extraPodSpec:     priorityClassName: high-priority |
 | clickhouse.extraPorts | list | `[]` | Additional ports to expose in the ClickHouse container Example: extraPorts:   - name: custom-port     containerPort: 8080 |
 | clickhouse.extraUsers | string | `"<clickhouse>\n</clickhouse>\n"` | Additional users config for ClickHouse (in xml format) |
 | clickhouse.extraVolumeMounts | list | `[]` | Extra volume mounts for clickhouse pods |
@@ -209,7 +210,9 @@ EOSQL
 | clickhouse.users | list | `[]` | Configure additional ClickHouse users and per-user settings. |
 | clickhouse.zones | list | `[]` |  |
 | keeper.enabled | bool | `false` | Whether to enable Keeper. Required for replicated tables. |
+| keeper.extraPodSpec | object | `{}` | Extra fields merged into the Keeper pod spec. Any top-level PodSpec field the operator supports (e.g. priorityClassName, runtimeClassName, schedulerName, hostAliases). This is appended, not deep-merged: do not set keys the chart already renders (containers, tolerations, affinity, securityContext, imagePullSecrets, topologySpreadConstraints). Example:   extraPodSpec:     priorityClassName: high-priority |
 | keeper.image | string | `"altinity/clickhouse-keeper"` |  |
+| keeper.imagePullSecrets | list | `[]` | Image pull secrets for keeper pods. Example: [{"name": "my-registry-secret"}] |
 | keeper.localStorage.size | string | `"5Gi"` |  |
 | keeper.localStorage.storageClass | string | `""` |  |
 | keeper.metricsPort | string | `""` |  |

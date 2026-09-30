@@ -131,6 +131,12 @@ def wait_for_pod_count(self, namespace, expected_count, timeout=300):
     last_count = -1
     while True:
         pods = get_pods(namespace=namespace)
+        # The operator pod is deployed in the namespace but is not part of the
+        # ClickHouse/Keeper pod count that fixtures declare, so exclude it.
+        # Otherwise a fast operator pod can satisfy the count before slower
+        # Keeper pods are even created (e.g. 1 CH + operator == expected 2),
+        # causing Keeper verification to run against a not-yet-created pod.
+        pods = [p for p in pods if "operator" not in p]
         current_count = len(pods)
 
         # Log when pod count changes
@@ -489,6 +495,41 @@ def delete_namespace(self, namespace):
     )
 
     note(f"✓ Namespace {namespace} deleted")
+
+
+@TestStep(Given)
+def create_priority_class(self, name, value=1000, description="ClickHouse chart test priority class"):
+    """Create a cluster-scoped PriorityClass.
+
+    A pod that references a non-existent PriorityClass is rejected at admission,
+    so any priorityClassName used in a fixture must exist before install.
+
+    Args:
+        name: PriorityClass name
+        value: Integer priority value
+        description: Human-readable description
+    """
+    manifest = (
+        "apiVersion: scheduling.k8s.io/v1\n"
+        "kind: PriorityClass\n"
+        f"metadata:\n  name: {name}\n"
+        f"value: {value}\n"
+        "globalDefault: false\n"
+        f"description: {description}\n"
+    )
+    run(cmd=f"echo '{manifest}' | kubectl apply -f -", check=True)
+    note(f"✓ PriorityClass {name} created (value={value})")
+
+
+@TestStep(Finally)
+def delete_priority_class(self, name):
+    """Delete a cluster-scoped PriorityClass.
+
+    Args:
+        name: PriorityClass name
+    """
+    run(cmd=f"kubectl delete priorityclass {name} --ignore-not-found", check=False)
+    note(f"✓ PriorityClass {name} deleted")
 
 
 @TestStep(When)

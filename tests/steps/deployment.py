@@ -429,6 +429,41 @@ class HelmState:
         clickhouse.verify_secrets_exist(namespace=namespace)
         note(f"✓ Secrets verified")
 
+    def get_priority_class_names(self):
+        """Collect PriorityClass names referenced via extraPodSpec (server + keeper).
+
+        Returns a set so the harness can create these cluster-scoped resources
+        before install (pods referencing a missing PriorityClass fail admission).
+        """
+        names = set()
+        for cfg in (self.clickhouse_config, self.keeper_config):
+            name = (cfg.get("extraPodSpec") or {}).get("priorityClassName")
+            if name:
+                names.add(name)
+        return names
+
+    def verify_extra_pod_spec(self, namespace):
+        """Verify extraPodSpec fields render into the pod templates.
+
+        Currently checks priorityClassName (the original PR scenario) on both the
+        ClickHouse server and Keeper pods.
+        """
+        ch_priority = (self.clickhouse_config.get("extraPodSpec") or {}).get(
+            "priorityClassName"
+        )
+        if ch_priority:
+            clickhouse.verify_clickhouse_priority_class_name(
+                namespace=namespace, expected_name=ch_priority
+            )
+
+        keeper_priority = (self.keeper_config.get("extraPodSpec") or {}).get(
+            "priorityClassName"
+        )
+        if keeper_priority and self.keeper_config.get("enabled"):
+            clickhouse.verify_keeper_priority_class_name(
+                namespace=namespace, expected_name=keeper_priority
+            )
+
     def verify_all(self, namespace):
         """Run all verification checks based on configuration.
 
@@ -514,3 +549,8 @@ class HelmState:
 
         if self.clickhouse_config.get("image", {}).get("tag"):
             self.verify_image(namespace=namespace)
+
+        if self.clickhouse_config.get("extraPodSpec") or self.keeper_config.get(
+            "extraPodSpec"
+        ):
+            self.verify_extra_pod_spec(namespace=namespace)

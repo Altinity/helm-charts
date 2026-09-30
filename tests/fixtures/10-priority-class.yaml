@@ -1,0 +1,40 @@
+---
+# extraPodSpec regression test (originally the priorityClassName PR scenario)
+# Ensures arbitrary top-level PodSpec fields set via extraPodSpec are rendered
+# into both the ClickHouse server and Keeper pod templates.
+# The referenced PriorityClass (clickhouse-test-priority) is created by the test
+# harness before install and deleted afterwards; without it the pods would fail
+# admission and never schedule.
+# Expected pods: 1 ClickHouse + 1 Keeper = 2 total
+nameOverride: "priority"
+
+clickhouse:
+  replicasCount: 1
+  shardsCount: 1
+
+  persistence:
+    enabled: true
+    size: 1Gi
+
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "512Mi"
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
+
+  # The scenario under test: a generic escape hatch for pod-spec fields.
+  extraPodSpec:
+    priorityClassName: clickhouse-test-priority
+
+keeper:
+  enabled: true
+  replicaCount: 1
+  localStorage:
+    size: 1Gi
+  extraPodSpec:
+    priorityClassName: clickhouse-test-priority
+
+operator:
+  enabled: true
