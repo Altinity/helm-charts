@@ -262,6 +262,10 @@
           "type": "object",
           "description": "Labels for ClickHouse pods."
         },
+        "automountServiceAccountToken": {
+          "type": "boolean",
+          "description": "Automatically mount the Kubernetes API service account token in ClickHouse pods."
+        },
         "podSecurityContext": {
           "type": "object",
           "description": "Pod security context for ClickHouse pods."
@@ -398,6 +402,10 @@
         "podAnnotations": {
           "type": "object",
           "description": "Annotations for Keeper pods."
+        },
+        "automountServiceAccountToken": {
+          "type": "boolean",
+          "description": "Automatically mount the Kubernetes API service account token in Keeper pods."
         },
         "podSecurityContext": {
           "type": "object",

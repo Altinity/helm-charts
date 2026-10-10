@@ -81,6 +81,7 @@ spec:
             {{- toYaml . | nindent 12 }}
         {{- end }}
         spec:
+          automountServiceAccountToken: {{ $.Values.keeper.automountServiceAccountToken }}
           {{- if $.Values.keeper.nodeSelector }}
           affinity:
             nodeAffinity:

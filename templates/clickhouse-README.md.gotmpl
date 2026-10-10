@@ -113,6 +113,10 @@ kubectl exec -it chi-clickhouse-0-0-0 --namespace clickhouse -- clickhouse-clien
 
 {{ template "chart.sourcesSection" . }}
 
+## Service Account Tokens
+
+ClickHouse and Keeper pods disable automatic mounting of Kubernetes API service account tokens by default. When upgrading, set `clickhouse.automountServiceAccountToken` or `keeper.automountServiceAccountToken` to `true` if a container or sidecar requires the token. This setting does not affect the Operator pods.
+
 ## Using Init Scripts with ConfigMap
 
 The chart allows mounting a ConfigMap containing initialization scripts that will be executed during the ClickHouse container startup.

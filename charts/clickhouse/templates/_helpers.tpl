@@ -79,6 +79,7 @@ Pod Template Base
         podDistribution:
           {{- include "clickhouse.podDistribution" . | nindent 10 }}
         spec:
+          automountServiceAccountToken: {{ .Values.clickhouse.automountServiceAccountToken }}
           {{- with .Values.clickhouse.imagePullSecrets }}
           imagePullSecrets:
             {{- toYaml . | nindent 12 }}

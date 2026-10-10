@@ -158,6 +158,9 @@ clickhouse:
   # @ignore
   imagePullSecrets: []
 
+  # -- Automatically mount the Kubernetes API service account token in ClickHouse pods. Set to true if a container requires it.
+  automountServiceAccountToken: false
+
   serviceAccount:
     # -- Specifies whether a service account should be created
     create: false
@@ -260,6 +263,8 @@ clickhouse:
 
 # CHK parameters
 keeper:
+  # -- Automatically mount the Kubernetes API service account token in Keeper pods. Set to true if a container requires it.
+  automountServiceAccountToken: false
   # -- Whether to enable Keeper.
   # Required for replicated tables.
   enabled: false
