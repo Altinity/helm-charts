@@ -319,6 +319,9 @@ keeper:
   # Example: [{"name": "my-registry-secret"}]
   imagePullSecrets: []
 
+  # -- Extra volume mounts for the Keeper container. Define the corresponding volumes in keeper.extraPodSpec.volumes.
+  extraVolumeMounts: []
+
 operator:
   # -- Whether to enable the Altinity Operator for ClickHouse.
   # Disable if you already have the Operator installed cluster-wide.
