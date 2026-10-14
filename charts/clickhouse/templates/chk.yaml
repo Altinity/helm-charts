@@ -131,6 +131,10 @@ spec:
                 {{- toYaml . | nindent 16 }}
               {{- end }}
               image: "{{ $.Values.keeper.image }}:{{ $.Values.keeper.tag }}"
+              {{- with $.Values.keeper.extraVolumeMounts }}
+              volumeMounts:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
               {{- if not (empty $.Values.keeper.metricsPort) }}
               ports:
               - name: metrics
