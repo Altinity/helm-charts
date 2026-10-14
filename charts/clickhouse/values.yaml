@@ -167,6 +167,19 @@ clickhouse:
     # If not set and create is true, a name is generated using the fullname template
     name: ""
 
+  # -- How the operator manages the ClickHouse server volumes, rendered as the
+  # installation's `spec.defaults.storageManagement`. With `provisioner: Operator`
+  # the operator owns the PVCs instead of the StatefulSet, so a volume can grow in
+  # place on a storage class that allows expansion, without recreating the
+  # StatefulSet or restarting the pods. `reclaimPolicy` decides whether the PVCs
+  # survive the deletion of the installation. Empty keeps the operator default
+  # (`StatefulSet`). The Keeper installation already uses `provisioner: Operator`.
+  # Example:
+  #   storageManagement:
+  #     provisioner: Operator
+  #     reclaimPolicy: Retain
+  storageManagement: {}
+
   # -- Extra fields merged into the ClickHouse server pod spec.
   # Any top-level PodSpec field the operator supports (e.g. priorityClassName,
   # runtimeClassName, schedulerName, hostAliases). This is appended, not deep-merged:
