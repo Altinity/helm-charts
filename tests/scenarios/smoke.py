@@ -14,6 +14,7 @@ FIXTURES = [
     "fixtures/08-extracontainer-data-mount.yaml",
     "fixtures/09-usersprofiles-settings.yaml",
     "fixtures/10-priority-class.yaml",
+    "fixtures/11-storage-management.yaml",
     # "fixtures/03-sharded-advanced.yaml",
     # "fixtures/04-external-keeper.yaml",
     # "fixtures/05-persistence-disabled.yaml",

@@ -900,6 +900,57 @@ def verify_clickhouse_priority_class_name(self, namespace, expected_name):
 
 
 @TestStep(Then)
+def verify_clickhouse_storage_management(self, namespace, expected):
+    """Verify that clickhouse.storageManagement is rendered and honoured.
+
+    The value must land in the installation as spec.defaults.storageManagement.
+    With provisioner: Operator the operator, not the StatefulSet, owns the data
+    PVCs: the server StatefulSets carry no volumeClaimTemplates, and the PVCs
+    still exist and are Bound.
+    """
+    chi = get_chi_info(namespace=namespace)
+    assert chi is not None, "No ClickHouseInstallation found"
+
+    actual = chi.get("spec", {}).get("defaults", {}).get("storageManagement")
+    assert actual == expected, f"Expected storageManagement {expected}, got {actual}"
+    note(f"✓ storageManagement {expected} rendered into the installation")
+
+    if expected.get("provisioner", "").lower() != "operator":
+        return
+
+    statefulsets = json.loads(
+        run(cmd=f"kubectl get statefulsets -n {namespace} -o json").stdout
+    )["items"]
+    servers = [
+        s for s in statefulsets
+        if s["metadata"].get("labels", {}).get("clickhouse.altinity.com/chi")
+    ]
+    assert len(servers) > 0, "No ClickHouse server StatefulSets found"
+
+    for sts in servers:
+        templates = sts["spec"].get("volumeClaimTemplates") or []
+        assert not templates, (
+            f"StatefulSet {sts['metadata']['name']} still carries volumeClaimTemplates "
+            f"{[t['metadata']['name'] for t in templates]} with provisioner: Operator"
+        )
+
+    pvcs = json.loads(run(cmd=f"kubectl get pvc -n {namespace} -o json").stdout)["items"]
+    server_pvcs = [
+        p for p in pvcs
+        if p["metadata"].get("labels", {}).get("clickhouse.altinity.com/chi")
+    ]
+    assert len(server_pvcs) > 0, "No ClickHouse server PVCs found"
+    for pvc in server_pvcs:
+        phase = pvc.get("status", {}).get("phase")
+        assert phase == "Bound", f"PVC {pvc['metadata']['name']} is {phase}, expected Bound"
+
+    note(
+        f"✓ provisioner: Operator honoured: {len(servers)} StatefulSet(s) without "
+        f"volumeClaimTemplates, {len(server_pvcs)} Bound PVC(s) owned by the operator"
+    )
+
+
+@TestStep(Then)
 def verify_keeper_priority_class_name(self, namespace, expected_name):
     """Verify that Keeper pods have the expected priorityClassName.
 

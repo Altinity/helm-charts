@@ -442,6 +442,13 @@ class HelmState:
                 names.add(name)
         return names
 
+    def verify_storage_management(self, namespace):
+        """Verify clickhouse.storageManagement reaches the installation and is honoured."""
+        expected = self.clickhouse_config.get("storageManagement") or {}
+        clickhouse.verify_clickhouse_storage_management(
+            namespace=namespace, expected=expected
+        )
+
     def verify_extra_pod_spec(self, namespace):
         """Verify extraPodSpec fields render into the pod templates.
 
@@ -554,3 +561,6 @@ class HelmState:
             "extraPodSpec"
         ):
             self.verify_extra_pod_spec(namespace=namespace)
+
+        if self.clickhouse_config.get("storageManagement"):
+            self.verify_storage_management(namespace=namespace)

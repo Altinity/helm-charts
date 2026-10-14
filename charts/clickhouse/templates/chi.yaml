@@ -8,6 +8,10 @@ metadata:
     {{- include "clickhouse.labels" . | nindent 4 }}
 spec:
   defaults:
+    {{- with .Values.clickhouse.storageManagement }}
+    storageManagement:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
     templates:
       serviceTemplate: {{ $service_name }}
       {{- if .Values.clickhouse.lbService.enabled }}

@@ -207,6 +207,7 @@ EOSQL
 | clickhouse.serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | clickhouse.settings | object | `{}` |  |
 | clickhouse.shardsCount | int | `1` | number of shards. |
+| clickhouse.storageManagement | object | `{}` | How the operator manages the ClickHouse server volumes, rendered as the installation's `spec.defaults.storageManagement`. With `provisioner: Operator` the operator owns the PVCs instead of the StatefulSet, so a volume can grow in place on a storage class that allows expansion, without recreating the StatefulSet or restarting the pods. `reclaimPolicy` decides whether the PVCs survive the deletion of the installation. Empty keeps the operator default (`StatefulSet`). The Keeper installation already uses `provisioner: Operator`. Example:   storageManagement:     provisioner: Operator     reclaimPolicy: Retain |
 | clickhouse.users | list | `[]` | Configure additional ClickHouse users and per-user settings. |
 | clickhouse.zones | list | `[]` |  |
 | keeper.enabled | bool | `false` | Whether to enable Keeper. Required for replicated tables. |

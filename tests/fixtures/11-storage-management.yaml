@@ -1,0 +1,39 @@
+---
+# clickhouse.storageManagement regression test
+# Ensures the value renders into the ClickHouseInstallation as
+# spec.defaults.storageManagement and that the operator honours it: with
+# provisioner: Operator the operator owns the server PVCs, so the server
+# StatefulSets carry no volumeClaimTemplates while the data PVCs still exist
+# and are Bound.
+# Expected pods: 1 ClickHouse + 1 Keeper = 2 total
+nameOverride: "storagemgmt"
+
+clickhouse:
+  replicasCount: 1
+  shardsCount: 1
+
+  persistence:
+    enabled: true
+    size: 1Gi
+
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "512Mi"
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
+
+  # The scenario under test.
+  storageManagement:
+    provisioner: Operator
+    reclaimPolicy: Retain
+
+keeper:
+  enabled: true
+  replicaCount: 1
+  localStorage:
+    size: 1Gi
+
+operator:
+  enabled: true
