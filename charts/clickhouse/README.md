@@ -211,6 +211,7 @@ EOSQL
 | clickhouse.zones | list | `[]` |  |
 | keeper.enabled | bool | `false` | Whether to enable Keeper. Required for replicated tables. |
 | keeper.extraPodSpec | object | `{}` | Extra fields merged into the Keeper pod spec. Any top-level PodSpec field the operator supports (e.g. priorityClassName, runtimeClassName, schedulerName, hostAliases). This is appended, not deep-merged: do not set keys the chart already renders (containers, tolerations, affinity, securityContext, imagePullSecrets, topologySpreadConstraints). Example:   extraPodSpec:     priorityClassName: high-priority |
+| keeper.extraVolumeMounts | list | `[]` | Extra volume mounts for the Keeper container. Define the corresponding volumes in keeper.extraPodSpec.volumes. |
 | keeper.image | string | `"altinity/clickhouse-keeper"` |  |
 | keeper.imagePullSecrets | list | `[]` | Image pull secrets for keeper pods. Example: [{"name": "my-registry-secret"}] |
 | keeper.localStorage.size | string | `"5Gi"` |  |
