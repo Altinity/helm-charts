@@ -267,6 +267,71 @@ clickhouse:
 #    limits:
 #      memory: "200Gi"
 
+  # -- Liveness probe for the ClickHouse server container. Empty keeps the
+  # operator default: `/ping` on the `http` port every 3s after 60s, with a 1s
+  # timeout and 10 failures, so a server that does not answer for 30 seconds is
+  # restarted. A busy server can queue `/ping` behind its HTTP handler threads,
+  # so a longer timeout and budget avoid restarting a healthy server.
+  # Example:
+  #   livenessProbe:
+  #     httpGet:
+  #       path: /ping
+  #       port: http
+  #     periodSeconds: 10
+  #     timeoutSeconds: 5
+  #     failureThreshold: 6
+  livenessProbe: {}
+
+  # -- Startup probe for the ClickHouse server container. Liveness and readiness
+  # are not checked until it succeeds, so it covers a slow start, such as a
+  # server that loads every table before it opens its HTTP port
+  # (`async_load_databases` set to 0), without loosening the liveness probe for
+  # the rest of the pod's life. Size `periodSeconds * failureThreshold` to the
+  # longest start you have measured, with margin. Empty renders no startup probe,
+  # unless `reconcile.host.wait.probes.startup` is true: the operator then adds
+  # its own default one, which matches its liveness probe and allows about 90
+  # seconds, so set this key whenever you turn that wait on.
+  # Example:
+  #   startupProbe:
+  #     httpGet:
+  #       path: /ping
+  #       port: http
+  #     periodSeconds: 10
+  #     timeoutSeconds: 5
+  #     failureThreshold: 120
+  startupProbe: {}
+
+  # -- Readiness probe for the ClickHouse server container, which decides when
+  # the pod receives traffic through the Service and when the operator moves on
+  # to the next host during a rolling update. Empty keeps the operator default:
+  # `/ping` on the `http` port every 3s after 10s, with a 1s timeout.
+  # Example:
+  #   readinessProbe:
+  #     httpGet:
+  #       path: /ping
+  #       port: http
+  #     periodSeconds: 5
+  #     timeoutSeconds: 5
+  #     failureThreshold: 3
+  readinessProbe: {}
+
+  # -- How the operator reconciles this installation, rendered as the
+  # installation's `spec.reconcile`. Empty keeps the operator configuration.
+  # See the operator's `ClickHouseInstallation` reference for every field. Some
+  # settings are read from the operator's own configuration only, whatever the
+  # installation says (as of operator 0.27: `host.wait.replicas` and
+  # `statefulSet.update.timeout` / `pollInterval`); set those in the operator
+  # chart's `configs.files.config.yaml` instead.
+  # Example: during a rolling update, wait for each restarted server to pass
+  # its startup and readiness probes before the next one goes down.
+  #   reconcile:
+  #     host:
+  #       wait:
+  #         probes:
+  #           startup: true
+  #           readiness: true
+  reconcile: {}
+
 # CHK parameters
 keeper:
   # -- Whether to enable Keeper.

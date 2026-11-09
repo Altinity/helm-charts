@@ -187,6 +187,7 @@ EOSQL
 | clickhouse.lbService.loadBalancerSourceRanges | list | `[]` | Specify source IP ranges to the LoadBalancer service. If supported by the platform, this will restrict traffic through the cloud-provider load-balancer to the specified client IPs. This is ignored if the cloud-provider does not support the feature. |
 | clickhouse.lbService.serviceAnnotations | object | `{}` |  |
 | clickhouse.lbService.serviceLabels | object | `{}` |  |
+| clickhouse.livenessProbe | object | `{}` | Liveness probe for the ClickHouse server container. Empty keeps the operator default: `/ping` on the `http` port every 3s after 60s, with a 1s timeout and 10 failures, so a server that does not answer for 30 seconds is restarted. A busy server can queue `/ping` behind its HTTP handler threads, so a longer timeout and budget avoid restarting a healthy server. Example:   livenessProbe:     httpGet:       path: /ping       port: http     periodSeconds: 10     timeoutSeconds: 5     failureThreshold: 6 |
 | clickhouse.persistence.accessMode | string | `"ReadWriteOnce"` |  |
 | clickhouse.persistence.enabled | bool | `true` | enable storage |
 | clickhouse.persistence.logs.accessMode | string | `"ReadWriteOnce"` |  |
@@ -197,6 +198,8 @@ EOSQL
 | clickhouse.podAnnotations | object | `{}` |  |
 | clickhouse.podLabels | object | `{}` |  |
 | clickhouse.profiles | object | `{}` |  |
+| clickhouse.readinessProbe | object | `{}` | Readiness probe for the ClickHouse server container, which decides when the pod receives traffic through the Service and when the operator moves on to the next host during a rolling update. Empty keeps the operator default: `/ping` on the `http` port every 3s after 10s, with a 1s timeout. Example:   readinessProbe:     httpGet:       path: /ping       port: http     periodSeconds: 5     timeoutSeconds: 5     failureThreshold: 3 |
+| clickhouse.reconcile | object | `{}` | How the operator reconciles this installation, rendered as the installation's `spec.reconcile`. Empty keeps the operator configuration. See the operator's `ClickHouseInstallation` reference for every field. Some settings are read from the operator's own configuration only, whatever the installation says (as of operator 0.27: `host.wait.replicas` and `statefulSet.update.timeout` / `pollInterval`); set those in the operator chart's `configs.files.config.yaml` instead. Example: during a rolling update, wait for each restarted server to pass its startup and readiness probes before the next one goes down.   reconcile:     host:       wait:         probes:           startup: true           readiness: true |
 | clickhouse.replicasCount | int | `1` | number of replicas. If greater than 1, keeper must be enabled or a keeper host should be provided under clickhouse.keeper.host. Will be ignored if `zones` is set. |
 | clickhouse.resources | object | `{}` |  |
 | clickhouse.service.serviceAnnotations | object | `{}` |  |
@@ -207,6 +210,7 @@ EOSQL
 | clickhouse.serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | clickhouse.settings | object | `{}` |  |
 | clickhouse.shardsCount | int | `1` | number of shards. |
+| clickhouse.startupProbe | object | `{}` | Startup probe for the ClickHouse server container. Liveness and readiness are not checked until it succeeds, so it covers a slow start, such as a server that loads every table before it opens its HTTP port (`async_load_databases` set to 0), without loosening the liveness probe for the rest of the pod's life. Size `periodSeconds * failureThreshold` to the longest start you have measured, with margin. Empty renders no startup probe, unless `reconcile.host.wait.probes.startup` is true: the operator then adds its own default one, which matches its liveness probe and allows about 90 seconds, so set this key whenever you turn that wait on. Example:   startupProbe:     httpGet:       path: /ping       port: http     periodSeconds: 10     timeoutSeconds: 5     failureThreshold: 120 |
 | clickhouse.users | list | `[]` | Configure additional ClickHouse users and per-user settings. |
 | clickhouse.zones | list | `[]` |  |
 | keeper.enabled | bool | `false` | Whether to enable Keeper. Required for replicated tables. |

@@ -344,6 +344,22 @@
               "default": true
             }
           }
+        },
+        "livenessProbe": {
+          "type": "object",
+          "description": "Liveness probe for the ClickHouse server container. Empty keeps the operator default."
+        },
+        "startupProbe": {
+          "type": "object",
+          "description": "Startup probe for the ClickHouse server container. Empty renders none."
+        },
+        "readinessProbe": {
+          "type": "object",
+          "description": "Readiness probe for the ClickHouse server container. Empty keeps the operator default."
+        },
+        "reconcile": {
+          "type": "object",
+          "description": "Rendered as the installation's spec.reconcile. Empty keeps the operator configuration."
         }
       }
     },

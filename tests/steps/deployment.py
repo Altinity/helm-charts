@@ -464,6 +464,24 @@ class HelmState:
                 namespace=namespace, expected_name=keeper_priority
             )
 
+    def verify_probes_and_reconcile(self, namespace):
+        """Verify the server probes and the reconcile section render as configured."""
+        expected_probes = {
+            kind: self.clickhouse_config[kind]
+            for kind in ("livenessProbe", "startupProbe", "readinessProbe")
+            if self.clickhouse_config.get(kind)
+        }
+        if expected_probes:
+            clickhouse.verify_clickhouse_probes(
+                namespace=namespace, expected_probes=expected_probes
+            )
+
+        if self.clickhouse_config.get("reconcile"):
+            clickhouse.verify_clickhouse_reconcile(
+                namespace=namespace,
+                expected_reconcile=self.clickhouse_config["reconcile"],
+            )
+
     def verify_all(self, namespace):
         """Run all verification checks based on configuration.
 
@@ -554,3 +572,9 @@ class HelmState:
             "extraPodSpec"
         ):
             self.verify_extra_pod_spec(namespace=namespace)
+
+        if any(
+            self.clickhouse_config.get(key)
+            for key in ("livenessProbe", "startupProbe", "readinessProbe", "reconcile")
+        ):
+            self.verify_probes_and_reconcile(namespace=namespace)

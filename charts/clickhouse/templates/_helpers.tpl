@@ -111,6 +111,14 @@ Pod Template Base
               livenessProbe:
                 {{- toYaml . | nindent 16 }}
               {{- end }}
+              {{- with .Values.clickhouse.startupProbe }}
+              startupProbe:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              {{- with .Values.clickhouse.readinessProbe }}
+              readinessProbe:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
               {{- if .Values.clickhouse.initScripts.enabled }}
               env:
                 {{- if .Values.clickhouse.initScripts.alwaysRun }}
