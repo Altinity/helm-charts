@@ -1,0 +1,67 @@
+---
+# clickhouse.startupProbe / readinessProbe / livenessProbe / reconcile test
+# Ensures the three probes render into the ClickHouse server container exactly
+# as given (so the operator does not replace them with its defaults), and that
+# clickhouse.reconcile lands on the ClickHouseInstallation as spec.reconcile.
+# The startup-probe wait is on, which is the combination the startupProbe key
+# exists for: without a startupProbe of its own the operator would add its
+# default one.
+# Expected pods: 1 ClickHouse + 1 Keeper = 2 total
+nameOverride: "probes"
+
+clickhouse:
+  replicasCount: 1
+  shardsCount: 1
+
+  persistence:
+    enabled: true
+    size: 1Gi
+
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "512Mi"
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
+
+  # The scenario under test.
+  livenessProbe:
+    httpGet:
+      path: /ping
+      port: http
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+
+  startupProbe:
+    httpGet:
+      path: /ping
+      port: http
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 60
+
+  readinessProbe:
+    httpGet:
+      path: /ping
+      port: http
+    periodSeconds: 5
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  reconcile:
+    host:
+      wait:
+        probes:
+          startup: true
+          readiness: true
+
+keeper:
+  enabled: true
+  replicaCount: 1
+  localStorage:
+    size: 1Gi
+
+operator:
+  enabled: true

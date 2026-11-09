@@ -919,6 +919,70 @@ def verify_keeper_priority_class_name(self, namespace, expected_name):
 
 
 @TestStep(Then)
+def verify_clickhouse_probes(self, namespace, expected_probes):
+    """Verify that ClickHouse server containers carry the configured probes.
+
+    Exercises clickhouse.livenessProbe, startupProbe and readinessProbe landing
+    in the CHI pod template. Only the fields the fixture sets are compared, since
+    Kubernetes fills in defaults (scheme, successThreshold) for the rest.
+
+    Args:
+        namespace: Kubernetes namespace
+        expected_probes: Dict keyed by probe kind ("livenessProbe", ...) holding the configured probe
+    """
+    clickhouse_pods = get_clickhouse_pods(namespace=namespace)
+    assert len(clickhouse_pods) > 0, "No ClickHouse pods found"
+
+    for pod in clickhouse_pods:
+        pod_info = kubernetes.get_pod_info(namespace=namespace, pod_name=pod)
+        containers = pod_info.get("spec", {}).get("containers", [])
+        server = next((c for c in containers if c.get("name") == "clickhouse"), None)
+        assert server is not None, f"No 'clickhouse' container in pod {pod}"
+
+        for kind, expected in expected_probes.items():
+            actual = server.get(kind)
+            assert actual is not None, f"{kind} missing on the server container of pod {pod}"
+            for field, value in expected.items():
+                if field == "httpGet":
+                    for key, sub in value.items():
+                        got = actual.get("httpGet", {}).get(key)
+                        assert got == sub, f"{kind}.httpGet.{key}: expected {sub}, got {got} in pod {pod}"
+                    continue
+                assert (
+                    actual.get(field) == value
+                ), f"{kind}.{field}: expected {value}, got {actual.get(field)} in pod {pod}"
+
+    note(f"✓ ClickHouse probes {sorted(expected_probes)} verified on {len(clickhouse_pods)} pods")
+
+
+@TestStep(Then)
+def verify_clickhouse_reconcile(self, namespace, expected_reconcile):
+    """Verify that clickhouse.reconcile is rendered as the CHI spec.reconcile.
+
+    Args:
+        namespace: Kubernetes namespace
+        expected_reconcile: The configured reconcile section
+    """
+    chi_info = get_chi_info(namespace=namespace)
+    assert chi_info is not None, "ClickHouseInstallation not found"
+
+    def assert_subset(expected, actual, path):
+        if isinstance(expected, dict):
+            assert isinstance(actual, dict), f"{path}: expected a mapping, got {actual!r}"
+            for key, value in expected.items():
+                assert key in actual, f"{path}.{key} missing from the CHI"
+                assert_subset(value, actual[key], f"{path}.{key}")
+        else:
+            # The CRD types these as string booleans, so compare loosely.
+            assert str(actual).lower() == str(expected).lower(), (
+                f"{path}: expected {expected!r}, got {actual!r}"
+            )
+
+    assert_subset(expected_reconcile, chi_info.get("spec", {}).get("reconcile"), "spec.reconcile")
+    note("✓ ClickHouseInstallation spec.reconcile verified")
+
+
+@TestStep(Then)
 def verify_keeper_resources(self, namespace, expected_resources):
     """Verify that Keeper pods have expected resource requests and limits."""
     keeper_pods = get_keeper_pods(namespace=namespace)
