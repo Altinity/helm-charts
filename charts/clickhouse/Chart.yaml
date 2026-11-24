@@ -2,12 +2,12 @@ apiVersion: v2
 name: clickhouse
 description: A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for ClickHouse
 type: application
-version: 0.3.13
-appVersion: "25.3.6.10034"
+version: 0.3.14
+appVersion: "26.3.64.10001"
 
 dependencies:
   - name: altinity-clickhouse-operator
     repository: https://helm.altinity.com
-    version: 0.27.2
+    version: 0.27.4
     alias: operator
     condition: operator.enabled

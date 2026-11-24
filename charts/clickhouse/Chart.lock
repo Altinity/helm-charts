@@ -1,6 +1,6 @@
 dependencies:
 - name: altinity-clickhouse-operator
   repository: https://helm.altinity.com
-  version: 0.27.2
-digest: sha256:535597141f623d4ba7341d34b635b72bb447191ac2855b513e0d97f8240dccff
-generated: "2026-07-23T20:48:39.75492379-07:00"
+  version: 0.27.4
+digest: sha256:a7fb44156b919b56b8db0af971445943b7ac57fb3d12ab436e6742096705522f
+generated: "2026-11-24T10:37:39.911287+01:00"
