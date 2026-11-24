@@ -1,5 +1,5 @@
 # clickhouse
-![Version: 0.3.13](https://img.shields.io/badge/Version-0.3.13-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 25.3.6.10034](https://img.shields.io/badge/AppVersion-25.3.6.10034-informational?style=flat-square)
+![Version: 0.3.14](https://img.shields.io/badge/Version-0.3.14-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 26.3.64.10001](https://img.shields.io/badge/AppVersion-26.3.64.10001-informational?style=flat-square)
 
 A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for ClickHouse
 
@@ -15,7 +15,7 @@ A Helm chart for creating a ClickHouse® Cluster with the Altinity Operator for 
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://helm.altinity.com | operator(altinity-clickhouse-operator) | 0.27.2 |
+| https://helm.altinity.com | operator(altinity-clickhouse-operator) | 0.27.4 |
 
 ## Installing the Chart
 
@@ -175,7 +175,7 @@ EOSQL
 | clickhouse.extraVolumes | list | `[]` | Extra volumes for clickhouse pods |
 | clickhouse.image.pullPolicy | string | `"IfNotPresent"` |  |
 | clickhouse.image.repository | string | `"altinity/clickhouse-server"` |  |
-| clickhouse.image.tag | string | `"25.3.6.10034.altinitystable"` | Override the image tag for a specific version |
+| clickhouse.image.tag | string | `"26.3.64.10001.altinitystable"` | Override the image tag for a specific version |
 | clickhouse.initScripts | object | `{"alwaysRun":true,"configMapName":"","enabled":false}` | Init scripts ConfigMap configuration |
 | clickhouse.initScripts.alwaysRun | bool | `true` | Set to true to always run init scripts on container startup |
 | clickhouse.initScripts.configMapName | string | `""` | Name of an existing ConfigMap containing init scripts The scripts will be mounted at /docker-entrypoint-initdb.d/ |
@@ -224,7 +224,7 @@ EOSQL
 | keeper.resources.memoryLimitsMiB | string | `"1Gi"` |  |
 | keeper.resources.memoryRequestsMiB | string | `"512Mi"` |  |
 | keeper.settings | object | `{}` |  |
-| keeper.tag | string | `"25.3.6.10034.altinitystable"` |  |
+| keeper.tag | string | `"26.3.64.10001.altinitystable"` |  |
 | keeper.tolerations | list | `[]` |  |
 | keeper.volumeClaimAnnotations | object | `{}` |  |
 | keeper.zoneSpread | bool | `false` |  |

@@ -138,7 +138,7 @@ clickhouse:
     repository: altinity/clickhouse-server
     pullPolicy: IfNotPresent
     # -- Override the image tag for a specific version
-    tag: "25.3.6.10034.altinitystable"
+    tag: "26.3.64.10001.altinitystable"
 
   service:
     # e.g. `LoadBalancer`, `NodePort`
@@ -277,7 +277,7 @@ keeper:
   # !! DO NOT CHANGE AFTER INITIAL DEPLOYMENT
   replicaCount: 3
   image: "altinity/clickhouse-keeper"
-  tag: "25.3.6.10034.altinitystable"
+  tag: "26.3.64.10001.altinitystable"
   # allows to configure multiple aspects and behavior for `clickhouse-keeper`
   # instance
   settings: {}
